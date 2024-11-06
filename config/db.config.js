@@ -1,8 +1,15 @@
 const { Sequelize } = require("sequelize");
+const dotenv = require("dotenv");
+dotenv.config();
+
+const db = process.env.DATABASE_NAME;
+const user = process.env.DATABASE_USER;
+const password = process.env.PASSWORD;
+const host = process.env.HOST_NAME;
 
 // Create a Sequelize instance
-const sequelize = new Sequelize("doantotnghiep", "root", "password", {
-  host: "localhost",
+const sequelize = new Sequelize(db, user, password, {
+  host: host,
   dialect: "mysql", // Change to 'postgres' for PostgreSQL, etc.
   pool: {
     max: 10, // Max connections in the pool

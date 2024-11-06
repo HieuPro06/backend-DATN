@@ -3,15 +3,17 @@ const Doctor = require("../models/doctor.model.js");
 const defaultSize = 10;
 const defaultSort = "id";
 const defaultDirection = "ASC";
+const condition_active = { active: 1 };
 
 const getDoctorAll = (req, res) => {
   const { size, page } = req.body;
 
   const limit = size ? size : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
+  const condition = condition_active;
 
   Doctor.findAll({
-    // where: condition,
+    where: condition,
     limit: limit,
     offset: offset,
     // order: sorting.sortQuery(req, defaultSort, defaultDirection),
@@ -28,7 +30,6 @@ const getDoctorAll = (req, res) => {
           err.message || "Some error occurred while retrieving doctor list.",
       });
     });
-  // res.json("GET DOCTORS");
 };
 
 const getDoctorByID = (req, res) => {
@@ -46,7 +47,6 @@ const getDoctorByID = (req, res) => {
         message: err.message || "Some error occurred while retrieving doctor.",
       });
     });
-  // res.json("GET DOCTORS");
 };
 
 const createDoctor = (req, res) => {
@@ -76,15 +76,12 @@ const createDoctor = (req, res) => {
         message: err.message || "Some error occurred creating doctor",
       });
     });
-  // res.json("GET DOCTORS");
 };
 
 const updateDoctor = (req, res) => {
   const id = req.params.id;
 
-  Doctor.update(req.body, {
-    where: { id: id },
-  })
+  Doctor.update(req.body)
     .then((data) => {
       if (data == 1)
         res.send({
@@ -93,10 +90,37 @@ const updateDoctor = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message: `Cannot update Category with id=${id}`,
+        message: `Cannot update Doctor with id=${id}`,
       });
     });
-  // res.json("GET DOCTORS");
 };
 
-module.exports = { getDoctorAll, getDoctorByID, createDoctor, updateDoctor };
+const deleteDoctor = (req, res) => {
+  const id = req.params.id;
+
+  Doctor.update(
+    { active: 0 },
+    {
+      where: { id: id, active: 1 },
+    }
+  )
+    .then((data) => {
+      if (data == 1)
+        res.send({
+          message: "Doctor was removed successfully.",
+        });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `Cannot remove Doctor with id=${id}`,
+      });
+    });
+};
+
+module.exports = {
+  getDoctorAll,
+  getDoctorByID,
+  createDoctor,
+  updateDoctor,
+  deleteDoctor,
+};
