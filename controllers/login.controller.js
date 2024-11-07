@@ -1,7 +1,8 @@
 const Doctor = require("../models/doctor.model");
-const base64Url = require("../utils/index");
+// const base64Url = require("../utils/index");
 const dotenv = require("dotenv");
-const crypto = require("crypto");
+// const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 dotenv.config();
 
 const loginController = async (req,res) => {
@@ -20,21 +21,22 @@ const loginController = async (req,res) => {
             })
         } else{
             // Generate token
-            const header = {
-                "alg": "HS256",
-                "typ": "JWT"
-            }
+            // const header = {
+            //     "alg": "HS256",
+            //     "typ": "JWT"
+            // }
             const payload = {
                 id: result.id,
                 role: result.role,
                 expire: Date.now() + 3600
             }
-            const encodeHeader = base64Url(JSON.stringify(header));
-            const encodePayload = base64Url(JSON.stringify(payload));
-            const tokenData = `${encodeHeader}.${encodePayload}`;
-            const hmac = crypto.createHmac("sha256",process.env.JWT_SECRET);
-            const signature = hmac.update(tokenData).digest("base64url");
-            const token = `${tokenData}.${signature}`;
+            // const encodeHeader = base64Url(JSON.stringify(header));
+            // const encodePayload = base64Url(JSON.stringify(payload));
+            // const tokenData = `${encodeHeader}.${encodePayload}`;
+            // const hmac = crypto.createHmac("sha256",process.env.JWT_SECRET);
+            // const signature = hmac.update(tokenData).digest("base64url");
+            // const token = `${tokenData}.${signature}`;
+            const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '1h'});
             res.status(200).json({
                 accessToken: token
             })

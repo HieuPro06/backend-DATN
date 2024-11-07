@@ -23,8 +23,12 @@ const SignupController = async (req,res) => {
             )
         }
         const result = await Doctor.create(request);
-        res.json(result);
-    } catch (e){
+        res.status(200).json({
+            result: 1,
+            message: "Sign up successfully",
+            data: result
+        });
+    } catch (err){
         res.status(500).send({
             message: err.message || "Some error occurred creating doctor",
         });

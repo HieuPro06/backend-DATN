@@ -54,13 +54,13 @@ const Doctor = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
-    // speciality_id: {
-    //   type: DataTypes.INTEGER,
-    //   references: {
-    //     model: "tn_specialities", // The table name you are referencing
-    //     key: "id",
-    //   },
-    // },
+    speciality_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "tn_specialities", // The table name you are referencing
+        key: "id",
+      },
+    },
     // room_id: {
     //   type: DataTypes.INTEGER,
     //   references: {
