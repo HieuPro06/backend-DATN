@@ -15,8 +15,6 @@ const loginController = async (req,res) => {
     })
     if(result){
         if(result.password !== request.password){
-            console.log(result.password);
-            console.log(request.password);
             res.status(400).json({
                 message: "Wrong password"
             })
