@@ -6,5 +6,4 @@ const changeDoctorProfileController = require("../controllers/change-doctor-prof
 
 DoctorProfileRoute.get("/",isLogInController, doctorProfileController);
 DoctorProfileRoute.put("/",isLogInController, changeDoctorProfileController);
-
 module.exports = DoctorProfileRoute;
