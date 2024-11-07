@@ -1,4 +1,5 @@
 const Speciality = require("../models/speciality.model");
+const Doctor = require("../models/doctor.model");
 
 const defaultSize = 10;
 
@@ -76,10 +77,36 @@ const updateSpeciality = async (req,res) => {
         message: "Update speciality successfully"
     })
 }
+const deleteSpeciality = async (req,res) => {
+    const id = req.params.id;
+    const isExistDoctor = await Doctor.findOne({
+        where: {speciality_id: id}
+    })
+    if(isExistDoctor){
+        res.json({
+            result: 0,
+            message: "This speciality can't be deleted because it's have doctor"
+        })
+    }
+    const data = await Speciality.destroy({
+        where: {id: id}
+    })
+    if(!data){
+        res.status(500).json({
+            result: 0,
+            message: `Delete speciality ${id} failed`
+        })
+    }
+    res.status(200).json({
+        result: 1,
+        message: "Delete speciality successfully"
+    })
+}
 
 module.exports = {
     getAllSpeciality,
     getSpecialityById,
     createSpeciality,
-    updateSpeciality
+    updateSpeciality,
+    deleteSpeciality
 };
