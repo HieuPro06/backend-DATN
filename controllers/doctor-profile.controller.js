@@ -6,6 +6,8 @@ const doctorProfileController = async (data,req,res,next) => {
         where: {id: payload.id}
     })
     res.status(200).json({
+        result: 1,
+        message: "Successfully",
         data: result
     })
 }
