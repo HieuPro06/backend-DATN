@@ -61,13 +61,13 @@ const Doctor = sequelize.define(
         key: "id",
       },
     },
-    // room_id: {
-    //   type: DataTypes.INTEGER,
-    //   references: {
-    //     model: "tn_rooms", // The table name you are referencing
-    //     key: "id",
-    //   },
-    // },
+    room_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "tn_rooms", // The table name you are referencing
+        key: "id",
+      },
+    },
     recovery_token: {
       type: DataTypes.STRING(255),
       allowNull: true,

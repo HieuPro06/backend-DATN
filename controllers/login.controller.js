@@ -36,7 +36,7 @@ const loginController = async (req,res) => {
             // const hmac = crypto.createHmac("sha256",process.env.JWT_SECRET);
             // const signature = hmac.update(tokenData).digest("base64url");
             // const token = `${tokenData}.${signature}`;
-            const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '1h'});
+            const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '3h'});
             res.status(200).json({
                 accessToken: token
             })
