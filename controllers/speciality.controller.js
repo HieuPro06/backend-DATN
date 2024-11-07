@@ -60,9 +60,26 @@ const createSpeciality = async (req,res) => {
         data: data
     })
 }
+const updateSpeciality = async (req,res) => {
+    const id = req.params.id;
+    const data = await Speciality.update(req.body,{
+        where: {id: id}
+    })
+    if(!data){
+        res.status(500).json({
+            result: 0,
+            message: `Update speciality ${id} failed`
+        })
+    }
+    res.status(200).json({
+        result: 1,
+        message: "Update speciality successfully"
+    })
+}
 
 module.exports = {
     getAllSpeciality,
     getSpecialityById,
-    createSpeciality
+    createSpeciality,
+    updateSpeciality
 };
