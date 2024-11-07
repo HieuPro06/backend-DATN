@@ -23,6 +23,24 @@ const getAllSpeciality = async (data,req,res,next) => {
     })
 }
 
+const getSpecialityById = async (data,req,res,next) => {
+    const id = req.params.id;
+    const result = await Speciality.findOne({
+        where: {id: id}
+    })
+    if(!result){
+        res.status(500).json({
+            result: 0,
+            message: `Get speciality with id=${id} failed`
+        })
+    }
+    res.status(200).json({
+        result: 1,
+        message: "Get speciality successfully",
+        data: result
+    })
+}
+
 const createSpeciality = async (req,res) => {
     const request = {
         name: req.body.name,
@@ -45,5 +63,6 @@ const createSpeciality = async (req,res) => {
 
 module.exports = {
     getAllSpeciality,
+    getSpecialityById,
     createSpeciality
 };
