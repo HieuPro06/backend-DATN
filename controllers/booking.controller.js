@@ -3,6 +3,8 @@ const Service = require("../models/service.model");
 const booking_status = require("../enum");
 const moment = require("moment");
 
+const defaultSize = 1000000;
+
 const createBooking = async (req,res) => {
     const request = {
         service_id: req.body.serviceId,
@@ -77,7 +79,52 @@ const deleteBooking = async (req,res) => {
         })
     }
 }
+const readAllBooking = async (req,res) => {
+    const {length, page} = req.params;
+    const limit = length ? length : defaultSize;
+    const offset = page ? (page - 1) * limit : 0;
+
+    const result = await Booking.findAll({
+        limit: limit,
+        offset: offset
+    })
+    if(!result){
+        res.status(500).json({
+            result: 0,
+            msg: "Error ! Can't get all bookings "
+        })
+    }
+    res.status(200).json({
+        result: 1,
+        quantity: result.length,
+        data: await Promise.all(result.map(async (item) => {
+            const service = await Service.findOne({
+                where: { id: item?.service_id }
+            });
+            return {
+                id: item.id,
+                booking_name: item.booking_name,
+                booking_phone: item.booking_phone,
+                name: item.name,
+                gender: item.gender,
+                birthday: item.birthday,
+                address: item.address,
+                reason: item.reason,
+                appointment_time: `${item.appointment_date} ${item.appointment_hour}`,
+                status: item.status,
+                create_at: moment().format('YYYY-MM-DD HH:MM:SS'),
+                update_at: moment().format('YYYY-MM-DD HH:MM:SS'),
+                service: {
+                    id: item.service_id,
+                    name: service.name
+                }
+            }
+        }))
+    })
+}
+
 module.exports = {
     createBooking,
-    deleteBooking
+    deleteBooking,
+    readAllBooking
 };
