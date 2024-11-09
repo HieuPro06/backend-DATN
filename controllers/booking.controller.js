@@ -1,6 +1,8 @@
 const Booking = require("../models/booking.model");
 const Service = require("../models/service.model");
 const booking_status = require("../enum");
+const moment = require("moment");
+
 const createBooking = async (req,res) => {
     const request = {
         service_id: req.body.serviceId,
@@ -40,8 +42,8 @@ const createBooking = async (req,res) => {
             reason: data.reason,
             appointment_time: `${data.appointment_date} ${data.appointment_hour}`,
             status: data.status,
-            create_at: data.create_at ?? Date.now(),
-            update_at: data.update_at ?? Date.now(),
+            create_at: moment().format('YYYY-MM-DD HH:MM:SS'),
+            update_at: moment().format('YYYY-MM-DD HH:MM:SS'),
             service: {
                 id: data.service_id,
                 name: service.name
@@ -49,4 +51,33 @@ const createBooking = async (req,res) => {
         }
     })
 }
-module.exports = createBooking;
+const deleteBooking = async (req,res) => {
+    const id = req.params.id;
+    const requestBooking = await Booking.findOne({
+        where: {id: id}
+    })
+    if(!requestBooking){
+        res.status(404).json({
+            result: 0,
+            msg: "This booking not exist"
+        })
+    }
+    if(requestBooking.status === booking_status.CANCEL){
+        res.status(400).json({
+            result: 0,
+            msg: "This booking's status is cancelled . No need any more action !"
+        })
+    } else if(requestBooking.status === booking_status.PROCESSING){
+        await Booking.update({status: booking_status.CANCEL},{
+            where: {id: id}
+        })
+        res.status(200).json({
+            result: 1,
+            msg: "Booking has been cancelled successfully !"
+        })
+    }
+}
+module.exports = {
+    createBooking,
+    deleteBooking
+};
