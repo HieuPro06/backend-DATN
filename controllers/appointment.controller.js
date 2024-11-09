@@ -1,4 +1,5 @@
 const Appointment = require("../models/appointment.model.js");
+const Doctor = require("../models/doctor.model.js");
 
 const defaultSize = 10;
 const defaultSort = "id";
@@ -54,20 +55,23 @@ const getAppointmentByID = (req, res) => {
 const createAppointment = (req, res) => {
   const appointment_values = {
     booking_id: req.body.booking_id,
-    doctor_id: req.body.doctor_id,
+    doctor_id: req.body.doctor_id || null,
     patient_id: req.body.patient_id,
     patient_name: req.body.patient_name,
     patient_birthday: req.body.patient_birthday,
     patient_reason: req.body.patient_reason,
     patient_phone: req.body.patient_phone,
-    numerical_order: req.body.numerical_order,
-    position: req.body.position,
+    numerical_order: req.body.numerical_order || null,
+    position: req.body.position || null,
     appointment_time: req.body.appointment_time,
     date: req.body.date,
     status: req.body.status,
     create_at: new Date(), // automatically set the current date and time
     update_at: new Date(), // automatically set the current date and time
   };
+
+  if (doctor_id == null) {
+  }
 
   Appointment.create(appointment_values)
     .then((data) => {
@@ -117,6 +121,31 @@ const deleteAppointment = (req, res) => {
         message: `Cannot remove Appointment with id=${id}`,
       });
     });
+};
+
+// Check xem 1 bác sĩ đc chỉ định có rảnh trong thời gian được chỉ định không
+const doctorAppointmentTimeAvailable = async (doctor_id, date, time) => {
+  condition = { date: date, appointment_time: time, doctor_id: doctor_id };
+
+  // Tìm Appointment đã trùng, nếu tìm đc thì bác sĩ bị trùng lịch, trả về false
+  const existingAppointments = await Appointment.findOne({
+    where: condition,
+  });
+
+  if (existingAppointments) {
+    return false; 
+  } else {
+    return true;
+  }
+};
+
+// Tự động chỉ định 1 bác sĩ cho Appointment, theo các mức ưu tiên về trạng thái bác sĩ
+const doctorAutoAppoint = async () => {
+  allDoctors = await Doctor.findAll()
+  for (var doctor of allDoctors)
+    if (doctorAppointmentTimeAvailable()){
+      
+    }
 };
 
 module.exports = {
