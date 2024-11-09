@@ -159,6 +159,7 @@ const readBookingById = async (req,res) =>  {
         }
     })
 }
+
 module.exports = {
     createBooking,
     deleteBooking,

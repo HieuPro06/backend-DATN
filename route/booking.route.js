@@ -6,4 +6,5 @@ BookingRouter.post("/",createBooking);
 BookingRouter.delete("/:id",deleteBooking);
 BookingRouter.get("/",readAllBooking);
 BookingRouter.get("/:id",readBookingById);
+
 module.exports = BookingRouter;
