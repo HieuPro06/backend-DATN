@@ -1,10 +1,10 @@
 const Appointment = require("../models/appointment.model.js");
 const Doctor = require("../models/doctor.model.js");
-
+const { appointment_status } = require("../enum");
 const defaultSize = 10;
 const defaultSort = "id";
 const defaultDirection = "ASC";
-const condition_active = { active: 1 };
+const condition_active = { status: appointment_status.PROCESSING };
 
 const getAppointmentAll = (req, res) => {
   const { size, page } = req.body;
@@ -52,8 +52,8 @@ const getAppointmentByID = (req, res) => {
     });
 };
 
-const createAppointment = (req, res) => {
-  const appointment_values = {
+const createAppointment = async (req, res) => {
+  var appointment_values = {
     booking_id: req.body.booking_id,
     doctor_id: req.body.doctor_id || null,
     patient_id: req.body.patient_id,
@@ -65,29 +65,48 @@ const createAppointment = (req, res) => {
     position: req.body.position || null,
     appointment_time: req.body.appointment_time,
     date: req.body.date,
-    status: req.body.status,
+    status: appointment_status.PROCESSING,
     create_at: new Date(), // automatically set the current date and time
     update_at: new Date(), // automatically set the current date and time
   };
 
-  if (doctor_id == null) {
+  if (appointment_values.doctor_id == null) {
+    const appointDoctor = await doctorAutoAppoint(
+      appointment_values.date,
+      appointment_values.appointment_time
+    );
+    if (appointDoctor != null) {
+      appointment_values.doctor_id = appointDoctor.id;
+    }
+  } else {
+    if (
+      doctorAppointmentTimeAvailable(
+        appointment_values.doctor_id,
+        appointment_values.date,
+        appointment_values.time
+      ) == false
+    ) {
+      return null;
+    }
   }
 
-  Appointment.create(appointment_values)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred creating appointment",
-      });
-    });
+  if (appointment_values.numerical_order == null) {
+    appointment_values.numerical_order = getNumericalOrder().id;
+  }
+
+  console.log(appointment_values);
+
+  const appointment = await Appointment.create(appointment_values);
+
+  return appointment;
 };
 
 const updateAppointment = (req, res) => {
   const id = req.params.id;
 
-  Appointment.update(req.body)
+  Appointment.update(req.body, {
+    where: { id: id },
+  })
     .then((data) => {
       if (data == 1)
         res.send({
@@ -101,13 +120,13 @@ const updateAppointment = (req, res) => {
     });
 };
 
-const deleteAppointment = (req, res) => {
+const deleteAppointment = async (req, res) => {
   const id = req.params.id;
 
   Appointment.update(
     { active: 0 },
     {
-      where: { id: id, active: 1 },
+      where: { id: id, status: appointment_status.CANCEL },
     }
   )
     .then((data) => {
@@ -133,19 +152,42 @@ const doctorAppointmentTimeAvailable = async (doctor_id, date, time) => {
   });
 
   if (existingAppointments) {
-    return false; 
+    return false;
   } else {
     return true;
   }
 };
 
+const getDoctorAppointmentNumber = async (doctor_id, date) => {
+  const appointmentNumber = await Appointment.count({
+    where: {
+      doctor_id: doctor_id,
+      date: date,
+    },
+  });
+  return appointmentNumber;
+};
+
 // Tự động chỉ định 1 bác sĩ cho Appointment, theo các mức ưu tiên về trạng thái bác sĩ
-const doctorAutoAppoint = async () => {
-  allDoctors = await Doctor.findAll()
-  for (var doctor of allDoctors)
-    if (doctorAppointmentTimeAvailable()){
-      
+const doctorAutoAppoint = async (date, time) => {
+  allDoctors = await Doctor.findAll();
+  var min = 100;
+  var minDoctor = null;
+  for (var doctor of allDoctors) {
+    if (doctorAppointmentTimeAvailable(doctor.id, date, time)) {
+      const appNum = await getDoctorAppointmentNumber(doctor.id, date);
+      if (appNum < min) {
+        min = appNum;
+        minDoctor = doctor;
+      }
     }
+  }
+  return minDoctor;
+};
+
+const getNumericalOrder = async () => {
+  number = Appointment.count();
+  return number + 1;
 };
 
 module.exports = {
@@ -154,4 +196,5 @@ module.exports = {
   createAppointment,
   updateAppointment,
   deleteAppointment,
+  getNumericalOrder,
 };
