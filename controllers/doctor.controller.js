@@ -1,4 +1,6 @@
 const Doctor = require("../models/doctor.model.js");
+const Room = require("../models/room.model.js");
+const Speciality = require("../models/speciality.model.js");
 
 const defaultSize = 10;
 const defaultSort = "id";
@@ -18,10 +20,38 @@ const getDoctorAll = (req, res) => {
     offset: offset,
     // order: sorting.sortQuery(req, defaultSort, defaultDirection),
   })
-    .then((data) => {
+    .then(async (data) => {
+      const returnData = await Promise.all(
+        data.map(async (element) => {
+          const speciality = await Speciality.findByPk(
+            element.dataValues.speciality_id
+          ).data;
+          const room = await Room.findByPk(element.dataValues.room_id).data;
+
+          return {
+            id: element.dataValues.id,
+            email: element.dataValues.email,
+            phone: element.dataValues.phone,
+            password: element.dataValues.password,
+            name: element.dataValues.name,
+            description: element.dataValues.description,
+            price: element.dataValues.price,
+            role: element.dataValues.role,
+            active: element.dataValues.active ?? 1,
+            avatar: element.dataValues.avatar,
+            create_at: element.dataValues.create_at,
+            update_at: element.dataValues.update_at,
+            recovery_token: element.dataValues.recovery_token,
+            speciality_id: speciality ? speciality.data : null,
+            room_id: room ? room.data : null,
+          };
+        })
+      );
+
       res.send({
-        data: data ? data : [],
-        count: data ? data.length : 0,
+        result: 1,
+        quantity: data ? data.length : 0,
+        data: returnData ? returnData : [],
       });
     })
     .catch((err) => {
@@ -36,10 +66,34 @@ const getDoctorByID = (req, res) => {
   const id = req.params.id;
 
   Doctor.findByPk(id)
-    .then((data) => {
+    .then(async (data) => {
+      const speciality = await Speciality.findByPk(
+        element.dataValues.speciality_id
+      ).data;
+      const room = await Room.findByPk(element.dataValues.room_id).data;
+
+      const return_data = {
+        id: id,
+        email: element.dataValues.email,
+        phone: element.dataValues.phone,
+        password: element.dataValues.password,
+        name: element.dataValues.name,
+        description: element.dataValues.description,
+        price: element.dataValues.price,
+        role: element.dataValues.role,
+        active: element.dataValues.active ?? 1,
+        avatar: element.dataValues.avatar,
+        create_at: element.dataValues.create_at,
+        update_at: element.dataValues.update_at,
+        recovery_token: element.dataValues.recovery_token,
+        speciality_id: speciality ? speciality.data : null,
+        room_id: room ? room.data : null,
+      };
+
       res.send({
-        data: data ? data : [],
-        count: data ? data.length : 0,
+        result: 1,
+        data: return_data ? return_data : [],
+        msg: "Action Seccessful",
       });
     })
     .catch((err) => {
@@ -68,8 +122,35 @@ const createDoctor = (req, res) => {
   };
 
   Doctor.create(doctor_values)
-    .then((data) => {
-      res.send(data);
+    .then(async (data) => {
+      const speciality = await Speciality.findByPk(
+        element.dataValues.speciality_id
+      ).data;
+      const room = await Room.findByPk(element.dataValues.room_id).data;
+
+      const return_data = {
+        id: id,
+        email: element.dataValues.email,
+        phone: element.dataValues.phone,
+        password: element.dataValues.password,
+        name: element.dataValues.name,
+        description: element.dataValues.description,
+        price: element.dataValues.price,
+        role: element.dataValues.role,
+        active: element.dataValues.active ?? 1,
+        avatar: element.dataValues.avatar,
+        create_at: element.dataValues.create_at,
+        update_at: element.dataValues.update_at,
+        recovery_token: element.dataValues.recovery_token,
+        speciality_id: speciality ? speciality.data : null,
+        room_id: room ? room.data : null,
+      };
+
+      res.send({
+        result: 1,
+        data: return_data ? return_data : [],
+        msg: "Action Seccessful",
+      });
     })
     .catch((err) => {
       res.status(500).send({
@@ -82,11 +163,35 @@ const updateDoctor = (req, res) => {
   const id = req.params.id;
 
   Doctor.update(req.body)
-    .then((data) => {
-      if (data == 1)
-        res.send({
-          message: "Doctor was updated successfully.",
-        });
+    .then(async (data) => {
+      const speciality = await Speciality.findByPk(
+        element.dataValues.speciality_id
+      ).data;
+      const room = await Room.findByPk(element.dataValues.room_id).data;
+
+      const return_data = {
+        id: id,
+        email: element.dataValues.email,
+        phone: element.dataValues.phone,
+        password: element.dataValues.password,
+        name: element.dataValues.name,
+        description: element.dataValues.description,
+        price: element.dataValues.price,
+        role: element.dataValues.role,
+        active: element.dataValues.active ?? 1,
+        avatar: element.dataValues.avatar,
+        create_at: element.dataValues.create_at,
+        update_at: element.dataValues.update_at,
+        recovery_token: element.dataValues.recovery_token,
+        speciality_id: speciality ? speciality.data : null,
+        room_id: room ? room.data : null,
+      };
+
+      res.send({
+        result: 1,
+        data: return_data ? return_data : [],
+        msg: "Action Seccessful",
+      });
     })
     .catch((err) => {
       res.status(500).send({
