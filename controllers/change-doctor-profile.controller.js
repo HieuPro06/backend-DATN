@@ -1,5 +1,6 @@
 const Doctor = require("../models/doctor.model");
 const jwt = require("jsonwebtoken");
+
 const changeDoctorProfileController = async (data,req,res,next) => {
     const payload = jwt.decode(data);
     if(req.body.action === "personal"){

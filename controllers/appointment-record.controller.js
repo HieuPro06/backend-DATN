@@ -22,6 +22,8 @@ const createNewAppointmentRecord = async (req,res) => {
     })
 }
 
+
+
 const getAppointment = async (req,res) => {
     const appointmentId = req.params.id;
     const data = await AppointmentRecord.findOne({
