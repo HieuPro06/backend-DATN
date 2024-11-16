@@ -66,7 +66,7 @@ const getDoctorByID = (req, res) => {
   const id = req.params.id;
 
   Doctor.findByPk(id)
-    .then(async (data) => {
+    .then(async (element) => {
       const speciality = await Speciality.findByPk(
         element.dataValues.speciality_id
       ).data;
