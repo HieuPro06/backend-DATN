@@ -1,120 +1,120 @@
-const Room = require("../models/room.model");
+const Drug = require("../models/drug.model");
 const Doctor = require("../models/doctor.model");
 
 const defaultSize = 1000000;
 
-const getAllRooms = async (data, req, res, next) => {
+const getAllDrugs = async (data, req, res, next) => {
   const { length, page } = req.body;
   const limit = length ? length : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
-  const result = await Room.findAll({
+  const result = await Drug.findAll({
     limit: limit,
     offset: offset,
   });
   if (!result) {
     res.status(500).json({
       result: 0,
-      message: "Error , Don't get rooms",
+      message: "Error , Don't get drugs",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get all rooms successfully",
+    message: "Get all drugs successfully",
     data: result,
   });
 };
 
-const getRoomById = async (data, req, res, next) => {
+const getDrugById = async (data, req, res, next) => {
   const id = req.params.id;
-  const result = await Room.findOne({
+  const result = await Drug.findOne({
     where: { id: id },
   });
   if (!result) {
     res.status(404).json({
       result: 0,
-      message: `Get room with id=${id} failed`,
+      message: `Get drug with id=${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get room successfully",
+    message: "Get drug successfully",
     data: result,
   });
 };
 
-const createRoom = async (req, res) => {
+const createDrug = async (req, res) => {
   const request = {
     name: req.body.name,
     location: req.body.location,
   };
-  const isExistRoomName = await Room.findOne({
+  const isExistDrugName = await Drug.findOne({
     where: { name: request.name },
   });
-  if (isExistRoomName) {
+  if (isExistDrugName) {
     res.status(400).json({
       result: 0,
-      message: "Room name was exist",
+      message: "Drug name was exist",
     });
   }
-  const data = await Room.create(request);
+  const data = await Drug.create(request);
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: "Create room failed",
+      message: "Create drug failed",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Create room successfully",
+    message: "Create drug successfully",
     data: data,
   });
 };
-const updateRoom = async (req, res) => {
+const updateDrug = async (req, res) => {
   const id = req.params.id;
-  const data = await Room.update(req.body, {
+  const data = await Drug.update(req.body, {
     where: { id: id },
   });
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Update room ${id} failed`,
+      message: `Update drug ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Update room successfully",
+    message: "Update drug successfully",
   });
 };
-const deleteRoom = async (req, res) => {
+const deleteDrug = async (req, res) => {
   const id = req.params.id;
   const isExistDoctor = await Doctor.findOne({
-    where: { room_id: id },
+    where: { drug_id: id },
   });
   if (isExistDoctor) {
     res.json({
       result: 0,
-      message: "This room can't be deleted because it's have doctor",
+      message: "This drug can't be deleted because it's have doctor",
     });
   }
-  const data = await Room.destroy({
+  const data = await Drug.destroy({
     where: { id: id },
   });
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Delete room ${id} failed`,
+      message: `Delete drug ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Delete room successfully",
+    message: "Delete drug successfully",
   });
 };
 
 module.exports = {
-  getAllRooms,
-  getRoomById,
-  createRoom,
-  updateRoom,
-  deleteRoom,
+  getAllDrugs,
+  getDrugById,
+  createDrug,
+  updateDrug,
+  deleteDrug,
 };

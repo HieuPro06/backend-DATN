@@ -7,7 +7,6 @@ const { createAppointment } = require("../controllers/appointment.controller");
 const defaultSize = 1000000;
 
 const createBooking = async (req, res) => {
-  console.log(req.body);
   const request = {
     service_id: req.body.service_id,
     patient_id: req.body.patient_id,

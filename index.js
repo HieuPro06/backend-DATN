@@ -15,6 +15,9 @@ const BookingRouter = require("./route/booking.route");
 const AppointmentRecordRouter = require("./route/appointment-record.route");
 const TreatmentRouter = require("./route/treatment.route");
 const AppointmentRouter = require("./route/appointment.routes");
+const DrugRouter = require("./route/drug.routes");
+const DoctorServiceRouter = require("./route/doctorAndService.routes.js");
+const DoctorServiceReadyRouter = require("./route/doctorAndServiceReady.routes.js");
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -35,6 +38,9 @@ app.use("/api/patient/booking", BookingRouter);
 app.use("/api/appointment-records", AppointmentRecordRouter);
 app.use("/api/treatments", TreatmentRouter);
 app.use("/api/appointment", AppointmentRouter);
+app.use("/api/drug", DrugRouter);
+app.use("/api/doctors-and-services", DoctorServiceRouter);
+app.use("/api/doctors-and-services-ready", DoctorServiceReadyRouter);
 
 app.listen(port, (req, res) => {
   console.log(`Backend is running at http://localhost:${port}`);
