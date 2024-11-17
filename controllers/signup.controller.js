@@ -8,7 +8,7 @@ const SignupController = async (req, res) => {
     name: req.body.name,
     description: req.body.description ?? "",
     price: req.body.price ?? 100000,
-    role: "member",
+    role: "doctor",
     active: 1, // Default to 1 if not provided
     avatar: "",
     create_at: req.body.create_at ?? new Date(), // Default to current date if not provided
