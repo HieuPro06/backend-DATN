@@ -38,12 +38,12 @@ const SignupController = async (req, res) => {
   /* Đăng kí bên app - patient */
   else {
     const request = {
-      email: req.body.email,
+      email: "",
       phone: req.body.phone,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
-      name: req.body.name,
-      gender: req.body.gender,
+      name: "",
+      gender: null,
       birthday: "Unknown",
       address: "Unknown",
       avatar: null,
@@ -52,6 +52,15 @@ const SignupController = async (req, res) => {
     };
     if (request.password !== request.passwordConfirm) {
       res.status(400).json("Password confirm no match password");
+    }
+    const existPhone = await Patient.findOne({
+      where: {phone: request.phone}
+    })
+    if(existPhone){
+      res.status(400).json({
+        result: 0,
+        msg: "This phone number had been exist"
+      })
     }
     try {
       const result = await Patient.create(request);
