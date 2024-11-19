@@ -55,13 +55,7 @@ const loginController = async (req,res) => {
         const request = {
             type: req.body.type ?? "patient",
             phone: req.body.phone,
-            password: "12345",
-            email: "android@gmail.com",
-            name: "android-app",
-            gender: 1,
-            birthday: "09-05-2000",
-            address: "Bắc Ninh",
-            avatar: ""
+            password: req.body.password,
         }
         /* Tìm xem số điện thoại này đã được đăng ký chưa */
         const result = await Patient.findOne({
@@ -86,20 +80,13 @@ const loginController = async (req,res) => {
             } else {
                 res.status(400).json({
                     result: 0,
-                    msg: "Wrong password OTP"
+                    msg: "Wrong password"
                 })
             }
         } else {
-            const result = await Patient.create(request);
-            const payload = {
-                phone: result.phone,
-                expire: Date.now() + 3600
-            }
-            const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '3h'});
-            res.status(200).json({
-                result: 1,
-                msg: "Sign up with phone successfully",
-                accessToken: token
+            res.status(404).json({
+                result: 0,
+                msg: "Account invalid",
             })
         }
     }
