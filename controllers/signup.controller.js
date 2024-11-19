@@ -50,6 +50,7 @@ const SignupController = async (req, res) => {
       create_at: req.body.create_at ?? new Date(), // Default to current date if not provided
       update_at: req.body.update_at ?? new Date(),
     };
+    /* Tạm thời xử lý ở đây , sau này nên để fe xử lý */
     if (request.password !== request.passwordConfirm) {
       res.status(400).json("Password confirm no match password");
     }
