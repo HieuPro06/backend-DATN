@@ -6,7 +6,7 @@ const { createAppointment } = require("../controllers/appointment.controller");
 
 const defaultSize = 1000000;
 
-const createBooking = async (req, res) => {
+const createBooking = async (result,req, res,next) => {
   const request = {
     service_id: req.body.service_id,
     patient_id: req.body.patient_id,
@@ -17,8 +17,8 @@ const createBooking = async (req, res) => {
     birthday: req.body.birthday,
     address: req.body.address,
     reason: req.body.reason,
-    appointment_date: req.body.appointment_time.split(" ")[0],
-    appointment_hour: req.body.appointment_time.split(" ")[1],
+    appointment_date: req.body.appointment_time?.split(" ")[0],
+    appointment_hour: req.body.appointment_time?.split(" ")[1],
     status: booking_status.PROCESSING,
   };
   const data = await Booking.create(request);
@@ -54,7 +54,7 @@ const createBooking = async (req, res) => {
     },
   });
 };
-const deleteBooking = async (req, res) => {
+const deleteBooking = async (data,req,res,next) => {
   const id = req.params.id;
   const requestBooking = await Booking.findOne({
     where: { id: id },
@@ -83,7 +83,7 @@ const deleteBooking = async (req, res) => {
     });
   }
 };
-const readAllBooking = async (req, res) => {
+const readAllBooking = async (data,req,res,next) => {
   const { length, page } = req.params;
   const limit = length ? length : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
@@ -128,7 +128,7 @@ const readAllBooking = async (req, res) => {
     ),
   });
 };
-const readBookingById = async (req, res) => {
+const readBookingById = async (data,req,res,next) => {
   const id = req.params.id;
   const requestBooking = await Booking.findOne({
     where: { id: id },
@@ -166,7 +166,7 @@ const readBookingById = async (req, res) => {
   });
 };
 
-const updateBooking = (req, res) => {
+const updateBooking = (result,req,res,next) => {
   const id = req.params.id;
   Booking.update(req.body, {
     where: { id: id },
@@ -184,7 +184,7 @@ const updateBooking = (req, res) => {
     });
 };
 
-const confirmBooking = async (req, res) => {
+const confirmBooking = async (data,req,res,next) => {
   const id = req.params.id;
   var new_req = req;
   const booking = await Booking.findByPk(id);
