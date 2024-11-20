@@ -29,8 +29,10 @@ const loginController = async (req,res) => {
                 //     "typ": "JWT"
                 // }
                 const payload = {
-                    id: result.id,
-                    role: result.role,
+                    doctor: {
+                        id: result.id,
+                        role: result.role
+                    },
                     expire: Date.now() + 3600
                 }
                 // const encodeHeader = base64Url(JSON.stringify(header));
@@ -66,7 +68,10 @@ const loginController = async (req,res) => {
             /* Check mật khẩu */
             if(result.password === request.password){
                 const payload = {
-                    phone: result.phone,
+                    patient: {
+                        id: result.id,
+                        phone: result.phone
+                    },
                     expire: Date.now() + 3600
                 }
                 const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '3h'});
