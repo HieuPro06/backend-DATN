@@ -29,8 +29,10 @@ const loginController = async (req,res) => {
                 //     "typ": "JWT"
                 // }
                 const payload = {
-                    id: result.id,
-                    role: result.role,
+                    doctor: {
+                        id: result.id,
+                        role: result.role
+                    },
                     expire: Date.now() + 3600
                 }
                 // const encodeHeader = base64Url(JSON.stringify(header));
@@ -41,7 +43,23 @@ const loginController = async (req,res) => {
                 // const token = `${tokenData}.${signature}`;
                 const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '3h'});
                 res.status(200).json({
-                    accessToken: token
+                    result: 1,
+                    msg: "Login successfully",
+                    accessToken: token,
+                    data: {
+                        id: result.id,
+                        email: result.email,
+                        phone: result.phone,
+                        name: result.name,
+                        description: result.description,
+                        price: result.price,
+                        role: result.role,
+                        speciality_id: result.speciality_id,
+                        room_id: result.room_id,
+                        avatar: result.avatar,
+                        create_at: result.create_at,
+                        update_at: result.update_at
+                    }
                 })
             }
         } else {
@@ -66,15 +84,33 @@ const loginController = async (req,res) => {
             /* Check mật khẩu */
             if(result.password === request.password){
                 const payload = {
-                    phone: result.phone,
+                    patient: {
+                        id: result.id,
+                        phone: result.phone
+                    },
                     expire: Date.now() + 3600
                 }
                 const token = jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '3h'});
+                for (let key in result) {
+                    if (key === 'password') {
+                        delete obj[key];
+                    }
+                }
                 res.status(200).json({
                     result: 1,
                     msg: "Login successfully",
+                    accessToken: token,
                     data: {
-                        accessToken: token
+                        id: result.id,
+                        email: result.email,
+                        phone: result.phone,
+                        name: result.name,
+                        gender: result.gender,
+                        birthday: result.birthday,
+                        address: result.address,
+                        avatar: result.avatar,
+                        create_at: result.create_at,
+                        update_at: result.update_at
                     }
                 })
             } else {

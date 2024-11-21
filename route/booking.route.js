@@ -8,11 +8,12 @@ const {
   confirmBooking,
   updateBooking,
 } = require("../controllers/booking.controller");
+const isLogInController = require("../controllers/is-logIn.controller");
 
-BookingRouter.post("/", createBooking);
-BookingRouter.delete("/:id", deleteBooking);
-BookingRouter.get("/", readAllBooking);
-BookingRouter.get("/:id", readBookingById);
-BookingRouter.put("/:id", updateBooking);
-BookingRouter.put("/confirm/:id", confirmBooking);
+BookingRouter.post("/",isLogInController,createBooking);
+BookingRouter.delete("/:id",isLogInController,deleteBooking);
+BookingRouter.get("/",isLogInController,readAllBooking);
+BookingRouter.get("/:id",isLogInController,readBookingById);
+BookingRouter.put("/:id",isLogInController,updateBooking);
+BookingRouter.put("/confirm/:id",isLogInController,confirmBooking);
 module.exports = BookingRouter;

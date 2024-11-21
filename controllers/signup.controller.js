@@ -8,7 +8,7 @@ const SignupController = async (req, res) => {
       phone: req.body.phone,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
-      name: req.body.name,
+      name: req.body.name ?? "",
       description: req.body.description ?? "",
       price: req.body.price ?? 100000,
       role: "doctor",
@@ -19,6 +19,26 @@ const SignupController = async (req, res) => {
       speciality_id: 1,
       room_id: 1,
     };
+    /* Kiểm tra xem email và số điện thoại đã được dùng chưa */
+    const existEmail = await Doctor.findOne({
+      where: {email: request.email}
+    });
+    const existPhone = await Doctor.findOne({
+      where: {phone: request.phone}
+    })
+    if(existEmail){
+      res.status(400).json({
+        result: 0,
+        msg: "Email had been use"
+      })
+    }
+    if(existPhone){
+      res.status(400).json({
+        result: 0,
+        msg: "Phone number had been use"
+      })
+    }
+    /* Xử lý đăng ký */
     try {
       if (request.password !== request.passwordConfirm) {
         res.status(400).json("Password confirm no match password");

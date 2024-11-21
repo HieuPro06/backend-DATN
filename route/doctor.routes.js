@@ -7,11 +7,13 @@ const {
   updateDoctor,
   deleteDoctor,
 } = require("../controllers/doctor.controller.js");
+const isLogInController = require("../controllers/is-logIn.controller");
+const isAdminController = require("../controllers/is-admin.controller");
 
-DoctorRouter.get("/", getDoctorAll);
-DoctorRouter.get("/:id", getDoctorByID);
-DoctorRouter.post("/", createDoctor);
-DoctorRouter.put("/:id", updateDoctor);
-DoctorRouter.delete("/:id", deleteDoctor);
+DoctorRouter.get("/",isLogInController,getDoctorAll);
+DoctorRouter.get("/:id",isLogInController,getDoctorByID);
+DoctorRouter.post("/",isAdminController,createDoctor);
+DoctorRouter.put("/:id",isAdminController,updateDoctor);
+DoctorRouter.delete("/:id",isAdminController,deleteDoctor);
 
 module.exports = DoctorRouter;
