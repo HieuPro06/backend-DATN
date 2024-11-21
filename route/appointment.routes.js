@@ -8,10 +8,12 @@ const {
   deleteAppointment,
   //   getNumericalOrder,
 } = require("../controllers/appointment.controller.js");
+const isLogInController = require("../controllers/is-logIn.controller");
 
-AppointmentRouter.get("/", getAppointmentAll);
-AppointmentRouter.get("/:id", getAppointmentByID);
-AppointmentRouter.delete("/:id", deleteAppointment);
-AppointmentRouter.put("/:id", updateAppointment);
+
+AppointmentRouter.get("/",isLogInController,getAppointmentAll);
+AppointmentRouter.get("/:id",isLogInController,getAppointmentByID);
+AppointmentRouter.delete("/:id",isLogInController,deleteAppointment);
+AppointmentRouter.put("/:id",isLogInController,updateAppointment);
 
 module.exports = AppointmentRouter;
