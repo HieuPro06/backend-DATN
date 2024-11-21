@@ -7,7 +7,7 @@ const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { active: 1 };
 
-const getDoctorAll = (req, res) => {
+const getDoctorAll = (info,req,res,next) => {
   const { size, page } = req.body;
 
   const limit = size ? size : defaultSize;
@@ -62,7 +62,7 @@ const getDoctorAll = (req, res) => {
     });
 };
 
-const getDoctorByID = (req, res) => {
+const getDoctorByID = (info,req,res,next) => {
   const id = req.params.id;
 
   Doctor.findByPk(id)

@@ -101,7 +101,7 @@ const createAppointment = async (req, res) => {
   return appointment;
 };
 
-const updateAppointment = (data,req,res,next) => {
+const updateAppointment = (req,res) => {
   const id = req.params.id;
 
   Appointment.update(req.body, {
@@ -120,7 +120,7 @@ const updateAppointment = (data,req,res,next) => {
     });
 };
 
-const deleteAppointment = async (data,req,res,next) => {
+const deleteAppointment = async (req,res) => {
   const id = req.params.id;
 
   Appointment.update(
