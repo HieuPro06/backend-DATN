@@ -178,37 +178,78 @@ const readBookingById = async (data,req,res,next) => {
   const requestBooking = await Booking.findOne({
     where: { id: id },
   });
-  if (!requestBooking) {
-    res.status(404).json({
-      result: 0,
-      msg: "This booking not exist",
+  if(jwt.decode(data).hasOwnProperty('doctor')){
+    if (!requestBooking) {
+      res.status(404).json({
+        result: 0,
+        msg: "This booking not exist",
+      });
+    }
+    const service = await Service.findOne({
+      where: { id: requestBooking?.service_id },
     });
-  }
-  const service = await Service.findOne({
-    where: { id: requestBooking?.service_id },
-  });
-  res.status(200).json({
-    result: 1,
-    msg: "Action successfully !",
-    data: {
-      id: requestBooking.id,
-      booking_name: requestBooking.booking_name,
-      booking_phone: requestBooking.booking_phone,
-      name: requestBooking.name,
-      gender: requestBooking.gender,
-      birthday: requestBooking.birthday,
-      address: requestBooking.address,
-      reason: requestBooking.reason,
-      appointment_time: `${requestBooking.appointment_date} ${requestBooking.appointment_hour}`,
-      status: requestBooking.status,
-      create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-      update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-      service: {
-        id: requestBooking.service_id,
-        name: service.name,
+    res.status(200).json({
+      result: 1,
+      msg: "Action successfully !",
+      data: {
+        id: requestBooking.id,
+        booking_name: requestBooking.booking_name,
+        booking_phone: requestBooking.booking_phone,
+        name: requestBooking.name,
+        gender: requestBooking.gender,
+        birthday: requestBooking.birthday,
+        address: requestBooking.address,
+        reason: requestBooking.reason,
+        appointment_time: `${requestBooking.appointment_date} ${requestBooking.appointment_hour}`,
+        status: requestBooking.status,
+        create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+        update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+        service: {
+          id: requestBooking.service_id,
+          name: service.name,
+        },
       },
-    },
-  });
+    });
+  } else if(jwt.decode(data).hasOwnProperty('patient')){
+    if(requestBooking.patient_id === jwt.decode(data).patient.id){
+      if (!requestBooking) {
+        res.status(404).json({
+          result: 0,
+          msg: "This booking not exist",
+        });
+      }
+      const service = await Service.findOne({
+        where: { id: requestBooking?.service_id },
+      });
+      res.status(200).json({
+        result: 1,
+        msg: "Action successfully !",
+        data: {
+          id: requestBooking.id,
+          booking_name: requestBooking.booking_name,
+          booking_phone: requestBooking.booking_phone,
+          name: requestBooking.name,
+          gender: requestBooking.gender,
+          birthday: requestBooking.birthday,
+          address: requestBooking.address,
+          reason: requestBooking.reason,
+          appointment_time: `${requestBooking.appointment_date} ${requestBooking.appointment_hour}`,
+          status: requestBooking.status,
+          create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+          update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+          service: {
+            id: requestBooking.service_id,
+            name: service.name,
+          },
+        },
+      });
+    } else {
+      res.status(404).json({
+        result: 0,
+        msg: "Not available this booking"
+      })
+    }
+  }
 };
 
 const updateBooking = (result,req,res,next) => {
