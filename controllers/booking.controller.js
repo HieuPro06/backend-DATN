@@ -1,5 +1,6 @@
 const Booking = require("../models/booking.model");
 const Service = require("../models/service.model");
+const jwt = require("jsonwebtoken");
 const { booking_status } = require("../enum");
 const moment = require("moment");
 const { createAppointment } = require("../controllers/appointment.controller");
@@ -87,46 +88,90 @@ const readAllBooking = async (data,req,res,next) => {
   const { length, page } = req.params;
   const limit = length ? length : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
-
-  const result = await Booking.findAll({
-    limit: limit,
-    offset: offset,
-  });
-  if (!result) {
-    res.status(500).json({
-      result: 0,
-      msg: "Error ! Can't get all bookings ",
+  /* Lấy ra toàn bộ thông tin booking cho bác sĩ */
+  if(jwt.decode(data).hasOwnProperty('doctor')){
+    const result = await Booking.findAll({
+      limit: limit,
+      offset: offset,
+    });
+    if (!result) {
+      res.status(500).json({
+        result: 0,
+        msg: "Error ! Can't get all bookings ",
+      });
+    }
+    res.status(200).json({
+      result: 1,
+      quantity: result.length,
+      data: await Promise.all(
+          result.map(async (item) => {
+            const service = await Service.findOne({
+              where: { id: item?.service_id },
+            });
+            return {
+              id: item.id,
+              booking_name: item.booking_name,
+              booking_phone: item.booking_phone,
+              name: item.name,
+              gender: item.gender,
+              birthday: item.birthday,
+              address: item.address,
+              reason: item.reason,
+              appointment_time: `${item.appointment_date} ${item.appointment_hour}`,
+              status: item.status,
+              create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+              update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+              service: {
+                id: item.service_id,
+                name: service.name,
+              },
+            };
+          })
+      ),
     });
   }
-  res.status(200).json({
-    result: 1,
-    quantity: result.length,
-    data: await Promise.all(
-      result.map(async (item) => {
-        const service = await Service.findOne({
-          where: { id: item?.service_id },
-        });
-        return {
-          id: item.id,
-          booking_name: item.booking_name,
-          booking_phone: item.booking_phone,
-          name: item.name,
-          gender: item.gender,
-          birthday: item.birthday,
-          address: item.address,
-          reason: item.reason,
-          appointment_time: `${item.appointment_date} ${item.appointment_hour}`,
-          status: item.status,
-          create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-          update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-          service: {
-            id: item.service_id,
-            name: service.name,
-          },
-        };
+  /* Lấy ra toàn bộ thông tin booking cho bác sĩ */
+  else if(jwt.decode(data).hasOwnProperty('patient')){
+    const patientId = jwt.decode(data).patient.id;
+    const result = await Booking.findAll({
+      where: {patient_id: patientId}
+    })
+    if(!result){
+      res.status(500).json({
+        result: 0,
+        msg: "Error ! Don't get all booking of you"
       })
-    ),
-  });
+    }
+    res.status(200).json({
+      result: 1,
+      quantity: result.length,
+      data: await Promise.all(
+          result.map(async (item) => {
+            const service = await Service.findOne({
+              where: { id: item?.service_id },
+            });
+            return {
+              id: item.id,
+              booking_name: item.booking_name,
+              booking_phone: item.booking_phone,
+              name: item.name,
+              gender: item.gender,
+              birthday: item.birthday,
+              address: item.address,
+              reason: item.reason,
+              appointment_time: `${item.appointment_date} ${item.appointment_hour}`,
+              status: item.status,
+              create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+              update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+              service: {
+                id: item.service_id,
+                name: service.name,
+              },
+            };
+          })
+      ),
+    });
+  }
 };
 const readBookingById = async (data,req,res,next) => {
   const id = req.params.id;
