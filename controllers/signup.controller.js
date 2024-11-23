@@ -8,16 +8,16 @@ const SignupController = async (req, res) => {
       phone: req.body.phone,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
-      name: req.body.name ?? "",
-      description: req.body.description ?? "",
-      price: req.body.price ?? 100000,
-      role: "doctor",
+      name: req.body.name ?? "", // Default name is empty string
+      description: req.body.description ?? "", // Default description is empty string
+      price: req.body.price ?? 100000, // Default price is 100000
+      role: "doctor", // Default role is DOCTOR
       active: 1, // Default to 1 if not provided
-      avatar: "",
+      avatar: "", // Default avatar is empty string
       create_at: req.body.create_at ?? new Date(), // Default to current date if not provided
       update_at: req.body.update_at ?? new Date(), // Default to current date if not provided
-      speciality_id: 1,
-      room_id: 1,
+      speciality_id: 1, // Default speciality 1
+      room_id: 1, // Default room 1
     };
     /* Kiểm tra xem email và số điện thoại đã được dùng chưa */
     const existEmail = await Doctor.findOne({
@@ -27,58 +27,52 @@ const SignupController = async (req, res) => {
       where: {phone: request.phone}
     })
     if(existEmail){
-      res.status(400).json({
+      return res.status(400).json({
         result: 0,
-        msg: "Email had been use"
+        msg: "Email had been exist"
       })
     }
     if(existPhone){
-      res.status(400).json({
+      return res.status(400).json({
         result: 0,
-        msg: "Phone number had been use"
+        msg: "Phone number had been exist"
       })
     }
     /* Xử lý đăng ký */
     try {
-      if (request.password !== request.passwordConfirm) {
-        res.status(400).json("Password confirm no match password");
-      }
       const result = await Doctor.create(request);
       res.status(200).json({
         result: 1,
-        message: "Sign up successfully",
+        msg: "Sign up successfully",
         data: result,
       });
     } catch (err) {
-      res.status(500).send({
-        message: err.message || "Some error occurred when sign up",
+      res.status(500).json({
+        result: 0,
+        msg: err.message || "Some error occurred when sign up"
       });
     }
   }
   /* Đăng kí bên app - patient */
   else {
     const request = {
-      email: "",
+      email: "user@gmail.com", // Default email is user@gmail.com
       phone: req.body.phone,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
-      name: "",
-      gender: null,
-      birthday: "Unknown",
-      address: "Unknown",
-      avatar: null,
+      name: "User", // Default name is User
+      gender: null, // Default gendet is null
+      birthday: "Unknown", // Default birthday is Unknown
+      address: "Unknown",// Default address is Unknown
+      avatar: null,// Default avatar is null
       create_at: req.body.create_at ?? new Date(), // Default to current date if not provided
-      update_at: req.body.update_at ?? new Date(),
+      update_at: req.body.update_at ?? new Date(), // Default to current date if not provided
     };
-    /* Tạm thời xử lý ở đây , sau này nên để fe xử lý */
-    if (request.password !== request.passwordConfirm) {
-      res.status(400).json("Password confirm no match password");
-    }
     const existPhone = await Patient.findOne({
       where: {phone: request.phone}
     })
     if(existPhone){
-      res.status(400).json({
+      return res.status(400).json({
         result: 0,
         msg: "This phone number had been exist"
       })
@@ -87,12 +81,13 @@ const SignupController = async (req, res) => {
       const result = await Patient.create(request);
       res.status(200).json({
         result: 1,
-        message: "Sign up successfully",
+        msg: "Sign up successfully",
         data: result,
       });
     } catch (err){
-      res.status(500).send({
-        message: err.message || "Some error occurred when sign up",
+      res.status(500).json({
+        result: 0,
+        msg: err.message || "Some error occurred when sign up"
       });
     }
   }
