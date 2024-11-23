@@ -1,4 +1,5 @@
 const AppointmentRecord = require("../models/appointment-record.model");
+const defaultSize = 1000000;
 
 const createNewAppointmentRecord = async (req, res) => {
   const request = {
@@ -21,7 +22,6 @@ const createNewAppointmentRecord = async (req, res) => {
     data: data,
   });
 };
-
 const getAppointmentRecord = async (req, res) => {
   const appointmentId = req.params.id;
   const data = await AppointmentRecord.findOne({
@@ -71,9 +71,31 @@ const updateAppointmentRecord = async (req,res) => {
     })
   }
 }
-
+const getAllAppointmentRecords = async (info,req,res,next) => {
+  const { length, page } = req.body;
+  const limit = length ? length : defaultSize;
+  const offset = page ? (page - 1) * limit : 0;
+  try{
+    const result = await AppointmentRecord.findAll({
+      limit: limit,
+      offset: offset,
+    })
+    res.status(200).json({
+      result: 1,
+      msg: "Get all appointment-record successfully",
+      quantity: result.length,
+      data: result
+    })
+  } catch (e) {
+    res.status(500).json({
+      result: 0,
+      msg: e.message || "Some error occur when get all appointment-records"
+    })
+  }
+}
 module.exports = {
   createNewAppointmentRecord,
   getAppointmentRecord,
-  updateAppointmentRecord
+  updateAppointmentRecord,
+  getAllAppointmentRecords
 };
