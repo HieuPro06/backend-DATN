@@ -1,5 +1,6 @@
 const Patient = require("../models/patient.model");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const ChangePatientProfileController = async (data, req, res, next) => {
     const payload = jwt.decode(data);
@@ -73,47 +74,52 @@ const ChangePatientProfileController = async (data, req, res, next) => {
             where: {id: payload.patient.id}
         })
         /* Check xem mật khẩu nhập vào đã đúng chưa */
-        if(result.password !== req.body.currentPassword){
-            return res.status(400).json({
-                result: 0,
-                msg: "Wrong password , please re-enter"
-            })
-        }
-        try{
-            const isUpdatePassword = await Patient.update({password: req.body.newPassword},{
-                where: {id: payload.patient.id}
-            })
-            if (isUpdatePassword){
-                const afterUpdateData = await Patient.findOne({
-                    where: {id: payload.patient.id}
-                })
-                res.status(200).json({
-                    result: 1,
-                    msg: "Update password successfully",
-                    data: {
-                        id: afterUpdateData.id,
-                        email: afterUpdateData.email,
-                        phone: afterUpdateData.phone,
-                        name: afterUpdateData.name,
-                        description: afterUpdateData.description,
-                        price: afterUpdateData.price,
-                        role: afterUpdateData.role,
-                        active: afterUpdateData.active,
-                        avatar: afterUpdateData.avatar,
-                        create_at: afterUpdateData.create_at,
-                        update_at: afterUpdateData.update_at,
-                        speciality_id: afterUpdateData.speciality_id,
-                        room_id: afterUpdateData.room_id,
-                        recovery_token: afterUpdateData.recovery_token,
-                    }
+        bcrypt.compare(req.body.currentPassword, result.password, async (err,isMatch) => {
+            if (err) {
+                return res.status(500).json({ message: "Error comparing passwords" });
+            }
+            if (!isMatch) {
+                return res.status(400).json({
+                    result: 0,
+                    msg: "Wrong password , please re-enter"
                 })
             }
-        } catch(err){
-            res.status(500).json({
-                result: 0,
-                msg: err.message || "Some error occurred when update password"
-            });
-        }
+            try{
+                const isUpdatePassword = await Patient.update({password: req.body.newPassword},{
+                    where: {id: payload.patient.id}
+                })
+                if (isUpdatePassword){
+                    const afterUpdateData = await Patient.findOne({
+                        where: {id: payload.patient.id}
+                    })
+                    res.status(200).json({
+                        result: 1,
+                        msg: "Update password successfully",
+                        data: {
+                            id: afterUpdateData.id,
+                            email: afterUpdateData.email,
+                            phone: afterUpdateData.phone,
+                            name: afterUpdateData.name,
+                            description: afterUpdateData.description,
+                            price: afterUpdateData.price,
+                            role: afterUpdateData.role,
+                            active: afterUpdateData.active,
+                            avatar: afterUpdateData.avatar,
+                            create_at: afterUpdateData.create_at,
+                            update_at: afterUpdateData.update_at,
+                            speciality_id: afterUpdateData.speciality_id,
+                            room_id: afterUpdateData.room_id,
+                            recovery_token: afterUpdateData.recovery_token,
+                        }
+                    })
+                }
+            } catch(err){
+                res.status(500).json({
+                    result: 0,
+                    msg: err.message || "Some error occurred when update password"
+                });
+            }
+        })
     }
 };
 module.exports = ChangePatientProfileController;

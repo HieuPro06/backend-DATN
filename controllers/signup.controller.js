@@ -1,6 +1,9 @@
 const Doctor = require("../models/doctor.model");
 const Patient = require("../models/patient.model");
+const bcrypt = require("bcrypt");
+
 const SignupController = async (req, res) => {
+  const salt = 10;
   /* Đăng kí bên web - doctor */
   if(req.body.type !== "patient"){
     const request = {
@@ -38,20 +41,27 @@ const SignupController = async (req, res) => {
         msg: "Phone number had been exist"
       })
     }
-    /* Xử lý đăng ký */
-    try {
-      const result = await Doctor.create(request);
-      res.status(200).json({
-        result: 1,
-        msg: "Sign up successfully",
-        data: result,
-      });
-    } catch (err) {
-      res.status(500).json({
-        result: 0,
-        msg: err.message || "Some error occurred when sign up"
-      });
-    }
+    /* Mã hoá password */
+    bcrypt.hash(request.password , salt , async (err, hashedPassword) => {
+      if (err) {
+        return res.status(500).json({ message: "Error hashing password" });
+      }
+      request.password = hashedPassword;
+      /* Xử lý đăng ký */
+      try {
+        const result = await Doctor.create(request);
+        res.status(200).json({
+          result: 1,
+          msg: "Sign up successfully",
+          data: result,
+        });
+      } catch (err) {
+        res.status(500).json({
+          result: 0,
+          msg: err.message || "Some error occurred when sign up"
+        });
+      }
+    })
   }
   /* Đăng kí bên app - patient */
   else {
@@ -77,19 +87,26 @@ const SignupController = async (req, res) => {
         msg: "This phone number had been exist"
       })
     }
-    try {
-      const result = await Patient.create(request);
-      res.status(200).json({
-        result: 1,
-        msg: "Sign up successfully",
-        data: result,
-      });
-    } catch (err){
-      res.status(500).json({
-        result: 0,
-        msg: err.message || "Some error occurred when sign up"
-      });
-    }
+    /* Mã hoá password */
+    bcrypt.hash(request.password, salt , async (err, hashedPassword) => {
+      if (err) {
+        return res.status(500).json({ message: "Error hashing password" });
+      }
+      request.password = hashedPassword;
+      try {
+        const result = await Patient.create(request);
+        res.status(200).json({
+          result: 1,
+          msg: "Sign up successfully",
+          data: result,
+        });
+      } catch (err){
+        res.status(500).json({
+          result: 0,
+          msg: err.message || "Some error occurred when sign up"
+        });
+      }
+    })
   }
 };
 
