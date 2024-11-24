@@ -19,6 +19,9 @@ const DrugRouter = require("./route/drug.routes");
 const DoctorServiceRouter = require("./route/doctorAndService.routes.js");
 const DoctorServiceReadyRouter = require("./route/doctorAndServiceReady.routes.js");
 const PatientProfileRouter = require("./route/patient-profile.route");
+const BookingPhotosRouter = require("./route/booking-photos.routes.js");
+const BookingPhotoRouter = require("./route/booking-photo.routes.js");
+
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -42,6 +45,8 @@ app.use("/api/appointment", AppointmentRouter);
 app.use("/api/drug", DrugRouter);
 app.use("/api/doctors-and-services", DoctorServiceRouter);
 app.use("/api/doctors-and-services-ready", DoctorServiceReadyRouter);
+app.use("/api/booking/photos", BookingPhotosRouter);
+app.use("/api/booking/photo", BookingPhotoRouter);
 
 app.listen(port, (req, res) => {
   console.log(`Backend is running at http://localhost:${port}`);
