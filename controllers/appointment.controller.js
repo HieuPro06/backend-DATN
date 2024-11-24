@@ -6,7 +6,7 @@ const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { status: appointment_status.PROCESSING };
 
-const getAppointmentAll = (req, res) => {
+const getAppointmentAll = (data,req,res,next) => {
   const { size, page } = req.body;
 
   const limit = size ? size : defaultSize;
@@ -34,7 +34,7 @@ const getAppointmentAll = (req, res) => {
     });
 };
 
-const getAppointmentByID = (req, res) => {
+const getAppointmentByID = (data,req,res,next) => {
   const id = req.params.id;
 
   Appointment.findByPk(id)
@@ -101,7 +101,7 @@ const createAppointment = async (req, res) => {
   return appointment;
 };
 
-const updateAppointment = (req, res) => {
+const updateAppointment = (req,res) => {
   const id = req.params.id;
 
   Appointment.update(req.body, {
@@ -120,7 +120,7 @@ const updateAppointment = (req, res) => {
     });
 };
 
-const deleteAppointment = async (req, res) => {
+const deleteAppointment = async (req,res) => {
   const id = req.params.id;
 
   Appointment.update(

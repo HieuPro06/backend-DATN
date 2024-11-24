@@ -18,6 +18,7 @@ const AppointmentRouter = require("./route/appointment.routes");
 const DrugRouter = require("./route/drug.routes");
 const DoctorServiceRouter = require("./route/doctorAndService.routes.js");
 const DoctorServiceReadyRouter = require("./route/doctorAndServiceReady.routes.js");
+const PatientProfileRouter = require("./route/patient-profile.route");
 const BookingPhotosRouter = require("./route/booking-photos.routes.js");
 const BookingPhotoRouter = require("./route/booking-photo.routes.js");
 
@@ -32,6 +33,7 @@ app.use("/api/doctors", DoctorRouter);
 app.use("/api/signup", SignUpRouter);
 app.use("/api/login", LoginRouter);
 app.use("/api/doctor/profile", DoctorProfileRouter);
+app.use("/api/patient/profile",PatientProfileRouter);
 app.use("/api/specialites", SpecialityRouter);
 app.use("/api/rooms", RoomRouter);
 app.use("/api/services", ServiceRouter);

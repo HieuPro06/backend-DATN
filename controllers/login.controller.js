@@ -1,6 +1,7 @@
 const Doctor = require("../models/doctor.model");
 const Patient = require("../models/patient.model");
 const dotenv = require("dotenv");
+const bcrypt = require("bcrypt");
 // const base64Url = require("../utils/index");
 // const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
@@ -18,19 +19,26 @@ const loginController = async (req, res) => {
       where: { email: request.email },
     });
     if (result) {
-      if (result.password !== request.password) {
-        res.status(400).json({
-          message: "Wrong password",
-        });
-      } else {
+      bcrypt.compare(request.password, result.password, (err, isMatch) => {
+        if (err) {
+          return res.status(500).json({ message: "Error comparing passwords" });
+        }
+        if (!isMatch) {
+          return res.status(401).json({
+            result: 0,
+            msg: "Wrong password",
+          });
+        }
         // Generate token
         // const header = {
         //     "alg": "HS256",
         //     "typ": "JWT"
         // }
         const payload = {
-          id: result.id,
-          role: result.role,
+          doctor: {
+            id: result.id,
+            role: result.role,
+          },
           expire: Date.now() + 3600,
         };
         // const encodeHeader = base64Url(JSON.stringify(header));
@@ -43,26 +51,36 @@ const loginController = async (req, res) => {
           expiresIn: "3h",
         });
         res.status(200).json({
+          result: 1,
+          msg: "Login successfully",
           accessToken: token,
+          data: {
+            id: result.id,
+            email: result.email,
+            phone: result.phone,
+            name: result.name,
+            description: result.description,
+            price: result.price,
+            role: result.role,
+            speciality_id: result.speciality_id,
+            room_id: result.room_id,
+            avatar: result.avatar,
+            create_at: result.create_at,
+            update_at: result.update_at,
+          },
         });
-      }
+      });
     } else {
       res.status(404).json({
         message: "Account invalid",
       });
     }
   } else {
-    /* Đăng nhập bên app - patient */
+  /* Đăng nhập bên app - patient */
     const request = {
       type: req.body.type ?? "patient",
       phone: req.body.phone,
-      password: "12345",
-      email: "android@gmail.com",
-      name: "android-app",
-      gender: 1,
-      birthday: "09-05-2000",
-      address: "Bắc Ninh",
-      avatar: "",
+      password: req.body.password,
     };
     /* Tìm xem số điện thoại này đã được đăng ký chưa */
     const result = await Patient.findOne({
@@ -70,41 +88,53 @@ const loginController = async (req, res) => {
     });
     /* Nếu mà SĐT đã được đăng ký */
     if (result) {
-      /* Check mật khẩu */
-      if (result.password === request.password) {
+      bcrypt.compare(request.password, result.password, (err, isMatch) => {
+        if (err) {
+          return res.status(500).json({ message: "Error comparing passwords" });
+        }
+        if (!isMatch) {
+          return res.status(401).json({
+            result: 0,
+            msg: "Wrong password",
+          });
+        }
         const payload = {
-          phone: result.phone,
+          patient: {
+            id: result.id,
+            phone: result.phone,
+          },
           expire: Date.now() + 3600,
         };
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
           expiresIn: "3h",
         });
+        for (let key in result) {
+          if (key === "password") {
+            delete obj[key];
+          }
+        }
         res.status(200).json({
           result: 1,
           msg: "Login successfully",
+          accessToken: token,
           data: {
-            accessToken: token,
+            id: result.id,
+            email: result.email,
+            phone: result.phone,
+            name: result.name,
+            gender: result.gender,
+            birthday: result.birthday,
+            address: result.address,
+            avatar: result.avatar,
+            create_at: result.create_at,
+            update_at: result.update_at,
           },
         });
-      } else {
-        res.status(400).json({
-          result: 0,
-          msg: "Wrong password OTP",
-        });
-      }
-    } else {
-      const result = await Patient.create(request);
-      const payload = {
-        phone: result.phone,
-        expire: Date.now() + 3600,
-      };
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "3h",
       });
-      res.status(200).json({
-        result: 1,
-        msg: "Sign up with phone successfully",
-        accessToken: token,
+    } else {
+      res.status(404).json({
+        result: 0,
+        msg: "Account invalid",
       });
     }
   }
