@@ -1,7 +1,6 @@
 const Doctor = require("../models/doctor.model");
 const Patient = require("../models/patient.model");
 const bcrypt = require("bcrypt");
-const {hashPassword} = require("mysql/lib/protocol/Auth");
 
 const SignupController = async (req, res) => {
   const salt = 10;

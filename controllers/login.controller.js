@@ -1,6 +1,7 @@
 const Doctor = require("../models/doctor.model");
 const Patient = require("../models/patient.model");
 const dotenv = require("dotenv");
+const bcrypt = require("bcrypt");
 // const base64Url = require("../utils/index");
 // const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
@@ -18,11 +19,16 @@ const loginController = async (req,res) => {
             where: {email: request.email}
         })
         if(result){
-            if(result.password !== request.password){
-                res.status(400).json({
-                    message: "Wrong password"
-                })
-            } else{
+            bcrypt.compare(request.password, result.password, (err,isMatch) => {
+                if (err) {
+                    return res.status(500).json({ message: "Error comparing passwords" });
+                }
+                if (!isMatch) {
+                    return res.status(401).json({
+                        result: 0,
+                        msg: "Wrong password"
+                    });
+                }
                 // Generate token
                 // const header = {
                 //     "alg": "HS256",
@@ -61,7 +67,7 @@ const loginController = async (req,res) => {
                         update_at: result.update_at
                     }
                 })
-            }
+            })
         } else {
             res.status(404).json({
                 message: "Account invalid"
@@ -81,8 +87,16 @@ const loginController = async (req,res) => {
         })
         /* Nếu mà SĐT đã được đăng ký */
         if(result){
-            /* Check mật khẩu */
-            if(result.password === request.password){
+            bcrypt.compare(request.password, result.password, (err,isMatch) => {
+                if (err) {
+                    return res.status(500).json({ message: "Error comparing passwords" });
+                }
+                if (!isMatch) {
+                    return res.status(401).json({
+                        result: 0,
+                        msg: "Wrong password"
+                    });
+                }
                 const payload = {
                     patient: {
                         id: result.id,
@@ -113,12 +127,7 @@ const loginController = async (req,res) => {
                         update_at: result.update_at
                     }
                 })
-            } else {
-                res.status(400).json({
-                    result: 0,
-                    msg: "Wrong password"
-                })
-            }
+            })
         } else {
             res.status(404).json({
                 result: 0,
