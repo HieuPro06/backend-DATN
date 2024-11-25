@@ -6,6 +6,7 @@ const booking_status = {
 
 const appointment_status = {
   PROCESSING: "PROCESSING",
+  DONE: "DONE",
   // VERIFIED: "VERIFIED",
   CANCEL: "CANCEL",
 };
