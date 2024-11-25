@@ -20,6 +20,13 @@ const Booking = sequelize.define(
         key: "id",
       },
     },
+    doctor_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: "tn_doctors", // The table name you are referencing
+            key: "id",
+        },
+    },
     booking_name: {
       type: DataTypes.STRING(50),
     },

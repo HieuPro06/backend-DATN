@@ -11,6 +11,7 @@ const createBooking = async (result,req, res,next) => {
   const request = {
     service_id: req.body.service_id,
     patient_id: req.body.patient_id,
+    doctor_id: req.body.doctor_id,
     booking_name: req.body.booking_name,
     booking_phone: req.body.booking_phone,
     name: req.body.name,
@@ -20,6 +21,8 @@ const createBooking = async (result,req, res,next) => {
     reason: req.body.reason,
     appointment_date: req.body.appointment_time?.split(" ")[0],
     appointment_hour: req.body.appointment_time?.split(" ")[1],
+    create_at: Date.now(),
+    update_at: Date.now(),
     status: booking_status.PROCESSING,
   };
   const data = await Booking.create(request);
@@ -39,6 +42,7 @@ const createBooking = async (result,req, res,next) => {
       id: data.id,
       booking_name: data.booking_name,
       booking_phone: data.booking_phone,
+      doctor_id: data.doctor_id,
       name: data.name,
       gender: data.gender,
       birthday: data.birthday,
