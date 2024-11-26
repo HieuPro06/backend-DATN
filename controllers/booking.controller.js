@@ -8,6 +8,24 @@ const { createAppointment } = require("../controllers/appointment.controller");
 const defaultSize = 1000000;
 
 const createBooking = async (result,req, res,next) => {
+  const payload = jwt.decode(result);
+  /* Kiểm tra thơì gian booking tránh bị trùng lặp */
+  const appointment_time = req.body.appointment_time;
+  const appointmentDate = appointment_time?.split(" ")[0];
+  const appointmentHour = appointment_time?.split(" ")[1];
+  const isExistBookingInThisTime = await Booking.findAll({
+    where: {
+      patient_id: payload.patient.id,
+      appointment_date: appointmentDate,
+      appointment_hour: appointmentHour
+    }
+  })
+  if(isExistBookingInThisTime.length !== 0){
+    return res.status(400).json({
+      result: 0,
+      msg: `Please choose another time booking , had at least booking with this time ${appointmentDate} ${appointmentHour}`
+    })
+  }
   const request = {
     service_id: req.body.service_id,
     patient_id: req.body.patient_id,
@@ -19,8 +37,8 @@ const createBooking = async (result,req, res,next) => {
     birthday: req.body.birthday,
     address: req.body.address,
     reason: req.body.reason,
-    appointment_date: req.body.appointment_time?.split(" ")[0],
-    appointment_hour: req.body.appointment_time?.split(" ")[1],
+    appointment_date: appointmentDate,
+    appointment_hour: appointmentHour,
     create_at: Date.now(),
     update_at: Date.now(),
     status: booking_status.PROCESSING,

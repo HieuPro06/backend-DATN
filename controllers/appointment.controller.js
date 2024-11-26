@@ -103,43 +103,42 @@ const createAppointment = async (req, res) => {
 
 const updateAppointment = (req,res) => {
   const id = req.params.id;
-
   Appointment.update(req.body, {
     where: { id: id },
   })
     .then((data) => {
       if (data == 1)
-        res.send({
-          message: "Appointment was updated successfully.",
+        res.status(200).json({
+          result: 1,
+          msg: "Appointment was updated successfully.",
         });
     })
     .catch((err) => {
       res.status(500).send({
-        message: `Cannot update Appointment with id=${id}`,
+        result: 0,
+        msg: `Cannot update Appointment with id=${id}`,
       });
     });
 };
 
 const deleteAppointment = async (req,res) => {
   const id = req.params.id;
-
-  Appointment.update(
-    { active: 0 },
-    {
-      where: { id: id, status: appointment_status.CANCEL },
-    }
-  )
-    .then((data) => {
-      if (data == 1)
-        res.send({
-          message: "Appointment was removed successfully.",
+  Appointment.update({status: appointment_status.CANCEL}, {
+    where: { id: id },
+  })
+      .then((data) => {
+        if (data == 1)
+          res.status(200).json({
+            result: 1,
+            msg: "Appointment was canceled successfully.",
+          });
+      })
+      .catch((err) => {
+        res.status(500).json({
+          result: 0,
+          msg: `Cannot cancel Appointment with id=${id}`,
         });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: `Cannot remove Appointment with id=${id}`,
       });
-    });
 };
 
 // Check xem 1 bác sĩ đc chỉ định có rảnh trong thời gian được chỉ định không
