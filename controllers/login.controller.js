@@ -51,7 +51,7 @@ const loginController = async (req, res) => {
           // const signature = hmac.update(tokenData).digest("base64url");
           // const token = `${tokenData}.${signature}`;
           const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "3h",
+            expiresIn: "100h",
           });
           res.status(200).json({
             result: 1,
@@ -111,7 +111,7 @@ const loginController = async (req, res) => {
             expire: Date.now() + 3600,
           };
           const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "3h",
+            expiresIn: "100h",
           });
           for (let key in result) {
             if (key === "password") {
