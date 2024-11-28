@@ -189,7 +189,7 @@ const getNumericalOrder = async () => {
   return number + 1;
 };
 
-const orderAppointments = async (info,req,res,next) => {
+const orderAppointments = async (req,res) => {
   const request = req.body;
   // console.log(request)
   for(var value of request){

@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const IsSupporterController = (req,res) => {
+const isSupporterController = (req,res,next) => {
     const access_token = req.headers["authorization"];
     const token = access_token.split(" ")[1];
     const payload = jwt.verify(token, process.env.JWT_SECRET);
@@ -13,4 +13,4 @@ const IsSupporterController = (req,res) => {
     next();
 }
 
-module.exports = IsSupporterController;
+module.exports = isSupporterController;

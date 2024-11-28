@@ -78,32 +78,40 @@ const createBooking = async (result,req, res,next) => {
   });
 };
 const deleteBooking = async (data,req,res,next) => {
-  const id = req.params.id;
-  const requestBooking = await Booking.findOne({
-    where: { id: id },
-  });
-  if (!requestBooking) {
-    res.status(404).json({
-      result: 0,
-      msg: "This booking not exist",
+  const payload = jwt.verify(data, process.env.JWT_SECRET);
+  if(payload.hasOwnProperty("patient") || (payload.hasOwnProperty("doctor") && payload.doctor.role !== "doctor")){
+    const id = req.params.id;
+    const requestBooking = await Booking.findOne({
+      where: { id: id },
     });
-  }
-  if (requestBooking.status === booking_status.CANCEL) {
+    if (!requestBooking) {
+      res.status(404).json({
+        result: 0,
+        msg: "This booking not exist",
+      });
+    }
+    if (requestBooking.status === booking_status.CANCEL) {
+      res.status(400).json({
+        result: 0,
+        msg: "This booking's status is cancelled . No need any more action !",
+      });
+    } else if (requestBooking.status === booking_status.PROCESSING) {
+      await Booking.update(
+          { status: booking_status.CANCEL },
+          {
+            where: { id: id },
+          }
+      );
+      res.status(200).json({
+        result: 1,
+        msg: "Booking has been cancelled successfully !",
+      });
+    }
+  } else {
     res.status(400).json({
       result: 0,
-      msg: "This booking's status is cancelled . No need any more action !",
-    });
-  } else if (requestBooking.status === booking_status.PROCESSING) {
-    await Booking.update(
-      { status: booking_status.CANCEL },
-      {
-        where: { id: id },
-      }
-    );
-    res.status(200).json({
-      result: 1,
-      msg: "Booking has been cancelled successfully !",
-    });
+      msg: "You don't allow to delete booking because you not have permission"
+    })
   }
 };
 const readAllBooking = async (data,req,res,next) => {

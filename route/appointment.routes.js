@@ -9,12 +9,12 @@ const {
   //   getNumericalOrder,
 } = require("../controllers/appointment.controller.js");
 const isLogInController = require("../controllers/is-logIn.controller");
-const isDoctorController = require("../controllers/is-doctor.controller");
+const isSupporterController = require("../controllers/is-supporter.controller");
 const {orderAppointments} = require("../controllers/appointment.controller");
 
 AppointmentRouter.get("/",isLogInController,getAppointmentAll);
 AppointmentRouter.get("/:id",isLogInController,getAppointmentByID);
-AppointmentRouter.delete("/:id",isDoctorController,deleteAppointment);
-AppointmentRouter.put("/:id",isDoctorController,updateAppointment);
-AppointmentRouter.post("/order",isLogInController,orderAppointments);
+AppointmentRouter.delete("/:id",isSupporterController,deleteAppointment);
+AppointmentRouter.put("/:id",isSupporterController,updateAppointment);
+AppointmentRouter.post("/order",isSupporterController,orderAppointments);
 module.exports = AppointmentRouter;

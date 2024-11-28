@@ -22,7 +22,7 @@ const createNewAppointmentRecord = async (req, res) => {
     data: data,
   });
 };
-const getAppointmentRecord = async (req, res) => {
+const getAppointmentRecord = async (info,req, res,next) => {
   const appointmentId = req.params.id;
   const data = await AppointmentRecord.findOne({
     where: { appointment_id: appointmentId },
