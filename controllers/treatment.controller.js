@@ -26,7 +26,7 @@ const createNewTreatment = async (req, res) => {
   });
 };
 
-const getTreatment = async (req, res) => {
+const getTreatment = async (info,req, res, next) => {
   const appointmentId = req.params.id;
   const data = await Treatment.findOne({
     where: { appointment_id: appointmentId },

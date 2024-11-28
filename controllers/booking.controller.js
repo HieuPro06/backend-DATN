@@ -79,7 +79,8 @@ const createBooking = async (result,req, res,next) => {
 };
 const deleteBooking = async (data,req,res,next) => {
   const payload = jwt.verify(data, process.env.JWT_SECRET);
-  if(payload.hasOwnProperty("patient") || (payload.hasOwnProperty("doctor") && payload.doctor.role !== "doctor")){
+  if(payload.hasOwnProperty("patient")
+      || (payload.hasOwnProperty("doctor") && payload.doctor.role !== "doctor")){
     const id = req.params.id;
     const requestBooking = await Booking.findOne({
       where: { id: id },
@@ -119,7 +120,7 @@ const readAllBooking = async (data,req,res,next) => {
   const limit = length ? length : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
   /* Lấy ra toàn bộ thông tin booking cho bác sĩ */
-  if(jwt.decode(data).hasOwnProperty('doctor')){
+  if(jwt.decode(data).hasOwnProperty('doctor') && jwt.decode(data).doctor.role !== "doctor"){
     const result = await Booking.findAll({
       limit: limit,
       offset: offset,
@@ -208,7 +209,7 @@ const readBookingById = async (data,req,res,next) => {
   const requestBooking = await Booking.findOne({
     where: { id: id },
   });
-  if(jwt.decode(data).hasOwnProperty('doctor')){
+  if(jwt.decode(data).hasOwnProperty('doctor') && jwt.decode(data).doctor.role !== "doctor"){
     if (!requestBooking) {
       res.status(404).json({
         result: 0,
@@ -300,7 +301,7 @@ const updateBooking = (result,req,res,next) => {
     });
 };
 
-const confirmBooking = async (data,req,res,next) => {
+const confirmBooking = async (req,res) => {
   const id = req.params.id;
   var new_req = req;
   const booking = await Booking.findByPk(id);

@@ -36,7 +36,8 @@ const ChangePatientProfileController = async (data, req, res, next) => {
                 recovery_token: afterUpdateData.recovery_token,
             }
         });
-    } else if (req.body.action === "avatar") {
+    }
+    else if (req.body.action === "avatar") {
         const urlObj = {
             avatar: req.body.url,
         };
@@ -69,7 +70,8 @@ const ChangePatientProfileController = async (data, req, res, next) => {
                 recovery_token: afterUpdateData.recovery_token,
             }
         });
-    } else if(req.body.action === "password"){
+    }
+    else if(req.body.action === "password"){
         const result = await Patient.findOne({
             where: {id: payload.patient.id}
         })
