@@ -189,6 +189,22 @@ const getNumericalOrder = async () => {
   return number + 1;
 };
 
+const orderAppointments = async (info,req,res,next) => {
+  const request = req.body;
+  // console.log(request)
+  for(var value of request){
+    const data = await Appointment.update({position: value.position},{
+      where: {numerical_order: value.numberOrder}
+    })
+    if(!data){
+      res.status(500).json({
+        result: 0,
+        msg: "Can't order appointments"
+      })
+    }
+  }
+}
+
 module.exports = {
   getAppointmentAll,
   getAppointmentByID,
@@ -196,4 +212,5 @@ module.exports = {
   updateAppointment,
   deleteAppointment,
   getNumericalOrder,
+  orderAppointments
 };
