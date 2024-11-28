@@ -45,7 +45,7 @@ const getDrugById = async (data, req, res, next) => {
 const createDrug = async (req, res) => {
   const request = {
     name: req.body.name,
-    location: req.body.location,
+    location: req.body.location ?? "Nhà thuốc Việt Nam",
   };
   const isExistDrugName = await Drug.findOne({
     where: { name: request.name },
