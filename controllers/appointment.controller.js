@@ -196,6 +196,12 @@ const orderAppointments = async (info,req,res,next) => {
     const data = await Appointment.update({position: value.position},{
       where: {numerical_order: value.numberOrder}
     })
+    if(!data){
+      res.status(500).json({
+        result: 0,
+        msg: "Can't order appointments"
+      })
+    }
   }
 }
 
