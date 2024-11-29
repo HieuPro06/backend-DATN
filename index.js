@@ -21,6 +21,7 @@ const DoctorServiceReadyRouter = require("./route/doctorAndServiceReady.routes.j
 const PatientProfileRouter = require("./route/patient-profile.route");
 const BookingPhotosRouter = require("./route/booking-photos.routes.js");
 const BookingPhotoRouter = require("./route/booking-photo.routes.js");
+const DashboardRouter = require("./route/dashboard.route");
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
   res.json("Backend home");
 });
 
+app.use("/dashboard", DashboardRouter);
 app.use("/api/doctors", DoctorRouter);
 app.use("/api/signup", SignUpRouter);
 app.use("/api/login", LoginRouter);
