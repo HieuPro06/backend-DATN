@@ -4,7 +4,11 @@ const PatientProfileController = require("../controllers/patient-profile.control
 const ChangePatientProfileController = require("../controllers/change-patient-profile.controller");
 const PatientProfileRouter = express.Router();
 
-PatientProfileRouter.get("/",isLogInController, PatientProfileController);
-PatientProfileRouter.put("/",isLogInController, ChangePatientProfileController);
+PatientProfileRouter.get("/", isLogInController, PatientProfileController);
+PatientProfileRouter.put(
+  "/",
+  isLogInController,
+  ChangePatientProfileController
+);
 
 module.exports = PatientProfileRouter;

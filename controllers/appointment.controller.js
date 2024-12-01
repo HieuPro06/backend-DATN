@@ -1,6 +1,12 @@
 const Appointment = require("../models/appointment.model.js");
 const Doctor = require("../models/doctor.model.js");
 const { appointment_status } = require("../enum");
+const DoctorAndService = require("../models/doctorAndService.model.js");
+const { where } = require("sequelize");
+const Booking = require("../models/booking.model.js");
+const {
+  checkDoctorServiceCompatible,
+} = require("./doctorAndService.controller.js");
 const defaultSize = 10;
 const defaultSort = "id";
 const defaultDirection = "ASC";
@@ -29,7 +35,7 @@ const getAppointmentAll = (data, req, res, next) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message:
+        msg:
           err.message ||
           "Some error occurred while retrieving appointment list.",
       });
@@ -48,8 +54,7 @@ const getAppointmentByID = (data, req, res, next) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving appointment.",
+        msg: err.message || "Some error occurred while retrieving appointment.",
       });
     });
 };
@@ -75,10 +80,14 @@ const createAppointment = async (req, res) => {
   // Biến chỉ định bắt buộc tạo (áp dụng sau khi xác nhận vẫn tạo khi có pop up lỗi)
   const force_create = req.body.force_create ? req.body.force_create : false;
 
+  const bookingRec = await Booking.findByPk(req.body.booking_id);
+  const service_id = bookingRec.service_id ? bookingRec.service_id : null;
+
   if (appointment_values.doctor_id == null) {
     const appointDoctor = await doctorAutoAppoint(
       appointment_values.date,
-      appointment_values.appointment_time
+      appointment_values.appointment_time,
+      service_id
     );
     if (appointDoctor != null) {
       appointment_values.doctor_id = appointDoctor.id;
@@ -95,7 +104,7 @@ const createAppointment = async (req, res) => {
         return {
           appointment: null,
           success: 0,
-          message: "Doctor isn't available during this time",
+          msg: "Doctor isn't available during this time",
           error_type: 1, // Xác định kiểu lỗi: tạo pop-up lỗi, k có xác nhận nào khác
           previous_request: req,
         };
@@ -110,8 +119,20 @@ const createAppointment = async (req, res) => {
         return {
           appointment: null,
           success: 0,
-          message: "Doctor has too many appointments in this day",
+          msg: "Doctor has too many appointments in this day",
           error_type: 2, // Xác định kiểu lỗi, tạo pop-up lỗi yêu cầu xác nhận tạo appointment hay k
+          previous_request: null,
+        };
+      }
+
+      if (
+        !checkDoctorServiceCompatible(service_id, appointment_values.doctor_id)
+      ) {
+        return {
+          appointment: null,
+          success: 0,
+          msg: "Doctor is not available for this service",
+          error_type: 1,
           previous_request: null,
         };
       }
@@ -122,12 +143,30 @@ const createAppointment = async (req, res) => {
     appointment_values.numerical_order = getNumericalOrder().id;
   }
 
+  if (appointDoctor == null)
+    return {
+      appointment: null,
+      success: 0,
+      msg: "No available doctors",
+      error_type: 1,
+      previous_request: null,
+    };
+
   const appointment = await Appointment.create(appointment_values);
+
+  if (appointment == null)
+    return {
+      appointment: null,
+      success: 0,
+      msg: "Create appointment failed",
+      error_type: 1,
+      previous_request: null,
+    };
 
   return {
     appointment: appointment,
     success: 1,
-    message: "Appointment has been created!",
+    msg: "Appointment has been created!",
     error_type: null,
     previous_request: null,
   };
@@ -203,8 +242,22 @@ const getDoctorAppointmentNumber = async (doctor_id, date) => {
 };
 
 // Tự động chỉ định 1 bác sĩ cho Appointment, theo các mức ưu tiên về trạng thái bác sĩ
-const doctorAutoAppoint = async (date, time) => {
-  allDoctors = await Doctor.findAll();
+const doctorAutoAppoint = async (date, time, service_id) => {
+  var condition = {};
+  if (service_id != null) {
+    condition = { ...condition, service_id: service_id };
+  }
+  const doctorServices = await DoctorAndService.findAll({ where: condition });
+
+  const doctorIds = doctorServices.map(
+    (doctorService) => doctorService.doctor_id
+  );
+
+  if (doctorIds.length === 0) {
+    return null;
+  }
+
+  allDoctors = await Doctor.findAll({ where: { id: { [Op.in]: doctorIds } } });
   var min = 100;
   var minDoctor = null;
   for (var doctor of allDoctors) {

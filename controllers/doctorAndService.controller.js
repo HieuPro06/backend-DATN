@@ -96,7 +96,7 @@ const getServicesFromDoctorId = async (req, res) => {
   }
 
   const doctorAndService = await DoctorAndService.findAll({
-    doctor_id: doctor.id,
+    where: { doctor_id: doctor.id },
   });
 
   const service_ids = doctorAndService.map((item) => item.service_id);
@@ -183,11 +183,22 @@ const createDoctorAndService = async (req, res) => {
   }
 };
 
+const checkDoctorServiceCompatible = async (service_id, doctor_id) => {
+  const data = await DoctorAndService.findAll({
+    where: {
+      doctor_id: doctor_id,
+      service_id: service_id,
+    },
+  });
 
+  if (data.length > 0) return true;
+  else return false;
+};
 
 module.exports = {
   getDoctorsFromServiceId,
   deleteDoctorService,
   getServicesFromDoctorId,
   createDoctorAndService,
+  checkDoctorServiceCompatible,
 };
