@@ -95,7 +95,7 @@ const createAppointment = async (req, res) => {
         return {
           appointment: null,
           success: 0,
-          msg: "Doctor isn't available during this time",
+          message: "Doctor isn't available during this time",
           error_type: 1, // Xác định kiểu lỗi: tạo pop-up lỗi, k có xác nhận nào khác
           previous_request: req,
         };
@@ -112,6 +112,7 @@ const createAppointment = async (req, res) => {
           success: 0,
           message: "Doctor has too many appointments in this day",
           error_type: 2, // Xác định kiểu lỗi, tạo pop-up lỗi yêu cầu xác nhận tạo appointment hay k
+          previous_request: null,
         };
       }
     }
@@ -128,6 +129,7 @@ const createAppointment = async (req, res) => {
     success: 1,
     message: "Appointment has been created!",
     error_type: null,
+    previous_request: null,
   };
 };
 
