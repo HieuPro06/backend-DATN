@@ -88,13 +88,13 @@ const deleteBooking = async (data, req, res, next) => {
       where: { id: id },
     });
     if (!requestBooking) {
-      res.status(404).json({
+      return res.status(404).json({
         result: 0,
         msg: "This booking not exist",
       });
     }
     if (requestBooking.status === booking_status.CANCEL) {
-      res.status(400).json({
+      return res.status(400).json({
         result: 0,
         msg: "This booking's status is cancelled . No need any more action !",
       });
