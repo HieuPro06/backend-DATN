@@ -1,12 +1,20 @@
 const Appointment = require("../models/appointment.model.js");
 const Doctor = require("../models/doctor.model.js");
 const { appointment_status } = require("../enum");
+const DoctorAndService = require("../models/doctorAndService.model.js");
+const { where } = require("sequelize");
+const Booking = require("../models/booking.model.js");
+const {
+  checkDoctorServiceCompatible,
+} = require("./doctorAndService.controller.js");
 const defaultSize = 10;
 const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { status: appointment_status.PROCESSING };
 
-const getAppointmentAll = (data,req,res,next) => {
+const appointment_number_threshold = 20;
+
+const getAppointmentAll = (data, req, res, next) => {
   const { size, page } = req.body;
 
   const limit = size ? size : defaultSize;
@@ -32,14 +40,14 @@ const getAppointmentAll = (data,req,res,next) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message:
+        msg:
           err.message ||
           "Some error occurred while retrieving appointment list.",
       });
     });
 };
 
-const getAppointmentByID = (data,req,res,next) => {
+const getAppointmentByID = (data, req, res, next) => {
   const id = req.params.id;
 
   Appointment.findByPk(id)
@@ -51,8 +59,7 @@ const getAppointmentByID = (data,req,res,next) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving appointment.",
+        msg: err.message || "Some error occurred while retrieving appointment.",
       });
     });
 };
@@ -75,23 +82,65 @@ const createAppointment = async (req, res) => {
     update_at: new Date(), // automatically set the current date and time
   };
 
+  // Biến chỉ định bắt buộc tạo (áp dụng sau khi xác nhận vẫn tạo khi có pop up lỗi)
+  const force_create = req.body.force_create ? req.body.force_create : false;
+
+  const bookingRec = await Booking.findByPk(req.body.booking_id);
+  const service_id = bookingRec.service_id ? bookingRec.service_id : null;
+
   if (appointment_values.doctor_id == null) {
     const appointDoctor = await doctorAutoAppoint(
       appointment_values.date,
-      appointment_values.appointment_time
+      appointment_values.appointment_time,
+      service_id
     );
     if (appointDoctor != null) {
       appointment_values.doctor_id = appointDoctor.id;
     }
   } else {
-    if (
-      doctorAppointmentTimeAvailable(
-        appointment_values.doctor_id,
-        appointment_values.date,
-        appointment_values.time
-      ) == false
-    ) {
-      return null;
+    if (!force_create) {
+      if (
+        doctorAppointmentTimeAvailable(
+          appointment_values.doctor_id,
+          appointment_values.date,
+          appointment_values.time
+        ) == false
+      ) {
+        return {
+          appointment: null,
+          success: 0,
+          msg: "Doctor isn't available during this time",
+          error_type: 1, // Xác định kiểu lỗi: tạo pop-up lỗi, k có xác nhận nào khác
+          previous_request: req,
+        };
+      }
+
+      if (
+        getDoctorAppointmentNumber(
+          appointment_values.doctor_id,
+          appointment_values.date
+        ) > appointment_number_threshold
+      ) {
+        return {
+          appointment: null,
+          success: 0,
+          msg: "Doctor has too many appointments in this day",
+          error_type: 2, // Xác định kiểu lỗi, tạo pop-up lỗi yêu cầu xác nhận tạo appointment hay k
+          previous_request: null,
+        };
+      }
+
+      if (
+        !checkDoctorServiceCompatible(service_id, appointment_values.doctor_id)
+      ) {
+        return {
+          appointment: null,
+          success: 0,
+          msg: "Doctor is not available for this service",
+          error_type: 1,
+          previous_request: null,
+        };
+      }
     }
   }
 
@@ -99,14 +148,36 @@ const createAppointment = async (req, res) => {
     appointment_values.numerical_order = getNumericalOrder().id;
   }
 
-  console.log(appointment_values);
+  if (appointDoctor == null)
+    return {
+      appointment: null,
+      success: 0,
+      msg: "No available doctors",
+      error_type: 1,
+      previous_request: null,
+    };
 
   const appointment = await Appointment.create(appointment_values);
 
-  return appointment;
+  if (appointment == null)
+    return {
+      appointment: null,
+      success: 0,
+      msg: "Create appointment failed",
+      error_type: 1,
+      previous_request: null,
+    };
+
+  return {
+    appointment: appointment,
+    success: 1,
+    msg: "Appointment has been created!",
+    error_type: null,
+    previous_request: null,
+  };
 };
 
-const updateAppointment = (req,res) => {
+const updateAppointment = (req, res) => {
   const id = req.params.id;
   Appointment.update(req.body, {
     where: { id: id },
@@ -126,24 +197,27 @@ const updateAppointment = (req,res) => {
     });
 };
 
-const deleteAppointment = async (req,res) => {
+const deleteAppointment = async (req, res) => {
   const id = req.params.id;
-  Appointment.update({status: appointment_status.CANCEL}, {
-    where: { id: id },
-  })
-      .then((data) => {
-        if (data == 1)
-          res.status(200).json({
-            result: 1,
-            msg: "Appointment was canceled successfully.",
-          });
-      })
-      .catch((err) => {
-        res.status(500).json({
-          result: 0,
-          msg: `Cannot cancel Appointment with id=${id}`,
+  Appointment.update(
+    { status: appointment_status.CANCEL },
+    {
+      where: { id: id },
+    }
+  )
+    .then((data) => {
+      if (data == 1)
+        res.status(200).json({
+          result: 1,
+          msg: "Appointment was canceled successfully.",
         });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        result: 0,
+        msg: `Cannot cancel Appointment with id=${id}`,
       });
+    });
 };
 
 // Check xem 1 bác sĩ đc chỉ định có rảnh trong thời gian được chỉ định không
@@ -173,8 +247,22 @@ const getDoctorAppointmentNumber = async (doctor_id, date) => {
 };
 
 // Tự động chỉ định 1 bác sĩ cho Appointment, theo các mức ưu tiên về trạng thái bác sĩ
-const doctorAutoAppoint = async (date, time) => {
-  allDoctors = await Doctor.findAll();
+const doctorAutoAppoint = async (date, time, service_id) => {
+  var condition = {};
+  if (service_id != null) {
+    condition = { ...condition, service_id: service_id };
+  }
+  const doctorServices = await DoctorAndService.findAll({ where: condition });
+
+  const doctorIds = doctorServices.map(
+    (doctorService) => doctorService.doctor_id
+  );
+
+  if (doctorIds.length === 0) {
+    return null;
+  }
+
+  allDoctors = await Doctor.findAll({ where: { id: { [Op.in]: doctorIds } } });
   var min = 100;
   var minDoctor = null;
   for (var doctor of allDoctors) {
@@ -194,21 +282,24 @@ const getNumericalOrder = async () => {
   return number + 1;
 };
 
-const orderAppointments = async (req,res) => {
+const orderAppointments = async (req, res) => {
   const request = req.body;
   // console.log(request)
-  for(var value of request){
-    const data = await Appointment.update({position: value.position},{
-      where: {numerical_order: value.numberOrder}
-    })
-    if(!data){
+  for (var value of request) {
+    const data = await Appointment.update(
+      { position: value.position },
+      {
+        where: { numerical_order: value.numberOrder },
+      }
+    );
+    if (!data) {
       res.status(500).json({
         result: 0,
-        msg: "Can't order appointments"
-      })
+        msg: "Can't order appointments",
+      });
     }
   }
-}
+};
 
 module.exports = {
   getAppointmentAll,
@@ -217,5 +308,5 @@ module.exports = {
   updateAppointment,
   deleteAppointment,
   getNumericalOrder,
-  orderAppointments
+  orderAppointments,
 };

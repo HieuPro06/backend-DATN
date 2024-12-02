@@ -7,7 +7,7 @@ const { createAppointment } = require("../controllers/appointment.controller");
 
 const defaultSize = 1000000;
 
-const createBooking = async (result,req, res,next) => {
+const createBooking = async (result, req, res, next) => {
   const payload = jwt.decode(result);
   /* Kiểm tra thơì gian booking tránh bị trùng lặp */
   const appointment_time = req.body.appointment_time;
@@ -17,14 +17,14 @@ const createBooking = async (result,req, res,next) => {
     where: {
       patient_id: payload.patient.id,
       appointment_date: appointmentDate,
-      appointment_hour: appointmentHour
-    }
-  })
-  if(isExistBookingInThisTime.length !== 0){
+      appointment_hour: appointmentHour,
+    },
+  });
+  if (isExistBookingInThisTime.length !== 0) {
     return res.status(400).json({
       result: 0,
-      msg: `Please choose another time booking , had at least booking with this time ${appointmentDate} ${appointmentHour}`
-    })
+      msg: `Please choose another time booking , had at least booking with this time ${appointmentDate} ${appointmentHour}`,
+    });
   }
   const request = {
     service_id: req.body.service_id,
@@ -77,10 +77,12 @@ const createBooking = async (result,req, res,next) => {
     },
   });
 };
-const deleteBooking = async (data,req,res,next) => {
+const deleteBooking = async (data, req, res, next) => {
   const payload = jwt.verify(data, process.env.JWT_SECRET);
-  if(payload.hasOwnProperty("patient")
-      || (payload.hasOwnProperty("doctor") && payload.doctor.role !== "doctor")){
+  if (
+    payload.hasOwnProperty("patient") ||
+    (payload.hasOwnProperty("doctor") && payload.doctor.role !== "doctor")
+  ) {
     const id = req.params.id;
     const requestBooking = await Booking.findOne({
       where: { id: id },
@@ -98,10 +100,10 @@ const deleteBooking = async (data,req,res,next) => {
       });
     } else if (requestBooking.status === booking_status.PROCESSING) {
       await Booking.update(
-          { status: booking_status.CANCEL },
-          {
-            where: { id: id },
-          }
+        { status: booking_status.CANCEL },
+        {
+          where: { id: id },
+        }
       );
       res.status(200).json({
         result: 1,
@@ -111,16 +113,19 @@ const deleteBooking = async (data,req,res,next) => {
   } else {
     res.status(400).json({
       result: 0,
-      msg: "You don't allow to delete booking because you not have permission"
-    })
+      msg: "You don't allow to delete booking because you not have permission",
+    });
   }
 };
-const readAllBooking = async (data,req,res,next) => {
+const readAllBooking = async (data, req, res, next) => {
   const { length, page } = req.params;
   const limit = length ? length : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
   /* Lấy ra toàn bộ thông tin booking cho bác sĩ */
-  if(jwt.decode(data).hasOwnProperty('doctor') && jwt.decode(data).doctor.role !== "doctor"){
+  if (
+    jwt.decode(data).hasOwnProperty("doctor") &&
+    jwt.decode(data).doctor.role !== "doctor"
+  ) {
     const result = await Booking.findAll({
       limit: limit,
       offset: offset,
@@ -135,81 +140,83 @@ const readAllBooking = async (data,req,res,next) => {
       result: 1,
       quantity: result.length,
       data: await Promise.all(
-          result.map(async (item) => {
-            const service = await Service.findOne({
-              where: { id: item?.service_id },
-            });
-            return {
-              id: item.id,
-              booking_name: item.booking_name,
-              booking_phone: item.booking_phone,
-              name: item.name,
-              gender: item.gender,
-              birthday: item.birthday,
-              address: item.address,
-              reason: item.reason,
-              appointment_time: `${item.appointment_date} ${item.appointment_hour}`,
-              status: item.status,
-              create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-              update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-              service: {
-                id: item.service_id,
-                name: service.name,
-              },
-            };
-          })
+        result.map(async (item) => {
+          const service = await Service.findOne({
+            where: { id: item?.service_id },
+          });
+          return {
+            id: item.id,
+            booking_name: item.booking_name,
+            booking_phone: item.booking_phone,
+            name: item.name,
+            gender: item.gender,
+            birthday: item.birthday,
+            address: item.address,
+            reason: item.reason,
+            appointment_time: `${item.appointment_date} ${item.appointment_hour}`,
+            status: item.status,
+            create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+            update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+            service: {
+              id: item.service_id,
+              name: service.name,
+            },
+          };
+        })
       ),
     });
-  }
-  /* Lấy ra toàn bộ thông tin booking cho bác sĩ */
-  else if(jwt.decode(data).hasOwnProperty('patient')){
+  } else if (jwt.decode(data).hasOwnProperty("patient")) {
+    /* Lấy ra toàn bộ thông tin booking cho bác sĩ */
     const patientId = jwt.decode(data).patient.id;
     const result = await Booking.findAll({
-      where: {patient_id: patientId}
-    })
-    if(!result){
+      where: { patient_id: patientId },
+    });
+    if (!result) {
       res.status(500).json({
         result: 0,
-        msg: "Error ! Don't get all booking of you"
-      })
+        msg: "Error ! Don't get all booking of you",
+      });
     }
     res.status(200).json({
       result: 1,
       quantity: result.length,
       data: await Promise.all(
-          result.map(async (item) => {
-            const service = await Service.findOne({
-              where: { id: item?.service_id },
-            });
-            return {
-              id: item.id,
-              booking_name: item.booking_name,
-              booking_phone: item.booking_phone,
-              name: item.name,
-              gender: item.gender,
-              birthday: item.birthday,
-              address: item.address,
-              reason: item.reason,
-              appointment_time: `${item.appointment_date} ${item.appointment_hour}`,
-              status: item.status,
-              create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-              update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-              service: {
-                id: item.service_id,
-                name: service.name,
-              },
-            };
-          })
+        result.map(async (item) => {
+          const service = await Service.findOne({
+            where: { id: item?.service_id },
+          });
+          return {
+            id: item.id,
+            booking_name: item.booking_name,
+            booking_phone: item.booking_phone,
+            name: item.name,
+            gender: item.gender,
+            birthday: item.birthday,
+            address: item.address,
+            reason: item.reason,
+            appointment_time: `${item.appointment_date} ${item.appointment_hour}`,
+            status: item.status,
+            create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+            update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+            service: {
+              id: item.service_id,
+              name: service.name,
+            },
+          };
+        })
       ),
     });
   }
 };
-const readBookingById = async (data,req,res,next) => {
+const readBookingById = async (data, req, res, next) => {
   const id = req.params.id;
   const requestBooking = await Booking.findOne({
     where: { id: id },
   });
-  if(jwt.decode(data).hasOwnProperty('doctor') && jwt.decode(data).doctor.role !== "doctor"){
+  if (
+    jwt.decode(data).hasOwnProperty("doctor") &&
+    jwt.decode(data).doctor.role !== "doctor"
+  ) {
     if (!requestBooking) {
       res.status(404).json({
         result: 0,
@@ -241,8 +248,8 @@ const readBookingById = async (data,req,res,next) => {
         },
       },
     });
-  } else if(jwt.decode(data).hasOwnProperty('patient')){
-    if(requestBooking.patient_id === jwt.decode(data).patient.id){
+  } else if (jwt.decode(data).hasOwnProperty("patient")) {
+    if (requestBooking.patient_id === jwt.decode(data).patient.id) {
       if (!requestBooking) {
         res.status(404).json({
           result: 0,
@@ -277,13 +284,13 @@ const readBookingById = async (data,req,res,next) => {
     } else {
       res.status(404).json({
         result: 0,
-        msg: "Not available this booking"
-      })
+        msg: "Not available this booking",
+      });
     }
   }
 };
 
-const updateBooking = (result,req,res,next) => {
+const updateBooking = (result, req, res, next) => {
   const id = req.params.id;
   Booking.update(req.body, {
     where: { id: id },
@@ -301,45 +308,60 @@ const updateBooking = (result,req,res,next) => {
     });
 };
 
-const confirmBooking = async (req,res) => {
-  const id = req.params.id;
-  var new_req = req;
-  const booking = await Booking.findByPk(id);
-  new_req.body = {
-    booking_id: id,
-    doctor_id: req.body.doctor_id || null,
-    patient_id: booking.patient_id,
-    patient_name: booking.name,
-    patient_birthday: booking.birthday,
-    patient_reason: booking.reason,
-    patient_phone: booking.booking_phone,
-    numerical_order: null,
-    position: null,
-    appointment_time: booking.appointment_hour,
-    date: booking.appointment_date || null,
-    status: null,
-    create_at: new Date(), // automatically set the current date and time
-    update_at: new Date(), // automatically set the current date and time
-  };
-  const appointment = await createAppointment(new_req, res);
-  if (appointment != null) {
-    Booking.update(
-      {
-        status: booking_status.VERIFIED,
-      },
-      { where: { id: id } }
-    )
-      .then((data) => {
-        if (data == 1)
-          res.send({
-            message: "Booking was confirmed successfully.",
+const confirmBooking = async (data, req, res, next) => {
+  const auth = jwt.decode(data);
+  if (!auth.hasOwnProperty("doctor")) {
+    const id = req.params.id;
+    var new_req = req;
+    const booking = await Booking.findByPk(id);
+    new_req.body = {
+      booking_id: id,
+      doctor_id: req.body.doctor_id || null,
+      patient_id: booking.patient_id,
+      patient_name: booking.name,
+      patient_birthday: booking.birthday,
+      patient_reason: booking.reason,
+      patient_phone: booking.booking_phone,
+      numerical_order: null,
+      position: null,
+      appointment_time: booking.appointment_hour,
+      date: booking.appointment_date || null,
+      status: null,
+      create_at: new Date(), // automatically set the current date and time
+      update_at: new Date(), // automatically set the current date and time
+    };
+    const response_appointment = await createAppointment(new_req, res);
+
+    const appointment = response_appointment.appointment;
+
+    if (appointment != null) {
+      Booking.update(
+        {
+          status: booking_status.VERIFIED,
+        },
+        { where: { id: id } }
+      )
+        .then((data) => {
+          if (data == 1)
+            res.send({
+              success: 1,
+              message: "Booking was confirmed successfully.",
+            });
+        })
+        .catch((err) => {
+          res.status(500).send({
+            success: 0,
+            message: `Cannot confirm Booking with id=${id}`,
           });
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: `Cannot confirm Booking with id=${id}`,
         });
-      });
+    } else {
+      res.status(500).send(response_appointment);
+    }
+  } else {
+    res.status(404).json({
+      result: 0,
+      message: "Action not available",
+    });
   }
 };
 
