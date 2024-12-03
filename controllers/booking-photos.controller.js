@@ -15,6 +15,7 @@ const getPhotosByBookingId = async (info,req, res,next) => {
   res.status(200).json({
     result: 1,
     message: "Get photo successfully",
+    data: data
   });
 };
 const createBookingPhoto = async (info,req,res,next) => {

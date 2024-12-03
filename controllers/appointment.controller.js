@@ -22,16 +22,21 @@ const getAppointmentAll = (data, req, res, next) => {
   const condition = condition_active;
 
   Appointment.findAll({
-    where: condition,
+    // where: condition,
     limit: limit,
     offset: offset,
     // order: sorting.sortQuery(req, defaultSort, defaultDirection),
   })
     .then((data) => {
-      res.send({
-        data: data ? data : [],
-        count: data ? data.length : 0,
-      });
+      res.status(200).json({
+        result: 1,
+        msg: "Get all appointments successfully",
+        data: data
+      })
+      // res.send({
+      //   data: data ? data : [],
+      //   count: data ? data.length : 0,
+      // });
     })
     .catch((err) => {
       res.status(500).send({

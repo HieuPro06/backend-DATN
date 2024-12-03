@@ -3,7 +3,7 @@ const Doctor = require("../models/doctor.model");
 
 const defaultSize = 1000000;
 
-const getAllDrugs = async (data, req, res, next) => {
+const getAllDrugs = async (req, res, next) => {
   const { length, page } = req.body;
   const limit = length ? length : defaultSize;
   const offset = page ? (page - 1) * limit : 0;

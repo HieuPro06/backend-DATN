@@ -8,6 +8,8 @@ const createNewAppointmentRecord = async (req, res) => {
     description: req.body.description,
     status_before: req.body.status_before,
     status_after: req.body.status_after,
+    create_at: Date.now(),
+    update_at: Date.now()
   };
   const data = await AppointmentRecord.create(request);
   if (!data) {
