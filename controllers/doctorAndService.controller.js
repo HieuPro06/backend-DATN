@@ -72,9 +72,8 @@ const getDoctorsFromServiceId = async (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving doctor list.",
+      return res.status(500).json({
+        msg: err.message || "Some error occurred while retrieving doctor list.",
       });
     });
 };
@@ -118,8 +117,8 @@ const getServicesFromDoctorId = async (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
+      return res.status(500).json({
+        msg:
           err.message || "Some error occurred while retrieving service list.",
       });
     });
@@ -134,12 +133,12 @@ const deleteDoctorService = (req, res) => {
     .then((data) => {
       if (data == 1)
         res.send({
-          message: "Doctor Service pair was removed successfully.",
+          msg: "Doctor Service pair was removed successfully.",
         });
     })
     .catch((err) => {
-      res.status(500).send({
-        message: `Cannot remove Doctor Service pair with id=${id}`,
+      return res.status(500).json({
+        msg: `Cannot remove Doctor Service pair with id=${id}`,
       });
     });
 };

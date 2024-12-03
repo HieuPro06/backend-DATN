@@ -55,9 +55,8 @@ const getDoctorAll = (info, req, res, next) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving doctor list.",
+      return res.status(500).json({
+        msg: err.message || "Some error occurred while retrieving doctor list.",
       });
     });
 };
@@ -97,8 +96,8 @@ const getDoctorByID = (info, req, res, next) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving doctor.",
+      return res.status(500).json({
+        msg: err.message || "Some error occurred while retrieving doctor.",
       });
     });
 };
@@ -153,8 +152,8 @@ const createDoctor = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred creating doctor",
+      return res.status(500).json({
+        msg: err.message || "Some error occurred creating doctor",
       });
     });
 };
@@ -194,8 +193,8 @@ const updateDoctor = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message: `Cannot update Doctor with id=${id}`,
+      return res.status(500).json({
+        msg: `Cannot update Doctor with id=${id}`,
       });
     });
 };
@@ -212,14 +211,15 @@ const deleteDoctor = (req, res) => {
     .then((data) => {
       if (data == 1)
         res.send({
-          message: "Doctor was removed successfully.",
+          msg: "Doctor was removed successfully.",
         });
     })
     .catch((err) => {
-      res.status(500).send({
-        message: `Cannot remove Doctor with id=${id}`,
+      return res.status(500).json({
+        msg: `Cannot remove Doctor with id=${id}`,
       });
     });
+  ``;
 };
 
 module.exports = {

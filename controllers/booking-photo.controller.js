@@ -9,12 +9,12 @@ const getBookingPhoto = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Get photo ${id} failed`,
+      msg: `Get photo ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get photo successfully",
+    msg: "Get photo successfully",
   });
 };
 
@@ -27,12 +27,12 @@ const deleteBookingPhoto = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Delete photo ${id} failed`,
+      msg: `Delete photo ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Delete photo successfully",
+    msg: "Delete photo successfully",
   });
 };
 

@@ -45,7 +45,7 @@ const SignupController = async (req, res) => {
       /* Mã hoá password */
       bcrypt.hash(request.password, salt, async (err, hashedPassword) => {
         if (err) {
-          return res.status(500).json({ message: "Error hashing password" });
+          return res.status(500).json({ msg: "Error hashing password" });
         }
         request.password = hashedPassword;
         /* Xử lý đăng ký */
@@ -90,7 +90,7 @@ const SignupController = async (req, res) => {
       /* Mã hoá password */
       bcrypt.hash(request.password, salt, async (err, hashedPassword) => {
         if (err) {
-          return res.status(500).json({ message: "Error hashing password" });
+          return res.status(500).json({ msg: "Error hashing password" });
         }
         request.password = hashedPassword;
         try {

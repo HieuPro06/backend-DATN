@@ -14,12 +14,12 @@ const getAllSpeciality = async (data, req, res, next) => {
   if (!result) {
     res.status(500).json({
       result: 0,
-      message: "Error , Don't get specialities",
+      msg: "Error , Don't get specialities",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get all specialities successfully",
+    msg: "Get all specialities successfully",
     data: result,
   });
 };
@@ -32,12 +32,12 @@ const getSpecialityById = async (data, req, res, next) => {
   if (!result) {
     res.status(500).json({
       result: 0,
-      message: `Get speciality with id=${id} failed`,
+      msg: `Get speciality with id=${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get speciality successfully",
+    msg: "Get speciality successfully",
     data: result,
   });
 };
@@ -52,12 +52,12 @@ const createSpeciality = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: "Create speciality failed",
+      msg: "Create speciality failed",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Create speciality successfully",
+    msg: "Create speciality successfully",
     data: data,
   });
 };
@@ -69,12 +69,12 @@ const updateSpeciality = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Update speciality ${id} failed`,
+      msg: `Update speciality ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Update speciality successfully",
+    msg: "Update speciality successfully",
   });
 };
 const deleteSpeciality = async (req, res) => {
@@ -85,7 +85,7 @@ const deleteSpeciality = async (req, res) => {
   if (isExistDoctor) {
     res.json({
       result: 0,
-      message: "This speciality can't be deleted because it's have doctor",
+      msg: "This speciality can't be deleted because it's have doctor",
     });
   }
   const data = await Speciality.destroy({
@@ -94,12 +94,12 @@ const deleteSpeciality = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Delete speciality ${id} failed`,
+      msg: `Delete speciality ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Delete speciality successfully",
+    msg: "Delete speciality successfully",
   });
 };
 

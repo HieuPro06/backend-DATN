@@ -39,7 +39,7 @@ const getAppointmentAll = (data, req, res, next) => {
       // });
     })
     .catch((err) => {
-      res.status(500).send({
+      return res.status(500).json({
         msg:
           err.message ||
           "Some error occurred while retrieving appointment list.",
@@ -58,7 +58,7 @@ const getAppointmentByID = (data, req, res, next) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
+      return res.status(500).json({
         msg: err.message || "Some error occurred while retrieving appointment.",
       });
     });
@@ -87,9 +87,9 @@ const createAppointment = async (req, res) => {
 
   const bookingRec = await Booking.findByPk(req.body.booking_id);
   const service_id = bookingRec.service_id ? bookingRec.service_id : null;
-
+  var appointDoctor = null
   if (appointment_values.doctor_id == null) {
-    const appointDoctor = await doctorAutoAppoint(
+    appointDoctor = await doctorAutoAppoint(
       appointment_values.date,
       appointment_values.appointment_time,
       service_id
@@ -190,7 +190,7 @@ const updateAppointment = (req, res) => {
         });
     })
     .catch((err) => {
-      res.status(500).send({
+      return res.status(500).json({
         result: 0,
         msg: `Cannot update Appointment with id=${id}`,
       });

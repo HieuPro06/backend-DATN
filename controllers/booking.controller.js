@@ -298,17 +298,17 @@ const updateBooking = (result, req, res, next) => {
     .then((data) => {
       if (data == 1)
         res.send({
-          message: "Booking was updated successfully.",
+          msg: "Booking was updated successfully.",
         });
     })
     .catch((err) => {
-      res.status(500).send({
-        message: `Cannot update Booking with id=${id}`,
+      return res.status(500).json({
+        msg: `Cannot update Booking with id=${id}`,
       });
     });
 };
 
-const confirmBooking = async (data, req, res, next) => {
+const confirmBooking = async (req, res) => {
   const access_token = req.headers["authorization"];
   const token = access_token.split(" ")[1];
   const payload = jwt.verify(token, process.env.JWT_SECRET);
@@ -356,17 +356,17 @@ const confirmBooking = async (data, req, res, next) => {
         if (data == 1)
           res.send({
             success: 1,
-            message: "Booking was confirmed successfully.",
+            msg: "Booking was confirmed successfully.",
           });
       })
       .catch((err) => {
-        res.status(500).send({
+        return res.status(500).json({
           success: 0,
-          message: `Cannot confirm Booking with id=${id}`,
+          msg: `Cannot confirm Booking with id=${id}`,
         });
       });
   } else {
-    res.status(500).send(response_appointment);
+    return res.status(500).json(response_appointment);
   }
 };
 

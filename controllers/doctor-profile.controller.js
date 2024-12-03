@@ -7,7 +7,7 @@ const doctorProfileController = async (data, req, res, next) => {
   });
   res.status(200).json({
     result: 1,
-    message: "Successfully",
+    msg: "Successfully",
     data: result,
   });
 };

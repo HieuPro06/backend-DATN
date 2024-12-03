@@ -60,9 +60,8 @@ const doctorAndServiceReady = async (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving doctor list.",
+      return res.status(500).json({
+        msg: err.message || "Some error occurred while retrieving doctor list.",
       });
     });
 };

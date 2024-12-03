@@ -24,7 +24,7 @@ const loginController = async (req, res) => {
           if (err) {
             return res
               .status(500)
-              .json({ message: "Error comparing passwords" });
+              .json({ msg: "Error comparing passwords" });
           }
           if (!isMatch) {
             return res.status(401).json({
@@ -75,7 +75,7 @@ const loginController = async (req, res) => {
         });
       } else {
         res.status(404).json({
-          message: "Account invalid",
+          msg: "Account invalid",
         });
       }
     } else {
@@ -95,7 +95,7 @@ const loginController = async (req, res) => {
           if (err) {
             return res
               .status(500)
-              .json({ message: "Error comparing passwords" });
+              .json({ msg: "Error comparing passwords" });
           }
           if (!isMatch) {
             return res.status(401).json({
