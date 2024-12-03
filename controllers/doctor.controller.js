@@ -2,7 +2,7 @@ const Doctor = require("../models/doctor.model.js");
 const Room = require("../models/room.model.js");
 const Speciality = require("../models/speciality.model.js");
 
-const defaultSize = 10;
+const defaultSize = 100;
 const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { active: 1 };
