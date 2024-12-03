@@ -7,7 +7,7 @@ const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { active: 1 };
 
-const getDoctorAll = (info,req,res,next) => {
+const getDoctorAll = (info, req, res, next) => {
   const { size, page } = req.body;
 
   const limit = size ? size : defaultSize;
@@ -62,7 +62,7 @@ const getDoctorAll = (info,req,res,next) => {
     });
 };
 
-const getDoctorByID = (info,req,res,next) => {
+const getDoctorByID = (info, req, res, next) => {
   const id = req.params.id;
 
   Doctor.findByPk(id)
@@ -162,7 +162,7 @@ const createDoctor = (req, res) => {
 const updateDoctor = (req, res) => {
   const id = req.params.id;
 
-  Doctor.update(req.body)
+  Doctor.update(req.body, { where: { id: id } })
     .then(async (data) => {
       const speciality = await Speciality.findByPk(
         element.dataValues.speciality_id

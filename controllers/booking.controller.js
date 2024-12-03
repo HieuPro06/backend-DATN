@@ -309,59 +309,64 @@ const updateBooking = (result, req, res, next) => {
 };
 
 const confirmBooking = async (data, req, res, next) => {
-  const auth = jwt.decode(data);
-  if (!auth.hasOwnProperty("doctor")) {
-    const id = req.params.id;
-    var new_req = req;
-    const booking = await Booking.findByPk(id);
-    new_req.body = {
-      booking_id: id,
-      doctor_id: req.body.doctor_id || null,
-      patient_id: booking.patient_id,
-      patient_name: booking.name,
-      patient_birthday: booking.birthday,
-      patient_reason: booking.reason,
-      patient_phone: booking.booking_phone,
-      numerical_order: null,
-      position: null,
-      appointment_time: booking.appointment_hour,
-      date: booking.appointment_date || null,
-      status: null,
-      create_at: new Date(), // automatically set the current date and time
-      update_at: new Date(), // automatically set the current date and time
-    };
-    const response_appointment = await createAppointment(new_req, res);
-
-    const appointment = response_appointment.appointment;
-
-    if (appointment != null) {
-      Booking.update(
-        {
-          status: booking_status.VERIFIED,
-        },
-        { where: { id: id } }
-      )
-        .then((data) => {
-          if (data == 1)
-            res.send({
-              success: 1,
-              message: "Booking was confirmed successfully.",
-            });
-        })
-        .catch((err) => {
-          res.status(500).send({
-            success: 0,
-            message: `Cannot confirm Booking with id=${id}`,
-          });
-        });
-    } else {
-      res.status(500).send(response_appointment);
-    }
-  } else {
-    res.status(404).json({
+  const access_token = req.headers["authorization"];
+  const token = access_token.split(" ")[1];
+  const payload = jwt.verify(token, process.env.JWT_SECRET);
+  if (
+    !payload.hasOwnProperty("doctor") ||
+    (payload.doctor.role !== "supporter" && payload.doctor.role !== "admin")
+  ) {
+    return res.status(400).json({
       result: 0,
-      message: "Action not available",
+      msg: "Not allowed to perform this action",
     });
+  }
+
+  const id = req.params.id;
+  var new_req = req;
+  const booking = await Booking.findByPk(id);
+  new_req.body = {
+    booking_id: id,
+    doctor_id: req.body.doctor_id || null,
+    patient_id: booking.patient_id,
+    patient_name: booking.name,
+    patient_birthday: booking.birthday,
+    patient_reason: booking.reason,
+    patient_phone: booking.booking_phone,
+    numerical_order: null,
+    position: null,
+    appointment_time: booking.appointment_hour,
+    date: booking.appointment_date || null,
+    status: null,
+    create_at: new Date(), // automatically set the current date and time
+    update_at: new Date(), // automatically set the current date and time
+  };
+  const response_appointment = await createAppointment(new_req, res);
+
+  const appointment = response_appointment.appointment;
+
+  if (appointment != null) {
+    Booking.update(
+      {
+        status: booking_status.VERIFIED,
+      },
+      { where: { id: id } }
+    )
+      .then((data) => {
+        if (data == 1)
+          res.send({
+            success: 1,
+            message: "Booking was confirmed successfully.",
+          });
+      })
+      .catch((err) => {
+        res.status(500).send({
+          success: 0,
+          message: `Cannot confirm Booking with id=${id}`,
+        });
+      });
+  } else {
+    res.status(500).send(response_appointment);
   }
 };
 
