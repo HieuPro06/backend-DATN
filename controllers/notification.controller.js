@@ -12,7 +12,7 @@ const getAllNotifications = async (data, req, res, next) => {
     if (patient_id == null) {
       res.status(500).json({
         result: 0,
-        message: "Error",
+        msg: "Error",
       });
     }
 
@@ -29,18 +29,18 @@ const getAllNotifications = async (data, req, res, next) => {
     if (!result) {
       res.status(500).json({
         result: 0,
-        message: "Error",
+        msg: "Error",
       });
     }
     res.status(200).json({
       result: 1,
-      message: "Get all notifications successfully",
+      msg: "Get all notifications successfully",
       data: result,
     });
   } catch (err) {
     res.status(500).json({
       result: 0,
-      message: err,
+      msg: err,
     });
   }
 };
@@ -54,18 +54,18 @@ const getNotificationById = async (data, req, res, next) => {
     if (!result) {
       res.status(404).json({
         result: 0,
-        message: `Get notification with id=${id} failed`,
+        msg: `Get notification with id=${id} failed`,
       });
     }
     res.status(200).json({
       result: 1,
-      message: "Get notification successfully",
+      msg: "Get notification successfully",
       data: result,
     });
   } catch (err) {
     res.status(500).json({
       result: 0,
-      message: err,
+      msg: err,
     });
   }
 };
@@ -78,7 +78,7 @@ const createNotification = async (data, req, res, next) => {
     if (patient_id == null) {
       res.status(500).json({
         result: 0,
-        message: "Error",
+        msg: "Error",
       });
     }
 
@@ -91,18 +91,18 @@ const createNotification = async (data, req, res, next) => {
     if (!data) {
       res.status(500).json({
         result: 0,
-        message: "Create notification failed",
+        msg: "Create notification failed",
       });
     }
     res.status(200).json({
       result: 1,
-      message: "Create notification successfully",
+      msg: "Create notification successfully",
       data: data,
     });
   } catch (err) {
     res.status(500).json({
       result: 0,
-      message: err,
+      msg: err,
     });
   }
 };
@@ -116,7 +116,7 @@ const markAsRead = async (data, req, res, next) => {
     if (patient_id == null) {
       res.status(500).json({
         result: 0,
-        message: "Error",
+        msg: "Error",
       });
     }
 
@@ -127,18 +127,18 @@ const markAsRead = async (data, req, res, next) => {
     if (!data) {
       res.status(500).json({
         result: 0,
-        message: "Mark as read failed",
+        msg: "Mark as read failed",
       });
     }
     res.status(200).json({
       result: 1,
-      message: "Mark as read successfully",
+      msg: "Mark as read successfully",
       data: data,
     });
   } catch (err) {
     res.status(500).json({
       result: 0,
-      message: err,
+      msg: err,
     });
   }
 };
@@ -151,7 +151,7 @@ const markAsReadAll = async (data, req, res, next) => {
     if (patient_id == null) {
       res.status(500).json({
         result: 0,
-        message: "Error",
+        msg: "Error",
       });
     }
 
@@ -162,18 +162,18 @@ const markAsReadAll = async (data, req, res, next) => {
     if (!data) {
       res.status(500).json({
         result: 0,
-        message: "Mark as read failed",
+        msg: "Mark as read failed",
       });
     }
     res.status(200).json({
       result: 1,
-      message: "Mark as read successfully",
+      msg: "Mark as read successfully",
       data: data,
     });
   } catch (err) {
     res.status(500).json({
       result: 0,
-      message: err,
+      msg: err,
     });
   }
 };

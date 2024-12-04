@@ -1,6 +1,6 @@
 const BookingPhoto = require("../models/bookingPhoto.model");
 
-const getPhotosByBookingId = async (info,req, res,next) => {
+const getPhotosByBookingId = async (info, req, res, next) => {
   const id = req.params.id;
 
   const data = await BookingPhoto.findAll({
@@ -9,37 +9,37 @@ const getPhotosByBookingId = async (info,req, res,next) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Get photo ${id} failed`,
+      msg: `Get photo ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get photo successfully",
-    data: data
+    msg: "Get photo successfully",
+    data: data,
   });
 };
-const createBookingPhoto = async (info,req,res,next) => {
+const createBookingPhoto = async (info, req, res, next) => {
   const request = {
     booking_id: req.body.booking_id,
-    url: req.body.url
-  }
-  try{
+    url: req.body.url,
+  };
+  try {
     const data = await BookingPhoto.create(request);
-    if(data){
+    if (data) {
       res.status(200).json({
         result: 1,
-        msg: "Upload booking photo successfully"
-      })
+        msg: "Upload booking photo successfully",
+      });
     }
   } catch (e) {
     return res.status(500).json({
       result: 0,
-      msg: e || "Upload booking photo failed , please try again !"
-    })
+      msg: e || "Upload booking photo failed , please try again !",
+    });
   }
-}
+};
 
 module.exports = {
   getPhotosByBookingId,
-  createBookingPhoto
+  createBookingPhoto,
 };

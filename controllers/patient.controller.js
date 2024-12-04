@@ -20,8 +20,8 @@ const getPatientAll = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
+      return res.status(500).json({
+        msg:
           err.message || "Some error occurred while retrieving patients list.",
       });
     });
@@ -38,9 +38,8 @@ const getPatientById = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving patients.",
+      return res.status(500).json({
+        msg: err.message || "Some error occurred while retrieving patients.",
       });
     });
 };
@@ -54,12 +53,12 @@ const updatePatient = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Update patient ${id} failed`,
+      msg: `Update patient ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Update patient successfully",
+    msg: "Update patient successfully",
   });
 };
 
@@ -71,12 +70,12 @@ const deletePatient = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Delete patient ${id} failed`,
+      msg: `Delete patient ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Delete patient successfully",
+    msg: "Delete patient successfully",
   });
 };
 

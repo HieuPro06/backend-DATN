@@ -14,12 +14,12 @@ const getAllDrugs = async (req, res, next) => {
   if (!result) {
     res.status(500).json({
       result: 0,
-      message: "Error , Don't get drugs",
+      msg: "Error , Don't get drugs",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get all drugs successfully",
+    msg: "Get all drugs successfully",
     data: result,
   });
 };
@@ -32,12 +32,12 @@ const getDrugById = async (data, req, res, next) => {
   if (!result) {
     res.status(404).json({
       result: 0,
-      message: `Get drug with id=${id} failed`,
+      msg: `Get drug with id=${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get drug successfully",
+    msg: "Get drug successfully",
     data: result,
   });
 };
@@ -53,19 +53,19 @@ const createDrug = async (req, res) => {
   if (isExistDrugName) {
     res.status(400).json({
       result: 0,
-      message: "Drug name was exist",
+      msg: "Drug name was exist",
     });
   }
   const data = await Drug.create(request);
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: "Create drug failed",
+      msg: "Create drug failed",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Create drug successfully",
+    msg: "Create drug successfully",
     data: data,
   });
 };
@@ -77,12 +77,12 @@ const updateDrug = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Update drug ${id} failed`,
+      msg: `Update drug ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Update drug successfully",
+    msg: "Update drug successfully",
   });
 };
 const deleteDrug = async (req, res) => {
@@ -93,7 +93,7 @@ const deleteDrug = async (req, res) => {
   if (isExistDoctor) {
     res.json({
       result: 0,
-      message: "This drug can't be deleted because it's have doctor",
+      msg: "This drug can't be deleted because it's have doctor",
     });
   }
   const data = await Drug.destroy({
@@ -102,12 +102,12 @@ const deleteDrug = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Delete drug ${id} failed`,
+      msg: `Delete drug ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Delete drug successfully",
+    msg: "Delete drug successfully",
   });
 };
 

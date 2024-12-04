@@ -14,12 +14,12 @@ const getAllRooms = async (data, req, res, next) => {
   if (!result) {
     res.status(500).json({
       result: 0,
-      message: "Error , Don't get rooms",
+      msg: "Error , Don't get rooms",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get all rooms successfully",
+    msg: "Get all rooms successfully",
     data: result,
   });
 };
@@ -32,12 +32,12 @@ const getRoomById = async (data, req, res, next) => {
   if (!result) {
     res.status(404).json({
       result: 0,
-      message: `Get room with id=${id} failed`,
+      msg: `Get room with id=${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get room successfully",
+    msg: "Get room successfully",
     data: result,
   });
 };
@@ -53,19 +53,19 @@ const createRoom = async (req, res) => {
   if (isExistRoomName) {
     res.status(400).json({
       result: 0,
-      message: "Room name was exist",
+      msg: "Room name was exist",
     });
   }
   const data = await Room.create(request);
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: "Create room failed",
+      msg: "Create room failed",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Create room successfully",
+    msg: "Create room successfully",
     data: data,
   });
 };
@@ -77,12 +77,12 @@ const updateRoom = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Update room ${id} failed`,
+      msg: `Update room ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Update room successfully",
+    msg: "Update room successfully",
   });
 };
 const deleteRoom = async (req, res) => {
@@ -93,7 +93,7 @@ const deleteRoom = async (req, res) => {
   if (isExistDoctor) {
     res.json({
       result: 0,
-      message: "This room can't be deleted because it's have doctor",
+      msg: "This room can't be deleted because it's have doctor",
     });
   }
   const data = await Room.destroy({
@@ -102,12 +102,12 @@ const deleteRoom = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Delete room ${id} failed`,
+      msg: `Delete room ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Delete room successfully",
+    msg: "Delete room successfully",
   });
 };
 

@@ -13,12 +13,12 @@ const getAllServices = async (data, req, res, next) => {
   if (!result) {
     res.status(500).json({
       result: 0,
-      message: "Error , Don't get services",
+      msg: "Error , Don't get services",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get all services successfully",
+    msg: "Get all services successfully",
     data: result,
   });
 };
@@ -31,12 +31,12 @@ const getServiceById = async (data, req, res, next) => {
   if (!result) {
     res.status(404).json({
       result: 0,
-      message: `Get service with id=${id} failed`,
+      msg: `Get service with id=${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Get service successfully",
+    msg: "Get service successfully",
     data: result,
   });
 };
@@ -53,19 +53,19 @@ const createService = async (req, res) => {
   if (isExistServiceName) {
     res.status(400).json({
       result: 0,
-      message: "Service name was exist",
+      msg: "Service name was exist",
     });
   }
   const data = await Service.create(request);
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: "Create service failed",
+      msg: "Create service failed",
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Create service successfully",
+    msg: "Create service successfully",
     data: data,
   });
 };
@@ -77,12 +77,12 @@ const updateService = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Update service ${id} failed`,
+      msg: `Update service ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Update service successfully",
+    msg: "Update service successfully",
   });
 };
 const deleteService = async (req, res) => {
@@ -93,12 +93,12 @@ const deleteService = async (req, res) => {
   if (!data) {
     res.status(500).json({
       result: 0,
-      message: `Delete service ${id} failed`,
+      msg: `Delete service ${id} failed`,
     });
   }
   res.status(200).json({
     result: 1,
-    message: "Delete service successfully",
+    msg: "Delete service successfully",
   });
 };
 
