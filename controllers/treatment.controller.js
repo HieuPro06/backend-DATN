@@ -67,7 +67,7 @@ const getAllTreatments = async (info,req,res,next) => {
 }
 
 const updateTreatment = async (req,res) => {
-  const appointmentId = req.params.id;
+  const id = req.params.id;
   const request = {
     name: req.body.name,
     type: req.body.type,
@@ -79,11 +79,11 @@ const updateTreatment = async (req,res) => {
   }
   try{
     const result = await Treatment.update(request,{
-      where: {appointment_id: appointmentId}
+      where: {id: id}
     })
     if(result){
       const afterUpdateData = await Treatment.findOne({
-        where: {appointment_id: appointmentId}
+        where: {id: id}
       })
       res.status(200).json({
         result: 1,

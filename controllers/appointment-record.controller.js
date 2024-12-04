@@ -44,7 +44,7 @@ const getAppointmentRecord = async (info,req, res,next) => {
   }
 };
 const updateAppointmentRecord = async (req,res) => {
-  const appointmentId = req.params.id;
+  const id = req.params.id;
   const request = {
     reason: req.body.reason,
     description: req.body.description,
@@ -52,14 +52,13 @@ const updateAppointmentRecord = async (req,res) => {
     status_after: req.body.status_after,
     update_at: Date.now()
   }
-  console.log(request);
   try{
     const result = await AppointmentRecord.update(request,{
-      where: {appointment_id: appointmentId}
+      where: {id: id}
     })
     if(result){
       const afterUpdateData = await AppointmentRecord.findOne({
-        where: {appointment_id: appointmentId}
+        where: {id: id}
       })
       res.status(200).json({
         result: 1,
@@ -99,7 +98,7 @@ const getAllAppointmentRecords = async (info,req,res,next) => {
 const deleteAppointmentRecord = async (req,res) => {
   try{
     const data = await AppointmentRecord.destroy({
-      where: {appointment_id: req.params.id}
+      where: {id: req.params.id}
     })
     if(data){
       return res.status(200).json({
