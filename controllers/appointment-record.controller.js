@@ -95,9 +95,29 @@ const getAllAppointmentRecords = async (info,req,res,next) => {
     })
   }
 }
+const deleteAppointmentRecord = async (req,res) => {
+  try{
+    const data = await AppointmentRecord.destroy({
+      where: {id: req.params.id}
+    })
+    if(data){
+      return res.status(200).json({
+        result: 1,
+        msg: "Remove successfully"
+      })
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      result: 0,
+      msg: "Remove failed"
+    })
+  }
+}
 module.exports = {
   createNewAppointmentRecord,
   getAppointmentRecord,
   updateAppointmentRecord,
-  getAllAppointmentRecords
+  getAllAppointmentRecords,
+  deleteAppointmentRecord
 };
