@@ -52,6 +52,7 @@ const updateAppointmentRecord = async (req,res) => {
     status_after: req.body.status_after,
     update_at: Date.now()
   }
+  console.log(request);
   try{
     const result = await AppointmentRecord.update(request,{
       where: {appointment_id: appointmentId}
@@ -98,7 +99,7 @@ const getAllAppointmentRecords = async (info,req,res,next) => {
 const deleteAppointmentRecord = async (req,res) => {
   try{
     const data = await AppointmentRecord.destroy({
-      where: {id: req.params.id}
+      where: {appointment_id: req.params.id}
     })
     if(data){
       return res.status(200).json({

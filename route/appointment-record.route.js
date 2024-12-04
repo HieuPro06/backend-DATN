@@ -11,4 +11,5 @@ AppointmentRecordRouter.get("/:id",isLogInController,getAppointmentRecord);
 AppointmentRecordRouter.post("/",isDoctorController,createNewAppointmentRecord);
 AppointmentRecordRouter.put("/:id",isDoctorController,updateAppointmentRecord)
 AppointmentRecordRouter.delete("/:id",isDoctorController,deleteAppointmentRecord);
+
 module.exports = AppointmentRecordRouter;

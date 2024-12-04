@@ -98,9 +98,29 @@ const updateTreatment = async (req,res) => {
     })
   }
 }
+const deleteTreatment = async (req,res) => {
+  try{
+    const data = await Treatment.destroy({
+      where: {id: req.params.id}
+    })
+    if(data){
+      return res.status(200).json({
+        result: 1,
+        msg: "Remove successfully"
+      })
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      result: 0,
+      msg: "Remove failed"
+    })
+  }
+}
 module.exports = {
   createNewTreatment,
   getTreatment,
   getAllTreatments,
-  updateTreatment
+  updateTreatment,
+  deleteTreatment
 };
