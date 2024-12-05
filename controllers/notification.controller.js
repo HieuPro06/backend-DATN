@@ -178,10 +178,48 @@ const markAsReadAll = async (data, req, res, next) => {
   }
 };
 
+const countUnread = async (data, req, res, next) => {
+  try {
+    const auth = jwt.decode(data);
+    const patient_id = auth.patient.id ? auth.patient.id : null;
+
+    if (patient_id == null) {
+      res.status(500).json({
+        result: 0,
+        msg: "Error",
+      });
+    }
+
+    const result = await Notification.count({
+      where: {
+        patient_id: patient_id,
+        is_read: 0,
+      },
+    });
+    if (!result) {
+      res.status(500).json({
+        result: 0,
+        msg: "Error",
+      });
+    }
+    res.status(200).json({
+      result: 1,
+      msg: "Get unread notifications number successfully",
+      data: result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      result: 0,
+      msg: err,
+    });
+  }
+};
+
 module.exports = {
   getAllNotifications,
   getNotificationById,
   createNotification,
   markAsRead,
   markAsReadAll,
+  countUnread,
 };

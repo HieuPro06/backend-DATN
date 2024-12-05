@@ -4,6 +4,7 @@ const Room = require("../models/room.model.js");
 const Service = require("../models/service.model.js");
 const Speciality = require("../models/speciality.model.js");
 const { getServiceById } = require("./services.controller.js");
+const { Op } = require("sequelize");
 
 const defaultSize = 10;
 const defaultSort = "id";

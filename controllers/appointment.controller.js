@@ -11,6 +11,7 @@ const defaultSize = 10;
 const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { status: appointment_status.PROCESSING };
+const { Op } = require("sequelize");
 
 const appointment_number_threshold = 20;
 
@@ -31,8 +32,8 @@ const getAppointmentAll = (data, req, res, next) => {
       res.status(200).json({
         result: 1,
         msg: "Get all appointments successfully",
-        data: data
-      })
+        data: data,
+      });
       // res.send({
       //   data: data ? data : [],
       //   count: data ? data.length : 0,
@@ -87,7 +88,7 @@ const createAppointment = async (req, res) => {
 
   const bookingRec = await Booking.findByPk(req.body.booking_id);
   const service_id = bookingRec.service_id ? bookingRec.service_id : null;
-  var appointDoctor = null
+  var appointDoctor = null;
   if (appointment_values.doctor_id == null) {
     appointDoctor = await doctorAutoAppoint(
       appointment_values.date,
