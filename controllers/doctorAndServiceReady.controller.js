@@ -3,6 +3,7 @@ const DoctorAndService = require("../models/doctorAndService.model.js");
 const Room = require("../models/room.model.js");
 const Service = require("../models/service.model.js");
 const Speciality = require("../models/speciality.model.js");
+const { Op } = require("sequelize");
 
 const doctorAndServiceReady = async (req, res) => {
   const id = req.params.id;
