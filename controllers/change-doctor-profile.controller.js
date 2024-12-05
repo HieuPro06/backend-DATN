@@ -1,6 +1,7 @@
 const Doctor = require("../models/doctor.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+
 const changeDoctorProfileController = async (data, req, res, next) => {
   const payload = jwt.decode(data);
   const salt = 10;
@@ -20,7 +21,7 @@ const changeDoctorProfileController = async (data, req, res, next) => {
   }
   else if (req.body.action === "avatar") {
     const urlObj = {
-      url: req.body.url,
+      avatar: req.body.url,
     };
     const result = await Doctor.update(urlObj, {
       where: { id: payload.doctor.id },
