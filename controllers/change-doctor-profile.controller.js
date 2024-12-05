@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const changeDoctorProfileController = async (data, req, res, next) => {
   const payload = jwt.decode(data);
+  const salt = 10;
   if (req.body.action === "personal") {
     const result = await Doctor.update(req.body, {
       where: { id: payload.doctor.id },
@@ -16,7 +17,8 @@ const changeDoctorProfileController = async (data, req, res, next) => {
       result: 1,
       msg: "Update personal info successfully",
     });
-  } else if (req.body.action === "avatar") {
+  }
+  else if (req.body.action === "avatar") {
     const urlObj = {
       url: req.body.url,
     };
@@ -32,7 +34,8 @@ const changeDoctorProfileController = async (data, req, res, next) => {
       result: 1,
       msg: "Update avatar successfully",
     });
-  } else if (req.body.action === "password") {
+  }
+  else if (req.body.action === "password") {
     const result = await Doctor.findOne({
       where: { id: payload.doctor.id },
     });
@@ -50,44 +53,53 @@ const changeDoctorProfileController = async (data, req, res, next) => {
             msg: "Wrong password , please re-enter",
           });
         }
-        try {
-          const isUpdatePassword = await Doctor.update(
-            { password: req.body.newPassword },
-            {
-              where: { id: payload.doctor.id },
+        const request = {
+          password: req.body.newPassword
+        }
+        bcrypt.hash(request.password, salt, async (err, hashedPassword) => {
+          if (err) {
+            return res.status(500).json({ msg: "Error hashing password" });
+          }
+          request.password = hashedPassword;
+          try {
+            const isUpdatePassword = await Doctor.update(
+                request,
+                {
+                  where: { id: payload.doctor.id },
+                }
+            );
+            if (isUpdatePassword) {
+              const afterUpdateData = await Doctor.findOne({
+                where: { id: payload.doctor.id },
+              });
+              res.status(200).json({
+                result: 1,
+                msg: "Update password successfully",
+                data: {
+                  id: afterUpdateData.id,
+                  email: afterUpdateData.email,
+                  phone: afterUpdateData.phone,
+                  name: afterUpdateData.name,
+                  description: afterUpdateData.description,
+                  price: afterUpdateData.price,
+                  role: afterUpdateData.role,
+                  active: afterUpdateData.active,
+                  avatar: afterUpdateData.avatar,
+                  create_at: afterUpdateData.create_at,
+                  update_at: afterUpdateData.update_at,
+                  speciality_id: afterUpdateData.speciality_id,
+                  room_id: afterUpdateData.room_id,
+                  recovery_token: afterUpdateData.recovery_token,
+                },
+              });
             }
-          );
-          if (isUpdatePassword) {
-            const afterUpdateData = await Doctor.findOne({
-              where: { id: payload.doctor.id },
-            });
-            res.status(200).json({
-              result: 1,
-              msg: "Update password successfully",
-              data: {
-                id: afterUpdateData.id,
-                email: afterUpdateData.email,
-                phone: afterUpdateData.phone,
-                name: afterUpdateData.name,
-                description: afterUpdateData.description,
-                price: afterUpdateData.price,
-                role: afterUpdateData.role,
-                active: afterUpdateData.active,
-                avatar: afterUpdateData.avatar,
-                create_at: afterUpdateData.create_at,
-                update_at: afterUpdateData.update_at,
-                speciality_id: afterUpdateData.speciality_id,
-                room_id: afterUpdateData.room_id,
-                recovery_token: afterUpdateData.recovery_token,
-              },
+          } catch (err) {
+            res.status(500).json({
+              result: 0,
+              msg: err.message || "Some error occurred when update password",
             });
           }
-        } catch (err) {
-          res.status(500).json({
-            result: 0,
-            msg: err.message || "Some error occurred when update password",
-          });
-        }
+        });
       }
     );
   }
