@@ -18,7 +18,7 @@ const changeDoctorProfileController = async (data, req, res, next) => {
     });
   } else if (req.body.action === "avatar") {
     const urlObj = {
-      avatar: req.body.url,
+      url: req.body.url,
     };
     const result = await Doctor.update(urlObj, {
       where: { id: payload.doctor.id },
