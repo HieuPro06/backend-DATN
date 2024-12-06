@@ -146,7 +146,9 @@ const createAppointment = async (req, res) => {
   }
 
   if (appointment_values.numerical_order == null) {
-    appointment_values.numerical_order = getNumericalOrder().id;
+    appointment_values.numerical_order = getNumericalOrder(
+      appointment_values.date
+    );
   }
 
   if (appointDoctor == null)
@@ -157,6 +159,9 @@ const createAppointment = async (req, res) => {
       error_type: 1,
       previous_request: null,
     };
+  else {
+    appointment_values.doctor_id = appointDoctor;
+  }
 
   const appointment = await Appointment.create(appointment_values);
 
@@ -278,8 +283,12 @@ const doctorAutoAppoint = async (date, time, service_id) => {
   return minDoctor;
 };
 
-const getNumericalOrder = async () => {
-  number = Appointment.count();
+const getNumericalOrder = async (date) => {
+  number = Appointment.count({
+    where: {
+      date: date,
+    },
+  });
   return number + 1;
 };
 
