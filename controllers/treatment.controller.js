@@ -67,7 +67,7 @@ const getAllTreatments = async (info,req,res,next) => {
 }
 
 const updateTreatment = async (req,res) => {
-  const appointmentId = req.params.id;
+  const id = req.params.id;
   const request = {
     name: req.body.name,
     type: req.body.type,
@@ -79,11 +79,11 @@ const updateTreatment = async (req,res) => {
   }
   try{
     const result = await Treatment.update(request,{
-      where: {appointment_id: appointmentId}
+      where: {id: id}
     })
     if(result){
       const afterUpdateData = await Treatment.findOne({
-        where: {appointment_id: appointmentId}
+        where: {id: id}
       })
       res.status(200).json({
         result: 1,
@@ -98,9 +98,29 @@ const updateTreatment = async (req,res) => {
     })
   }
 }
+const deleteTreatment = async (req,res) => {
+  try{
+    const data = await Treatment.destroy({
+      where: {id: req.params.id}
+    })
+    if(data){
+      return res.status(200).json({
+        result: 1,
+        msg: "Remove successfully"
+      })
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      result: 0,
+      msg: "Remove failed"
+    })
+  }
+}
 module.exports = {
   createNewTreatment,
   getTreatment,
   getAllTreatments,
-  updateTreatment
+  updateTreatment,
+  deleteTreatment
 };

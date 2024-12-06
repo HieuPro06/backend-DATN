@@ -26,7 +26,7 @@ const DashboardRouter = require("./route/dashboard.route");
 
 app.use(bodyParser.json());
 app.use(cors());
-
+app.use(express.static('avatar'));
 app.get("/", (req, res) => {
   res.json("Backend home");
 });
