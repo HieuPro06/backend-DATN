@@ -44,7 +44,7 @@ const getAppointmentRecord = async (info,req, res,next) => {
   }
 };
 const updateAppointmentRecord = async (req,res) => {
-  const appointmentId = req.params.id;
+  const id = req.params.id;
   const request = {
     reason: req.body.reason,
     description: req.body.description,
@@ -54,11 +54,11 @@ const updateAppointmentRecord = async (req,res) => {
   }
   try{
     const result = await AppointmentRecord.update(request,{
-      where: {appointment_id: appointmentId}
+      where: {id: id}
     })
     if(result){
       const afterUpdateData = await AppointmentRecord.findOne({
-        where: {appointment_id: appointmentId}
+        where: {id: id}
       })
       res.status(200).json({
         result: 1,
@@ -95,9 +95,29 @@ const getAllAppointmentRecords = async (info,req,res,next) => {
     })
   }
 }
+const deleteAppointmentRecord = async (req,res) => {
+  try{
+    const data = await AppointmentRecord.destroy({
+      where: {id: req.params.id}
+    })
+    if(data){
+      return res.status(200).json({
+        result: 1,
+        msg: "Remove successfully"
+      })
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      result: 0,
+      msg: "Remove failed"
+    })
+  }
+}
 module.exports = {
   createNewAppointmentRecord,
   getAppointmentRecord,
   updateAppointmentRecord,
-  getAllAppointmentRecords
+  getAllAppointmentRecords,
+  deleteAppointmentRecord
 };

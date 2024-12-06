@@ -1,8 +1,9 @@
 const Doctor = require("../models/doctor.model.js");
 const Room = require("../models/room.model.js");
 const Speciality = require("../models/speciality.model.js");
+const DoctorService = require("../models/doctorAndService.model");
 
-const defaultSize = 10;
+const defaultSize = 100;
 const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { active: 1 };
@@ -222,10 +223,107 @@ const deleteDoctor = (req, res) => {
   ``;
 };
 
+const getAllDoctorsBySpecialityId = async (info,req,res,next) => {
+  const specialityId = req.params.id;
+  try{
+    const data = await Doctor.findAll({
+      where: {speciality_id: specialityId}
+    })
+    if(data){
+      res.status(200).json({
+        result: 1,
+        msg: "Get all doctor by speciality successfully",
+        quantity: data.length,
+        data: data.map((item) => {
+          return {
+            id: item.id,
+            email: item.email,
+            phone: item.phone,
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            role: item.role,
+            active: item.active,
+            avatar: item.avatar,
+            create_at: item.create_at,
+            update_at: item.update_at,
+            speciality_id: item.speciality_id,
+            room_id: item.room_id,
+            recovery_token: item.recovery_token
+          }
+        })
+      })
+    }
+  } catch (e) {
+    res.status(500).json({
+      result: 0,
+      msg: "Get all doctor failed"
+    })
+  }
+}
+
+const getAllDoctorsByServiceId = async (info,req,res,next) => {
+  const serviceId = req.params.id;
+  try{
+    const data = await DoctorService.findAll({
+      where: {service_id: serviceId}
+    });
+    // return res.json(data);
+    if(data){
+      const returnData = await Promise.all(
+          data.map(async (item) => {
+            try {
+              const result = await Doctor.findOne({
+                where: { id: item.doctor_id },
+              });
+              return {
+                id: result.id,
+                email: result.email,
+                phone: result.phone,
+                name: result.name,
+                description: result.description,
+                price: result.price,
+                role: result.role,
+                active: result.active,
+                avatar: result.avatar,
+                create_at: result.create_at,
+                update_at: result.update_at,
+                speciality_id: result.speciality_id,
+                room_id: result.room_id,
+                recovery_token: result.recovery_token
+              };
+            } catch (e) {
+              console.log(e);
+              return null; // Trả về null nếu có lỗi
+            }
+          })
+      );
+      return res.status(200).json({
+        result: 1,
+        msg: "Get all doctors by service successfully",
+        quantity: returnData.length,
+        data: returnData
+      })
+    } else{
+      return res.status(400).json({
+        result: 0,
+        msg: "This service not exist"
+      })
+    }
+  } catch (e) {
+      res.status(500).json({
+        result: 0,
+        msg: `Error with ${e}`
+      })
+  }
+}
+
 module.exports = {
   getDoctorAll,
   getDoctorByID,
   createDoctor,
   updateDoctor,
   deleteDoctor,
+  getAllDoctorsBySpecialityId,
+  getAllDoctorsByServiceId
 };
