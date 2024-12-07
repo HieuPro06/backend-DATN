@@ -50,7 +50,7 @@ app.use("/api/doctors-and-services", DoctorServiceRouter);
 app.use("/api/doctors-and-services-ready", DoctorServiceReadyRouter);
 app.use("/api/booking/photos", BookingPhotosRouter);
 app.use("/api/booking/photo", BookingPhotoRouter);
-// app.use("/api/patient/notifications", NotificationsRouter);
+app.use("/api/patient/notifications", NotificationsRouter);
 
 app.listen(port, (req, res) => {
   console.log(`Backend is running at http://localhost:${port}`);
