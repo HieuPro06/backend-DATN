@@ -3,7 +3,7 @@ const DoctorProfileRoute = express.Router();
 const doctorProfileController = require("../controllers/doctor-profile.controller");
 const isLogInController = require("../controllers/is-logIn.controller");
 const changeDoctorProfileController = require("../controllers/change-doctor-profile.controller");
-const {changeAvatarController} = require("../controllers/change-avatar.controller");
+const {changeAvatarDoctorController} = require("../controllers/change-avatar-doctor.controller");
 const multer = require("multer");
 const path = require("path");
 /* Tạo tài nguyên lưu trữ dữ liệu ảnh trên server */
@@ -21,6 +21,6 @@ const upload = multer({
 })
 DoctorProfileRoute.get("/",isLogInController, doctorProfileController);
 DoctorProfileRoute.put("/",isLogInController, changeDoctorProfileController);
-DoctorProfileRoute.put("/avatar",upload.single('file'),isLogInController,changeAvatarController);
+DoctorProfileRoute.put("/avatar",upload.single('file'),isLogInController,changeAvatarDoctorController);
 
 module.exports = DoctorProfileRoute;
