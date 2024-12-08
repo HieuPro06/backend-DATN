@@ -146,6 +146,7 @@ const readAllBooking = async (data, req, res, next) => {
           });
           return {
             id: item.id,
+            doctor_id: item.doctor_id,
             booking_name: item.booking_name,
             booking_phone: item.booking_phone,
             name: item.name,

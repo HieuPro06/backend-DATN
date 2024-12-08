@@ -82,6 +82,7 @@ const createAppointment = async (req, res) => {
     create_at: new Date(), // automatically set the current date and time
     update_at: new Date(), // automatically set the current date and time
   };
+  console.log(req.body);
 
   // Biến chỉ định bắt buộc tạo (áp dụng sau khi xác nhận vẫn tạo khi có pop up lỗi)
   const force_create = req.body.force_create ? req.body.force_create : false;
@@ -89,6 +90,7 @@ const createAppointment = async (req, res) => {
   const bookingRec = await Booking.findByPk(req.body.booking_id);
   const service_id = bookingRec.service_id ? bookingRec.service_id : null;
   var appointDoctor = null;
+  var appoint_id = 0;
   if (appointment_values.doctor_id == null) {
     appointDoctor = await doctorAutoAppoint(
       appointment_values.date,
@@ -96,7 +98,7 @@ const createAppointment = async (req, res) => {
       service_id
     );
     if (appointDoctor != null) {
-      appointment_values.doctor_id = appointDoctor.id;
+      appoint_id = appointDoctor.id;
     }
   } else {
     if (!force_create) {
@@ -104,7 +106,7 @@ const createAppointment = async (req, res) => {
         doctorAppointmentTimeAvailable(
           appointment_values.doctor_id,
           appointment_values.date,
-          appointment_values.time
+          appointment_values.appointment_time
         ) == false
       ) {
         return {
@@ -143,15 +145,20 @@ const createAppointment = async (req, res) => {
         };
       }
     }
+    appoint_id = appointment_values.doctor_id;
   }
 
   if (appointment_values.numerical_order == null) {
-    appointment_values.numerical_order = getNumericalOrder(
+    appointment_values.numerical_order = await getNumericalOrder(
       appointment_values.date
     );
+
+  }
+  if (appointment_values.position == null) {
+    appointment_values.position = appointment_values.numerical_order;
   }
 
-  if (appointDoctor == null)
+  if (appoint_id == 0)
     return {
       appointment: null,
       success: 0,
@@ -160,7 +167,7 @@ const createAppointment = async (req, res) => {
       previous_request: null,
     };
   else {
-    appointment_values.doctor_id = appointDoctor;
+    appointment_values.doctor_id = appoint_id;
   }
 
   const appointment = await Appointment.create(appointment_values);
@@ -284,7 +291,7 @@ const doctorAutoAppoint = async (date, time, service_id) => {
 };
 
 const getNumericalOrder = async (date) => {
-  number = Appointment.count({
+  number = await Appointment.count({
     where: {
       date: date,
     },
