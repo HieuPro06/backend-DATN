@@ -22,7 +22,7 @@ const PatientProfileRouter = require("./route/patient-profile.route");
 const BookingPhotosRouter = require("./route/booking-photos.routes.js");
 const BookingPhotoRouter = require("./route/booking-photo.routes.js");
 const DashboardRouter = require("./route/dashboard.route");
-// const NotificationsRouter = require("./route/notifications.route.js");
+const NotificationsRouter = require("./route/notifications.route.js");
 
 app.use(bodyParser.json());
 app.use(cors());
