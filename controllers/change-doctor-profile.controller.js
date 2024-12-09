@@ -18,8 +18,7 @@ const changeDoctorProfileController = async (data, req, res, next) => {
       result: 1,
       msg: "Update personal info successfully",
     });
-  }
-  else if (req.body.action === "avatar") {
+  } else if (req.body.action === "avatar") {
     const urlObj = {
       avatar: req.body.url,
     };
@@ -35,8 +34,7 @@ const changeDoctorProfileController = async (data, req, res, next) => {
       result: 1,
       msg: "Update avatar successfully",
     });
-  }
-  else if (req.body.action === "password") {
+  } else if (req.body.action === "password") {
     const result = await Doctor.findOne({
       where: { id: payload.doctor.id },
     });
@@ -55,20 +53,17 @@ const changeDoctorProfileController = async (data, req, res, next) => {
           });
         }
         const request = {
-          password: req.body.newPassword
-        }
+          password: req.body.newPassword,
+        };
         bcrypt.hash(request.password, salt, async (err, hashedPassword) => {
           if (err) {
             return res.status(500).json({ msg: "Error hashing password" });
           }
           request.password = hashedPassword;
           try {
-            const isUpdatePassword = await Doctor.update(
-                request,
-                {
-                  where: { id: payload.doctor.id },
-                }
-            );
+            const isUpdatePassword = await Doctor.update(request, {
+              where: { id: payload.doctor.id },
+            });
             if (isUpdatePassword) {
               const afterUpdateData = await Doctor.findOne({
                 where: { id: payload.doctor.id },

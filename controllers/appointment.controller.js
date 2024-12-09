@@ -82,7 +82,6 @@ const createAppointment = async (req, res) => {
     create_at: new Date(), // automatically set the current date and time
     update_at: new Date(), // automatically set the current date and time
   };
-  console.log(req.body);
 
   // Biến chỉ định bắt buộc tạo (áp dụng sau khi xác nhận vẫn tạo khi có pop up lỗi)
   const force_create = req.body.force_create ? req.body.force_create : false;
@@ -152,7 +151,6 @@ const createAppointment = async (req, res) => {
     appointment_values.numerical_order = await getNumericalOrder(
       appointment_values.date
     );
-
   }
   if (appointment_values.position == null) {
     appointment_values.position = appointment_values.numerical_order;
@@ -205,7 +203,7 @@ const updateAppointment = (req, res) => {
     .catch((err) => {
       return res.status(500).json({
         result: 0,
-        msg: `Cannot update Appointment with id=${id}`,
+        msg: err.message,
       });
     });
 };
@@ -228,7 +226,7 @@ const deleteAppointment = async (req, res) => {
     .catch((err) => {
       res.status(500).json({
         result: 0,
-        msg: `Cannot cancel Appointment with id=${id}`,
+        msg: err.message,
       });
     });
 };
