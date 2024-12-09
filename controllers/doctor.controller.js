@@ -49,7 +49,7 @@ const getDoctorAll = (info, req, res, next) => {
         })
       );
 
-      res.send({
+      return res.status(200).json({
         result: 1,
         quantity: data ? data.length : 0,
         data: returnData ? returnData : [],
@@ -90,7 +90,7 @@ const getDoctorByID = (info, req, res, next) => {
         room_id: room ? room.data : null,
       };
 
-      res.send({
+      return res.status(200).json({
         result: 1,
         data: return_data ? return_data : [],
         msg: "Action Seccessful",
@@ -145,12 +145,12 @@ const createDoctor = (req, res) => {
         speciality_id: speciality ? speciality.data : null,
         room_id: room ? room.data : null,
       };
-
-      res.send({
-        result: 1,
-        data: return_data ? return_data : [],
-        msg: "Action Seccessful",
-      });
+      if (data == 1)
+        return res.status(200).json({
+          result: 1,
+          data: return_data ? return_data : [],
+          msg: "Action Successful",
+        });
     })
     .catch((err) => {
       return res.status(500).json({
@@ -187,10 +187,10 @@ const updateDoctor = (req, res) => {
         room_id: room ? room.data : null,
       };
 
-      res.send({
+      return res.status(200).json({
         result: 1,
         data: return_data ? return_data : [],
-        msg: "Action Seccessful",
+        msg: "Action Successful",
       });
     })
     .catch((err) => {
@@ -211,25 +211,28 @@ const deleteDoctor = (req, res) => {
   )
     .then((data) => {
       if (data == 1)
-        res.send({
+        return res.status(200).json({
           msg: "Doctor was removed successfully.",
+        });
+      else
+        return res.status(500).json({
+          msg: `Cannot remove Doctor with id=${id}`,
         });
     })
     .catch((err) => {
       return res.status(500).json({
-        msg: `Cannot remove Doctor with id=${id}`,
+        msg: err.message,
       });
     });
-  ``;
 };
 
-const getAllDoctorsBySpecialityId = async (info,req,res,next) => {
+const getAllDoctorsBySpecialityId = async (info, req, res, next) => {
   const specialityId = req.params.id;
-  try{
+  try {
     const data = await Doctor.findAll({
-      where: {speciality_id: specialityId}
-    })
-    if(data){
+      where: { speciality_id: specialityId },
+    });
+    if (data) {
       res.status(200).json({
         result: 1,
         msg: "Get all doctor by speciality successfully",
@@ -249,74 +252,74 @@ const getAllDoctorsBySpecialityId = async (info,req,res,next) => {
             update_at: item.update_at,
             speciality_id: item.speciality_id,
             room_id: item.room_id,
-            recovery_token: item.recovery_token
-          }
-        })
-      })
+            recovery_token: item.recovery_token,
+          };
+        }),
+      });
     }
   } catch (e) {
     res.status(500).json({
       result: 0,
-      msg: "Get all doctor failed"
-    })
+      msg: "Get all doctor failed",
+    });
   }
-}
+};
 
-const getAllDoctorsByServiceId = async (info,req,res,next) => {
+const getAllDoctorsByServiceId = async (info, req, res, next) => {
   const serviceId = req.params.id;
-  try{
+  try {
     const data = await DoctorService.findAll({
-      where: {service_id: serviceId}
+      where: { service_id: serviceId },
     });
     // return res.json(data);
-    if(data){
+    if (data) {
       const returnData = await Promise.all(
-          data.map(async (item) => {
-            try {
-              const result = await Doctor.findOne({
-                where: { id: item.doctor_id },
-              });
-              return {
-                id: result.id,
-                email: result.email,
-                phone: result.phone,
-                name: result.name,
-                description: result.description,
-                price: result.price,
-                role: result.role,
-                active: result.active,
-                avatar: result.avatar,
-                create_at: result.create_at,
-                update_at: result.update_at,
-                speciality_id: result.speciality_id,
-                room_id: result.room_id,
-                recovery_token: result.recovery_token
-              };
-            } catch (e) {
-              console.log(e);
-              return null; // Trả về null nếu có lỗi
-            }
-          })
+        data.map(async (item) => {
+          try {
+            const result = await Doctor.findOne({
+              where: { id: item.doctor_id },
+            });
+            return {
+              id: result.id,
+              email: result.email,
+              phone: result.phone,
+              name: result.name,
+              description: result.description,
+              price: result.price,
+              role: result.role,
+              active: result.active,
+              avatar: result.avatar,
+              create_at: result.create_at,
+              update_at: result.update_at,
+              speciality_id: result.speciality_id,
+              room_id: result.room_id,
+              recovery_token: result.recovery_token,
+            };
+          } catch (e) {
+            console.log(e);
+            return null; // Trả về null nếu có lỗi
+          }
+        })
       );
       return res.status(200).json({
         result: 1,
         msg: "Get all doctors by service successfully",
         quantity: returnData.length,
-        data: returnData
-      })
-    } else{
-      return res.status(400).json({
+        data: returnData,
+      });
+    } else {
+      return res.status(500).json({
         result: 0,
-        msg: "This service not exist"
-      })
+        msg: "This service not exist",
+      });
     }
   } catch (e) {
-      res.status(500).json({
-        result: 0,
-        msg: `Error with ${e}`
-      })
+    res.status(500).json({
+      result: 0,
+      msg: `Error with ${e}`,
+    });
   }
-}
+};
 
 module.exports = {
   getDoctorAll,
@@ -325,5 +328,5 @@ module.exports = {
   updateDoctor,
   deleteDoctor,
   getAllDoctorsBySpecialityId,
-  getAllDoctorsByServiceId
+  getAllDoctorsByServiceId,
 };
