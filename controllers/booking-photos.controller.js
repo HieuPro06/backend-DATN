@@ -1,22 +1,29 @@
 const BookingPhoto = require("../models/bookingPhoto.model");
 
 const getPhotosByBookingId = async (info, req, res, next) => {
-  const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-  const data = await BookingPhoto.findAll({
-    where: { booking_id: id },
-  });
-  if (!data) {
-    res.status(500).json({
+    const data = await BookingPhoto.findAll({
+      where: { booking_id: id },
+    });
+    if (!data) {
+      res.status(500).json({
+        result: 0,
+        msg: `Get photo ${id} failed`,
+      });
+    }
+    res.status(200).json({
+      result: 1,
+      msg: "Get photo successfully",
+      data: data,
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: `Get photo ${id} failed`,
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Get photo successfully",
-    data: data,
-  });
 };
 const createBookingPhoto = async (info, req, res, next) => {
   const request = {
