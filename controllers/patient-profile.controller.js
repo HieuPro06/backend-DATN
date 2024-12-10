@@ -7,7 +7,7 @@ const PatientProfileController = async (data, req, res, next) => {
     const result = await Patient.findOne({
       where: { id: payload.patient.id },
     });
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Successfully",
       data: {

@@ -6,7 +6,7 @@ const DashboardController = async (data, req, res, next) => {
     const user = await Doctor.findOne({
       where: { id: token.doctor.id },
     });
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Welcome to Umbrella corporation",
       data: {

@@ -60,7 +60,7 @@ const getDoctorsFromServiceId = async (req, res) => {
         })
       );
 
-      res.send({
+      return res.status(200).json({
         result: 1,
         msg: "Action successfully",
         quantity: data ? data.length : 0,
@@ -89,7 +89,7 @@ const getServicesFromDoctorId = async (req, res) => {
   const doctor = await Doctor.findOne({ where: { id: id, active: true } });
 
   if (!doctor) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: "Doctor is not available",
     });
@@ -110,7 +110,7 @@ const getServicesFromDoctorId = async (req, res) => {
     // order: sorting.sortQuery(req, defaultSort, defaultDirection),
   })
     .then(async (data) => {
-      res.send({
+      return res.status(200).json({
         result: 1,
         msg: "Action successfully",
         quantity: data ? data.length : 0,
@@ -133,7 +133,7 @@ const deleteDoctorService = (req, res) => {
   })
     .then((data) => {
       if (data == 1)
-        res.send({
+        return res.status(200).json({
           msg: "Doctor Service pair was removed successfully.",
         });
     })
@@ -145,54 +145,68 @@ const deleteDoctorService = (req, res) => {
 };
 
 const createDoctorAndService = async (req, res) => {
-  const request = req.body;
+  try {
+    const request = req.body;
 
-  const doctor = await Doctor.findOne({
-    where: { id: request.dataValues.doctor_id, active: true },
-  });
-
-  if (!doctor) {
-    res.status(500).json({
-      result: 0,
-      msg: "Doctor is not available",
+    const doctor = await Doctor.findOne({
+      where: { id: request.dataValues.doctor_id, active: true },
     });
-  }
 
-  const service = await Service.findOne({
-    where: { id: request.dataValues.service_id },
-  });
+    if (!doctor) {
+      return res.status(500).json({
+        result: 0,
+        msg: "Doctor is not available",
+      });
+    }
 
-  if (!service) {
-    res.status(500).json({
-      result: 0,
-      msg: "Service is not available",
+    const service = await Service.findOne({
+      where: { id: request.dataValues.service_id },
     });
-  }
 
-  const data = await DoctorAndService.create(request);
-  if (!data) {
-    res.status(500).json({
+    if (!service) {
+      return res.status(500).json({
+        result: 0,
+        msg: "Service is not available",
+      });
+    }
+
+    const data = await DoctorAndService.create(request);
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: "Error!",
+      });
+    } else {
+      return res.status(500).json({
+        result: 1,
+        msg: "Created successfully",
+      });
+    }
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: "Error!",
-    });
-  } else {
-    res.status(500).json({
-      result: 1,
-      msg: "Created successfully",
+      msg: e.message,
     });
   }
 };
 
 const checkDoctorServiceCompatible = async (service_id, doctor_id) => {
-  const data = await DoctorAndService.findAll({
-    where: {
-      doctor_id: doctor_id,
-      service_id: service_id,
-    },
-  });
+  try {
+    const data = await DoctorAndService.findAll({
+      where: {
+        doctor_id: doctor_id,
+        service_id: service_id,
+      },
+    });
 
-  if (data.length > 0) return true;
-  else return false;
+    if (data.length > 0) return true;
+    else return false;
+  } catch (e) {
+    return res.status(500).json({
+      result: 0,
+      msg: e.message,
+    });
+  }
 };
 
 module.exports = {

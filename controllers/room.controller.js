@@ -4,111 +4,146 @@ const Doctor = require("../models/doctor.model");
 const defaultSize = 1000000;
 
 const getAllRooms = async (data, req, res, next) => {
-  const { length, page } = req.body;
-  const limit = length ? length : defaultSize;
-  const offset = page ? (page - 1) * limit : 0;
-  const result = await Room.findAll({
-    limit: limit,
-    offset: offset,
-  });
-  if (!result) {
-    res.status(500).json({
+  try {
+    const { length, page } = req.body;
+    const limit = length ? length : defaultSize;
+    const offset = page ? (page - 1) * limit : 0;
+    const result = await Room.findAll({
+      limit: limit,
+      offset: offset,
+    });
+    if (!result) {
+      return res.status(500).json({
+        result: 0,
+        msg: "Error , Don't get rooms",
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Get all rooms successfully",
+      data: result,
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: "Error , Don't get rooms",
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Get all rooms successfully",
-    data: result,
-  });
 };
 
 const getRoomById = async (data, req, res, next) => {
-  const id = req.params.id;
-  const result = await Room.findOne({
-    where: { id: id },
-  });
-  if (!result) {
-    res.status(404).json({
+  try {
+    const id = req.params.id;
+    const result = await Room.findOne({
+      where: { id: id },
+    });
+    if (!result) {
+      return res.status(404).json({
+        result: 0,
+        msg: `Get room with id=${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Get room successfully",
+      data: result,
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: `Get room with id=${id} failed`,
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Get room successfully",
-    data: result,
-  });
 };
 
 const createRoom = async (req, res) => {
-  const request = {
-    name: req.body.name,
-    location: req.body.location,
-  };
-  const isExistRoomName = await Room.findOne({
-    where: { name: request.name },
-  });
-  if (isExistRoomName) {
-    res.status(400).json({
+  try {
+    const request = {
+      name: req.body.name,
+      location: req.body.location,
+    };
+    const isExistRoomName = await Room.findOne({
+      where: { name: request.name },
+    });
+    if (isExistRoomName) {
+      return res.status(400).json({
+        result: 0,
+        msg: "Room name was exist",
+      });
+    }
+    const data = await Room.create(request);
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: "Create room failed",
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Create room successfully",
+      data: data,
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: "Room name was exist",
+      msg: e.message,
     });
   }
-  const data = await Room.create(request);
-  if (!data) {
-    res.status(500).json({
-      result: 0,
-      msg: "Create room failed",
-    });
-  }
-  res.status(200).json({
-    result: 1,
-    msg: "Create room successfully",
-    data: data,
-  });
 };
 const updateRoom = async (req, res) => {
-  const id = req.params.id;
-  const data = await Room.update(req.body, {
-    where: { id: id },
-  });
-  if (!data) {
-    res.status(500).json({
+  try {
+    const id = req.params.id;
+    const data = await Room.update(req.body, {
+      where: { id: id },
+    });
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: `Update room ${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Update room successfully",
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: `Update room ${id} failed`,
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Update room successfully",
-  });
 };
 const deleteRoom = async (req, res) => {
-  const id = req.params.id;
-  const isExistDoctor = await Doctor.findOne({
-    where: { room_id: id },
-  });
-  if (isExistDoctor) {
-    res.json({
+  try {
+    const id = req.params.id;
+    const isExistDoctor = await Doctor.findOne({
+      where: { room_id: id },
+    });
+    if (isExistDoctor) {
+      res.json({
+        result: 0,
+        msg: "This room can't be deleted because it's have doctor",
+      });
+    }
+    const data = await Room.destroy({
+      where: { id: id },
+    });
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: `Delete room ${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Delete room successfully",
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: "This room can't be deleted because it's have doctor",
+      msg: e.message,
     });
   }
-  const data = await Room.destroy({
-    where: { id: id },
-  });
-  if (!data) {
-    res.status(500).json({
-      result: 0,
-      msg: `Delete room ${id} failed`,
-    });
-  }
-  res.status(200).json({
-    result: 1,
-    msg: "Delete room successfully",
-  });
 };
 
 module.exports = {

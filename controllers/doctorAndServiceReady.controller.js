@@ -48,7 +48,7 @@ const doctorAndServiceReady = async (req, res) => {
         })
       );
 
-      res.send({
+      return res.status(200).json({
         result: 1,
         msg: "Action successfully",
         quantity: data ? data.length : 0,

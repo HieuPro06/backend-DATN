@@ -22,9 +22,7 @@ const loginController = async (req, res) => {
       if (result) {
         bcrypt.compare(request.password, result.password, (err, isMatch) => {
           if (err) {
-            return res
-              .status(500)
-              .json({ msg: "Error comparing passwords" });
+            return res.status(500).json({ msg: "Error comparing passwords" });
           }
           if (!isMatch) {
             return res.status(401).json({
@@ -53,7 +51,7 @@ const loginController = async (req, res) => {
           const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: "100h",
           });
-          res.status(200).json({
+          return res.status(200).json({
             result: 1,
             msg: "Login successfully",
             accessToken: token,
@@ -74,7 +72,7 @@ const loginController = async (req, res) => {
           });
         });
       } else {
-        res.status(404).json({
+        return res.status(404).json({
           msg: "Account invalid",
         });
       }
@@ -93,9 +91,7 @@ const loginController = async (req, res) => {
       if (result) {
         bcrypt.compare(request.password, result.password, (err, isMatch) => {
           if (err) {
-            return res
-              .status(500)
-              .json({ msg: "Error comparing passwords" });
+            return res.status(500).json({ msg: "Error comparing passwords" });
           }
           if (!isMatch) {
             return res.status(401).json({
@@ -118,7 +114,7 @@ const loginController = async (req, res) => {
               delete obj[key];
             }
           }
-          res.status(200).json({
+          return res.status(200).json({
             result: 1,
             msg: "Login successfully",
             accessToken: token,
@@ -137,14 +133,14 @@ const loginController = async (req, res) => {
           });
         });
       } else {
-        res.status(404).json({
+        return res.status(404).json({
           result: 0,
           msg: "Account invalid",
         });
       }
     }
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: err.message || "Some error occurred when sign in",
     });

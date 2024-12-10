@@ -14,18 +14,18 @@ const createNewAppointmentRecord = async (req, res) => {
     };
     const data = await AppointmentRecord.create(request);
     if (!data) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Can't create new appointment record",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Create appointment record successfully",
       data: data,
     });
   } catch (e) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: e.message,
     });
@@ -37,12 +37,12 @@ const getAppointmentRecord = async (info, req, res, next) => {
     where: { appointment_id: appointmentId },
   });
   if (!data) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: "Can't get appointment record",
     });
   } else {
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Get appointment record successfully",
       data: data,
@@ -66,14 +66,14 @@ const updateAppointmentRecord = async (req, res) => {
       const afterUpdateData = await AppointmentRecord.findOne({
         where: { id: id },
       });
-      res.status(200).json({
+      return res.status(200).json({
         result: 1,
         msg: "Update appointment-record successfully",
         data: afterUpdateData,
       });
     }
   } catch (e) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: e.message || "Some error occur when update appointment-record",
     });
@@ -88,14 +88,14 @@ const getAllAppointmentRecords = async (info, req, res, next) => {
       limit: limit,
       offset: offset,
     });
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Get all appointment-record successfully",
       quantity: result.length,
       data: result,
     });
   } catch (e) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: e.message || "Some error occur when get all appointment-records",
     });

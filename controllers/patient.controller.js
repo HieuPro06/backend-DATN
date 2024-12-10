@@ -14,7 +14,7 @@ const getPatientAll = (req, res) => {
     // order: sorting.sortQuery(req, defaultSort, defaultDirection),
   })
     .then((data) => {
-      res.send({
+      return res.status(200).json({
         data: data ? data : [],
         count: data ? data.length : 0,
       });
@@ -32,7 +32,7 @@ const getPatientById = (req, res) => {
 
   Patient.findByPk(id)
     .then((data) => {
-      res.send({
+      return res.status(200).json({
         data: data ? data : [],
         count: data ? data.length : 0,
       });
@@ -51,12 +51,12 @@ const updatePatient = async (req, res) => {
     where: { id: id },
   });
   if (!data) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: `Update patient ${id} failed`,
     });
   }
-  res.status(200).json({
+  return res.status(200).json({
     result: 1,
     msg: "Update patient successfully",
   });
@@ -68,12 +68,12 @@ const deletePatient = async (req, res) => {
     where: { id: id },
   });
   if (!data) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: `Delete patient ${id} failed`,
     });
   }
-  res.status(200).json({
+  return res.status(200).json({
     result: 1,
     msg: "Delete patient successfully",
   });
