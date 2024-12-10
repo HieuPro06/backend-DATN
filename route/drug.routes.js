@@ -8,10 +8,10 @@ const {
   deleteDrug,
 } = require("../controllers/drug.controller.js");
 const isAdminController = require("../controllers/is-admin.controller");
-const isDoctorController = require("../controllers/is-doctor.controller");
+const isLogInController = require("../controllers/is-logIn.controller");
 
-DrugRouter.get("/", isDoctorController, getAllDrugs);
-DrugRouter.get("/:id",isDoctorController, getDrugById);
+DrugRouter.get("/",isLogInController, getAllDrugs);
+DrugRouter.get("/:id",isLogInController, getDrugById);
 DrugRouter.post("/",isAdminController, createDrug);
 DrugRouter.put("/:id",isAdminController, updateDrug);
 DrugRouter.delete("/:id",isAdminController, deleteDrug);

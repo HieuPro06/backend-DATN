@@ -3,28 +3,16 @@ const Doctor = require("../models/doctor.model");
 
 const defaultSize = 1000000;
 
-const getAllDrugs = async (req, res, next) => {
-  try {
-    const { length, page } = req.body;
-    const limit = length ? length : defaultSize;
-    const offset = page ? (page - 1) * limit : 0;
-    const result = await Drug.findAll({
-      limit: limit,
-      offset: offset,
-    });
-    if (!result) {
-      return res.status(500).json({
-        result: 0,
-        msg: "Error , Don't get drugs",
-      });
-    }
-    return res.status(200).json({
-      result: 1,
-      msg: "Get all drugs successfully",
-      data: result,
-    });
-  } catch (e) {
-    return res.status(500).json({
+const getAllDrugs = async (info,req, res, next) => {
+  const { length, page } = req.body;
+  const limit = length ? length : defaultSize;
+  const offset = page ? (page - 1) * limit : 0;
+  const result = await Drug.findAll({
+    limit: limit,
+    offset: offset,
+  });
+  if (!result) {
+    res.status(500).json({
       result: 0,
       msg: e.message,
     });
