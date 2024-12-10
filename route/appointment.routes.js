@@ -15,6 +15,6 @@ const {orderAppointments} = require("../controllers/appointment.controller");
 AppointmentRouter.get("/",isLogInController,getAppointmentAll);
 AppointmentRouter.get("/:id",isLogInController,getAppointmentByID);
 AppointmentRouter.delete("/:id",isSupporterController,deleteAppointment);
-AppointmentRouter.put("/:id",isSupporterController,updateAppointment);
+AppointmentRouter.put("/:id",isLogInController,updateAppointment);
 AppointmentRouter.post("/order",isSupporterController,orderAppointments);
 module.exports = AppointmentRouter;
