@@ -4,6 +4,7 @@ const { appointment_status } = require("../enum");
 const DoctorAndService = require("../models/doctorAndService.model.js");
 const { where } = require("sequelize");
 const Booking = require("../models/booking.model.js");
+const jwt = require("jsonwebtoken");
 const {
   checkDoctorServiceCompatible,
 } = require("./doctorAndService.controller.js");
@@ -15,33 +16,74 @@ const { Op } = require("sequelize");
 
 const appointment_number_threshold = 20;
 
-const getAppointmentAll = (data, req, res, next) => {
+const getAppointmentAll = async (data, req, res, next) => {
+  const token = jwt.decode(data);
   const { size, page } = req.body;
-
   const limit = size ? size : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
   const condition = condition_active;
-
-  Appointment.findAll({
-    // where: condition,
-    limit: limit,
-    offset: offset,
-    // order: sorting.sortQuery(req, defaultSort, defaultDirection),
-  })
-    .then((data) => {
-      return res.status(200).json({
-        result: 1,
-        msg: "Get all appointments successfully",
-        data: data,
-      });
-    })
-    .catch((err) => {
+  if(token.hasOwnProperty("doctor")){
+    if(token.doctor.role === "doctor"){
+      const doctorId = token.doctor.id;
+      try{
+        const appointments = await Appointment.findAll({
+          where: {doctor_id: doctorId}
+        })
+        if(appointments){
+          return res.status(200).json({
+            result: 1,
+            msg: "Get all appointments successfully",
+            data: appointments
+          })
+        }
+      } catch (e) {
+        return res.json(500).json({
+          result: 0,
+          msg: e
+        })
+      }
+    } else {
+      Appointment.findAll({
+        limit: limit,
+        offset: offset,
+        // where: condition,
+        // order: sorting.sortQuery(req, defaultSort, defaultDirection),
+      })
+          .then((data) => {
+            return res.status(200).json({
+              result: 1,
+              msg: "Get all appointments successfully",
+              data: data,
+            });
+          })
+          .catch((err) => {
+            return res.status(500).json({
+              msg:
+                  err.message ||
+                  "Some error occurred while retrieving appointment list.",
+            });
+          });
+    }
+  } else {
+    const patientId = token.patient.id;
+    try{
+      const appointments = await Appointment.findAll({
+        where: {patient_id: patientId}
+      })
+      if(appointments){
+        return res.status(200).json({
+          result: 1,
+          msg: "Get all appointments successfully",
+          data: appointments
+        })
+      }
+    } catch (e) {
       return res.status(500).json({
-        msg:
-          err.message ||
-          "Some error occurred while retrieving appointment list.",
-      });
-    });
+        result: 0,
+        msg: e
+      })
+    }
+  }
 };
 
 const getAppointmentByID = (data, req, res, next) => {
