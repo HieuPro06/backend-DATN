@@ -6,8 +6,8 @@ const booking_status = {
 
 const appointment_status = {
   PROCESSING: "PROCESSING",
+  EXAMINATING: "EXAMINATING",
   DONE: "DONE",
-  // VERIFIED: "VERIFIED",
   CANCEL: "CANCEL",
 };
 module.exports = { booking_status, appointment_status };
