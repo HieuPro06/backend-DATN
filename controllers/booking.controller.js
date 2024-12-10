@@ -46,7 +46,7 @@ const createBooking = async (result, req, res, next) => {
     };
     const data = await Booking.create(request);
     if (!data) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Error ! Can't be booking , please try again",
       });
@@ -54,7 +54,7 @@ const createBooking = async (result, req, res, next) => {
     const service = await Service.findOne({
       where: { id: data?.service_id },
     });
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: `Congratulations . ${request.booking_name} ! This booking at ${request.appointment_date} ${request.appointment_hour} which has been created succesfully by you`,
       data: {
@@ -113,13 +113,13 @@ const deleteBooking = async (data, req, res, next) => {
             where: { id: id },
           }
         );
-        res.status(200).json({
+        return res.status(200).json({
           result: 1,
           msg: "Booking has been cancelled successfully !",
         });
       }
     } else {
-      res.status(400).json({
+      return res.status(400).json({
         result: 0,
         msg: "You don't allow to delete booking because you not have permission",
       });
@@ -146,7 +146,7 @@ const readAllBooking = async (data, req, res, next) => {
         offset: offset,
       });
       if (!result) {
-        res.status(500).json({
+        return res.status(500).json({
           result: 0,
           msg: "Error ! Can't get all bookings ",
         });
@@ -305,7 +305,7 @@ const readBookingById = async (data, req, res, next) => {
           },
         });
       } else {
-        res.status(404).json({
+        return res.status(404).json({
           result: 0,
           msg: "Not available this booking",
         });
@@ -391,7 +391,7 @@ const confirmBooking = async (req, res) => {
       )
         .then((data) => {
           if (data == 1)
-            res.send({
+            return res.status(200).json({
               success: 1,
               msg: "Booking was confirmed successfully.",
             });

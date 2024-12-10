@@ -51,13 +51,13 @@ const SignupController = async (req, res) => {
         /* Xử lý đăng ký */
         try {
           const result = await Doctor.create(request);
-          res.status(200).json({
+          return res.status(200).json({
             result: 1,
             msg: "Sign up successfully",
             data: result,
           });
         } catch (err) {
-          res.status(500).json({
+          return res.status(500).json({
             result: 0,
             msg: err.message || "Some error occurred when sign up",
           });
@@ -95,13 +95,13 @@ const SignupController = async (req, res) => {
         request.password = hashedPassword;
         try {
           const result = await Patient.create(request);
-          res.status(200).json({
+          return res.status(200).json({
             result: 1,
             msg: "Sign up successfully",
             data: result,
           });
         } catch (err) {
-          res.status(500).json({
+          return res.status(500).json({
             result: 0,
             msg: err.message || "Some error occurred when sign up",
           });
@@ -109,7 +109,7 @@ const SignupController = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: err.message || "Some error occurred when sign up",
     });

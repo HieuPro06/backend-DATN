@@ -195,7 +195,7 @@ const updateDoctor = (req, res) => {
     })
     .catch((err) => {
       return res.status(500).json({
-        msg: `Cannot update Doctor with id=${id}`,
+        msg: err.message || `Cannot update Doctor with id=${id}`,
       });
     });
 };
@@ -233,7 +233,7 @@ const getAllDoctorsBySpecialityId = async (info, req, res, next) => {
       where: { speciality_id: specialityId },
     });
     if (data) {
-      res.status(200).json({
+      return res.status(200).json({
         result: 1,
         msg: "Get all doctor by speciality successfully",
         quantity: data.length,
@@ -258,7 +258,7 @@ const getAllDoctorsBySpecialityId = async (info, req, res, next) => {
       });
     }
   } catch (e) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: "Get all doctor failed",
     });
@@ -314,7 +314,7 @@ const getAllDoctorsByServiceId = async (info, req, res, next) => {
       });
     }
   } catch (e) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: `Error with ${e}`,
     });

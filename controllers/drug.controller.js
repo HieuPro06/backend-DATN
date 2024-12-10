@@ -14,101 +14,124 @@ const getAllDrugs = async (info,req, res, next) => {
   if (!result) {
     res.status(500).json({
       result: 0,
-      msg: "Error , Don't get drugs",
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Get all drugs successfully",
-    data: result,
-  });
 };
 
 const getDrugById = async (data, req, res, next) => {
-  const id = req.params.id;
-  const result = await Drug.findOne({
-    where: { id: id },
-  });
-  if (!result) {
-    res.status(404).json({
+  try {
+    const id = req.params.id;
+    const result = await Drug.findOne({
+      where: { id: id },
+    });
+    if (!result) {
+      return res.status(404).json({
+        result: 0,
+        msg: `Get drug with id=${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Get drug successfully",
+      data: result,
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: `Get drug with id=${id} failed`,
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Get drug successfully",
-    data: result,
-  });
 };
 
 const createDrug = async (req, res) => {
-  const request = {
-    name: req.body.name,
-    location: req.body.location ?? "Nhà thuốc Việt Nam",
-  };
-  const isExistDrugName = await Drug.findOne({
-    where: { name: request.name },
-  });
-  if (isExistDrugName) {
-    res.status(400).json({
+  try {
+    const request = {
+      name: req.body.name,
+      location: req.body.location ?? "Nhà thuốc Việt Nam",
+    };
+    const isExistDrugName = await Drug.findOne({
+      where: { name: request.name },
+    });
+    if (isExistDrugName) {
+      return res.status(400).json({
+        result: 0,
+        msg: "Drug name was exist",
+      });
+    }
+    const data = await Drug.create(request);
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: "Create drug failed",
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Create drug successfully",
+      data: data,
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: "Drug name was exist",
+      msg: e.message,
     });
   }
-  const data = await Drug.create(request);
-  if (!data) {
-    res.status(500).json({
-      result: 0,
-      msg: "Create drug failed",
-    });
-  }
-  res.status(200).json({
-    result: 1,
-    msg: "Create drug successfully",
-    data: data,
-  });
 };
 const updateDrug = async (req, res) => {
-  const id = req.params.id;
-  const data = await Drug.update(req.body, {
-    where: { id: id },
-  });
-  if (!data) {
-    res.status(500).json({
+  try {
+    const id = req.params.id;
+    const data = await Drug.update(req.body, {
+      where: { id: id },
+    });
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: `Update drug ${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Update drug successfully",
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: `Update drug ${id} failed`,
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Update drug successfully",
-  });
 };
 const deleteDrug = async (req, res) => {
-  const id = req.params.id;
-  const isExistDoctor = await Doctor.findOne({
-    where: { drug_id: id },
-  });
-  if (isExistDoctor) {
-    res.json({
+  try {
+    const id = req.params.id;
+    const isExistDoctor = await Doctor.findOne({
+      where: { drug_id: id },
+    });
+    if (isExistDoctor) {
+      res.json({
+        result: 0,
+        msg: "This drug can't be deleted because it's have doctor",
+      });
+    }
+    const data = await Drug.destroy({
+      where: { id: id },
+    });
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: `Delete drug ${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Delete drug successfully",
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: "This drug can't be deleted because it's have doctor",
+      msg: e.message,
     });
   }
-  const data = await Drug.destroy({
-    where: { id: id },
-  });
-  if (!data) {
-    res.status(500).json({
-      result: 0,
-      msg: `Delete drug ${id} failed`,
-    });
-  }
-  res.status(200).json({
-    result: 1,
-    msg: "Delete drug successfully",
-  });
 };
 
 module.exports = {

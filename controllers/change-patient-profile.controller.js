@@ -16,7 +16,7 @@ const ChangePatientProfileController = async (data, req, res, next) => {
     const afterUpdateData = await Patient.findOne({
       where: { id: payload.patient.id },
     });
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Update personal info successfully",
       data: {
@@ -51,7 +51,7 @@ const ChangePatientProfileController = async (data, req, res, next) => {
     const afterUpdateData = await Patient.findOne({
       where: { id: payload.patient.id },
     });
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Update avatar successfully",
       data: {
@@ -100,7 +100,7 @@ const ChangePatientProfileController = async (data, req, res, next) => {
             const afterUpdateData = await Patient.findOne({
               where: { id: payload.patient.id },
             });
-            res.status(200).json({
+            return res.status(200).json({
               result: 1,
               msg: "Update password successfully",
               data: {
@@ -122,7 +122,7 @@ const ChangePatientProfileController = async (data, req, res, next) => {
             });
           }
         } catch (err) {
-          res.status(500).json({
+          return res.status(500).json({
             result: 0,
             msg: err.message || "Some error occurred when update password",
           });

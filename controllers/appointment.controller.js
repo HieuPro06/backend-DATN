@@ -29,15 +29,11 @@ const getAppointmentAll = (data, req, res, next) => {
     // order: sorting.sortQuery(req, defaultSort, defaultDirection),
   })
     .then((data) => {
-      res.status(200).json({
+      return res.status(200).json({
         result: 1,
         msg: "Get all appointments successfully",
         data: data,
       });
-      // res.send({
-      //   data: data ? data : [],
-      //   count: data ? data.length : 0,
-      // });
     })
     .catch((err) => {
       return res.status(500).json({
@@ -53,7 +49,7 @@ const getAppointmentByID = (data, req, res, next) => {
 
   Appointment.findByPk(id)
     .then((data) => {
-      res.send({
+      return res.status(200).json({
         data: data ? data : [],
         count: data ? data.length : 0,
       });
@@ -195,7 +191,7 @@ const updateAppointment = (info,req, res,next) => {
   })
     .then((data) => {
       if (data == 1)
-        res.status(200).json({
+        return res.status(200).json({
           result: 1,
           msg: "Appointment was updated successfully.",
         });
@@ -218,13 +214,13 @@ const deleteAppointment = async (req, res) => {
   )
     .then((data) => {
       if (data == 1)
-        res.status(200).json({
+        return res.status(200).json({
           result: 1,
           msg: "Appointment was canceled successfully.",
         });
     })
     .catch((err) => {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: err.message,
       });
@@ -308,7 +304,7 @@ const orderAppointments = async (req, res) => {
       }
     );
     if (!data) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Can't order appointments",
       });

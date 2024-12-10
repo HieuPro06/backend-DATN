@@ -19,11 +19,11 @@ const changeDoctorProfileController = async (data, req, res, next) => {
       where: { id: payload.doctor.id },
     });
     if (!result) {
-      res.status(500).json({
+      return res.status(500).json({
         msg: "Can't update personal info !!!",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Update personal info successfully",
     });
@@ -35,11 +35,11 @@ const changeDoctorProfileController = async (data, req, res, next) => {
       where: { id: payload.doctor.id },
     });
     if (!result) {
-      res.status(500).json({
+      return res.status(500).json({
         msg: "Can't update avatar !!!",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Update avatar successfully",
     });
@@ -77,7 +77,7 @@ const changeDoctorProfileController = async (data, req, res, next) => {
               const afterUpdateData = await Doctor.findOne({
                 where: { id: payload.doctor.id },
               });
-              res.status(200).json({
+              return res.status(200).json({
                 result: 1,
                 msg: "Update password successfully",
                 data: {
@@ -99,7 +99,7 @@ const changeDoctorProfileController = async (data, req, res, next) => {
               });
             }
           } catch (err) {
-            res.status(500).json({
+            return res.status(500).json({
               result: 0,
               msg: err.message || "Some error occurred when update password",
             });

@@ -8,12 +8,12 @@ const getPhotosByBookingId = async (info, req, res, next) => {
       where: { booking_id: id },
     });
     if (!data) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: `Get photo ${id} failed`,
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Get photo successfully",
       data: data,
@@ -33,7 +33,7 @@ const createBookingPhoto = async (info, req, res, next) => {
   try {
     const data = await BookingPhoto.create(request);
     if (data) {
-      res.status(200).json({
+      return res.status(200).json({
         result: 1,
         msg: "Upload booking photo successfully",
       });

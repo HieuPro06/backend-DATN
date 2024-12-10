@@ -10,7 +10,7 @@ const getAllNotifications = async (data, req, res, next) => {
     const patient_id = auth.patient.id ? auth.patient.id : null;
 
     if (patient_id == null) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Error",
       });
@@ -27,18 +27,18 @@ const getAllNotifications = async (data, req, res, next) => {
       },
     });
     if (!result) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Error",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Get all notifications successfully",
       data: result,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: err,
     });
@@ -52,18 +52,18 @@ const getNotificationById = async (data, req, res, next) => {
       where: { id: id },
     });
     if (!result) {
-      res.status(404).json({
+      return res.status(404).json({
         result: 0,
         msg: `Get notification with id=${id} failed`,
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Get notification successfully",
       data: result,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: err,
     });
@@ -76,7 +76,7 @@ const createNotification = async (data, req, res, next) => {
     const patient_id = auth.patient.id ? auth.patient.id : null;
 
     if (patient_id == null) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Error",
       });
@@ -89,18 +89,18 @@ const createNotification = async (data, req, res, next) => {
 
     const data = await Notification.create(request);
     if (!data) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Create notification failed",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Create notification successfully",
       data: data,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: err,
     });
@@ -114,7 +114,7 @@ const markAsRead = async (data, req, res, next) => {
     const patient_id = auth.patient.id ? auth.patient.id : null;
 
     if (patient_id == null) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Error",
       });
@@ -125,18 +125,18 @@ const markAsRead = async (data, req, res, next) => {
       { where: { id: id } }
     );
     if (!data) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Mark as read failed",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Mark as read successfully",
       data: data,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: err,
     });
@@ -149,7 +149,7 @@ const markAsReadAll = async (data, req, res, next) => {
     const patient_id = auth.patient.id ? auth.patient.id : null;
 
     if (patient_id == null) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Error",
       });
@@ -160,18 +160,18 @@ const markAsReadAll = async (data, req, res, next) => {
       { where: { patient_id: patient_id, is_read: 0 } }
     );
     if (!data) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Mark as read failed",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Mark as read successfully",
       data: data,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: err,
     });
@@ -184,7 +184,7 @@ const countUnread = async (data, req, res, next) => {
     const patient_id = auth.patient.id ? auth.patient.id : null;
 
     if (patient_id == null) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Error",
       });
@@ -197,18 +197,18 @@ const countUnread = async (data, req, res, next) => {
       },
     });
     if (!result) {
-      res.status(500).json({
+      return res.status(500).json({
         result: 0,
         msg: "Error",
       });
     }
-    res.status(200).json({
+    return res.status(200).json({
       result: 1,
       msg: "Get unread notifications number successfully",
       data: result,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
       msg: err,
     });

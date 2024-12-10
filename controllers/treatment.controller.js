@@ -2,71 +2,85 @@ const Treatment = require("../models/treatment.model");
 const defaultSize = 1000000;
 
 const createNewTreatment = async (req, res) => {
-  const request = {
-    appointment_id: req.body.appointment_id,
-    name: req.body.name,
-    type: req.body.type,
-    times: req.body.times,
-    purpose: req.body.purpose,
-    instruction: req.body.instruction,
-    repeat_days: req.body.repeat_days,
-    repeat_time: req.body.repeat_time,
-  };
-  const data = await Treatment.create(request);
-  if (!data) {
-    res.status(500).json({
+  try {
+    const request = {
+      appointment_id: req.body.appointment_id,
+      name: req.body.name,
+      type: req.body.type,
+      times: req.body.times,
+      purpose: req.body.purpose,
+      instruction: req.body.instruction,
+      repeat_days: req.body.repeat_days,
+      repeat_time: req.body.repeat_time,
+    };
+    const data = await Treatment.create(request);
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: "Can't create new treatment record",
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Create treatment record successfully",
+      data: data,
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: "Can't create new treatment record",
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Create treatment record successfully",
-    data: data,
-  });
 };
 
-const getTreatment = async (info,req, res, next) => {
-  const appointmentId = req.params.id;
-  const data = await Treatment.findOne({
-    where: { appointment_id: appointmentId },
-  });
-  if (!data) {
-    res.status(500).json({
+const getTreatment = async (info, req, res, next) => {
+  try {
+    const appointmentId = req.params.id;
+    const data = await Treatment.findOne({
+      where: { appointment_id: appointmentId },
+    });
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: "Can't get treatment record",
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Get treatment record successfully",
+      data: data,
+    });
+  } catch (e) {
+    return res.status(500).json({
       result: 0,
-      msg: "Can't get treatment record",
+      msg: e.message,
     });
   }
-  res.status(200).json({
-    result: 1,
-    msg: "Get treatment record successfully",
-    data: data,
-  });
 };
-const getAllTreatments = async (info,req,res,next) => {
+const getAllTreatments = async (info, req, res, next) => {
   const { length, page } = req.body;
   const limit = length ? length : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
-  try{
+  try {
     const result = await Treatment.findAll({
       limit: limit,
       offset: offset,
-    })
-    res.status(200).json({
+    });
+    return res.status(200).json({
       result: 1,
       msg: "Get all treatments successfully",
       quantity: result.length,
-      data: result
-    })
+      data: result,
+    });
   } catch (e) {
-    res.status(500).json({
+    return res.status(500).json({
       result: 0,
-      msg: e.message || "Some error occur when get all treatments"
-    })
+      msg: e.message || "Some error occur when get all treatments",
+    });
   }
-}
+};
 
-const updateTreatment = async (req,res) => {
+const updateTreatment = async (req, res) => {
   const id = req.params.id;
   const request = {
     name: req.body.name,
@@ -76,51 +90,51 @@ const updateTreatment = async (req,res) => {
     instuction: req.body.instuction,
     repeat_days: req.body.repeat_days,
     repeat_time: req.body.repeat_time,
-  }
-  try{
-    const result = await Treatment.update(request,{
-      where: {id: id}
-    })
-    if(result){
+  };
+  try {
+    const result = await Treatment.update(request, {
+      where: { id: id },
+    });
+    if (result) {
       const afterUpdateData = await Treatment.findOne({
-        where: {id: id}
-      })
-      res.status(200).json({
-        result: 1,
-        msg: "Update treatment successfully",
-        data: afterUpdateData
-      })
-    }
-  } catch (e) {
-    res.status(500).json({
-      result: 0,
-      msg: e.message || "Some error occur when update treatment"
-    })
-  }
-}
-const deleteTreatment = async (req,res) => {
-  try{
-    const data = await Treatment.destroy({
-      where: {id: req.params.id}
-    })
-    if(data){
+        where: { id: id },
+      });
       return res.status(200).json({
         result: 1,
-        msg: "Remove successfully"
-      })
+        msg: "Update treatment successfully",
+        data: afterUpdateData,
+      });
+    }
+  } catch (e) {
+    return res.status(500).json({
+      result: 0,
+      msg: e.message || "Some error occur when update treatment",
+    });
+  }
+};
+const deleteTreatment = async (req, res) => {
+  try {
+    const data = await Treatment.destroy({
+      where: { id: req.params.id },
+    });
+    if (data) {
+      return res.status(200).json({
+        result: 1,
+        msg: "Remove successfully",
+      });
     }
   } catch (e) {
     console.log(e);
     return res.status(500).json({
       result: 0,
-      msg: "Remove failed"
-    })
+      msg: "Remove failed",
+    });
   }
-}
+};
 module.exports = {
   createNewTreatment,
   getTreatment,
   getAllTreatments,
   updateTreatment,
-  deleteTreatment
+  deleteTreatment,
 };
