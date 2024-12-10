@@ -188,7 +188,7 @@ const createAppointment = async (req, res) => {
   };
 };
 
-const updateAppointment = (req, res) => {
+const updateAppointment = (info,req, res,next) => {
   const id = req.params.id;
   Appointment.update(req.body, {
     where: { id: id },
