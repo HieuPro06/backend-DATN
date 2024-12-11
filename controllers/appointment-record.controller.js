@@ -86,34 +86,54 @@ const getAllAppointmentRecords = async (info, req, res, next) => {
     const limit = length ? length : defaultSize;
     const offset = page ? (page - 1) * limit : 0;
     if (token.hasOwnProperty("doctor")) {
-        try {
-            const appointments = await Appointment.findAll({
-                where: {doctor_id: token.doctor.id}
-            })
-            const result = await Promise.all(appointments.map(async (item) => {
-                const kq = await AppointmentRecord.findOne({
+        if(token.doctor.role === "doctor"){
+            try {
+                const appointments = await Appointment.findAll({
+                    where: {doctor_id: token.doctor.id}
+                })
+                const result = await Promise.all(appointments.map(async (item) => {
+                    const kq = await AppointmentRecord.findOne({
+                        limit: limit,
+                        offset: offset,
+                        where: {appointment_id: item.id}
+                    })
+                    if(kq !== null){
+                        return {...kq.dataValues,
+                            patient_name: item.patient_name,
+                            numerical_order: item.numerical_order
+                        };
+                    }
+                }))
+                return res.status(200).json({
+                    result: 1,
+                    msg: "Get all appointment-record successfully",
+                    quantity: result.length,
+                    data: result,
+                });
+            } catch (e) {
+                return res.status(500).json({
+                    result: 0,
+                    msg: e.message || "Some error occur when get all appointment-records",
+                });
+            }
+        } else {
+            try {
+                const result = await AppointmentRecord.findAll({
                     limit: limit,
                     offset: offset,
-                    where: {appointment_id: item.id}
-                })
-                if(kq !== null){
-                    return {...kq.dataValues,
-                        patient_name: item.patient_name,
-                        numerical_order: item.numerical_order
-                    };
-                }
-            }))
-            return res.status(200).json({
-                result: 1,
-                msg: "Get all appointment-record successfully",
-                quantity: result.length,
-                data: result,
-            });
-        } catch (e) {
-            return res.status(500).json({
-                result: 0,
-                msg: e.message || "Some error occur when get all appointment-records",
-            });
+                });
+                return res.status(200).json({
+                    result: 1,
+                    msg: "Get all appointment-record successfully",
+                    quantity: result.length,
+                    data: result,
+                });
+            } catch (e) {
+                return res.status(500).json({
+                    result: 0,
+                    msg: e.message || "Some error occur when get all appointment-records",
+                });
+            }
         }
     } else {
         try {
