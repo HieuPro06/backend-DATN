@@ -1,6 +1,7 @@
 const Appointment = require("../models/appointment.model.js");
 const Doctor = require("../models/doctor.model.js");
 const Room = require("../models/room.model");
+const Speciality = require("../models/speciality.model");
 const {appointment_status} = require("../enum");
 const DoctorAndService = require("../models/doctorAndService.model.js");
 const Booking = require("../models/booking.model.js");
@@ -30,10 +31,25 @@ const getAppointmentAll = async (data, req, res, next) => {
                     where: {doctor_id: doctorId}
                 })
                 if (appointments) {
+                    const returnData = await Promise.all(appointments.map(async (item) => {
+                        const doctor = await Doctor.findOne({
+                            where: {id: item.doctor_id}
+                        })
+                        const speciality = await Speciality.findOne({
+                            where: {id: doctor.speciality_id}
+                        })
+                        if(doctor){
+                            // console.log(doctor)
+                            return {
+                                ...item.dataValues,
+                                speciality: speciality
+                            }
+                        }
+                    }))
                     return res.status(200).json({
                         result: 1,
                         msg: "Get all appointments successfully",
-                        data: appointments
+                        data: returnData
                     })
                 }
             } catch (e) {
