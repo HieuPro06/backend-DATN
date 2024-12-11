@@ -1,8 +1,8 @@
 const Appointment = require("../models/appointment.model.js");
 const Doctor = require("../models/doctor.model.js");
+const Room = require("../models/room.model");
 const {appointment_status} = require("../enum");
 const DoctorAndService = require("../models/doctorAndService.model.js");
-const {where} = require("sequelize");
 const Booking = require("../models/booking.model.js");
 const jwt = require("jsonwebtoken");
 const {
@@ -71,10 +71,27 @@ const getAppointmentAll = async (data, req, res, next) => {
                 where: {patient_id: patientId}
             })
             if (appointments) {
+                const returnData = await Promise.all(appointments.map(async (item) => {
+                    const doctor = await Doctor.findOne({
+                        where: {id: item.doctor_id}
+                    })
+                    const room = await Room.findOne({
+                        where: {id: doctor.room_id}
+                    })
+                    if(doctor){
+                        // console.log(doctor)
+                        return {
+                            ...item.dataValues,
+                            doctor_name: doctor.name,
+                            room: room
+                        }
+                    }
+                }))
+                // console.log(returnData)
                 return res.status(200).json({
                     result: 1,
                     msg: "Get all appointments successfully",
-                    data: appointments
+                    data: returnData
                 })
             }
         } catch (e) {
