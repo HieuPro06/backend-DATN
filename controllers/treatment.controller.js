@@ -1,4 +1,6 @@
 const Treatment = require("../models/treatment.model");
+const jwt = require("jsonwebtoken");
+const Appointment = require("../models/appointment.model");
 const defaultSize = 1000000;
 
 const createNewTreatment = async (req, res) => {
@@ -58,25 +60,70 @@ const getTreatment = async (info, req, res, next) => {
   }
 };
 const getAllTreatments = async (info, req, res, next) => {
+  const token = jwt.decode(info);
   const { length, page } = req.body;
   const limit = length ? length : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
-  try {
-    const result = await Treatment.findAll({
-      limit: limit,
-      offset: offset,
-    });
-    return res.status(200).json({
-      result: 1,
-      msg: "Get all treatments successfully",
-      quantity: result.length,
-      data: result,
-    });
-  } catch (e) {
-    return res.status(500).json({
-      result: 0,
-      msg: e.message || "Some error occur when get all treatments",
-    });
+  if (token.hasOwnProperty("doctor")) {
+    try {
+      const appointments = await Appointment.findAll({
+        where: {doctor_id: token.doctor.id}
+      })
+      const result = await Promise.all(appointments.map(async (item) => {
+        const kq = await Treatment.findOne({
+          limit: limit,
+          offset: offset,
+          where: {appointment_id: item.id}
+        })
+        if(kq !== null){
+          return {...kq.dataValues,
+            patient_name: item.patient_name,
+            numerical_order: item.numerical_order
+          };
+        }
+      }))
+      return res.status(200).json({
+        result: 1,
+        msg: "Get all treatments successfully",
+        quantity: result.length,
+        data: result,
+      });
+    } catch (e) {
+      return res.status(500).json({
+        result: 0,
+        msg: e.message || "Some error occur when get all treatments",
+      });
+    }
+  } else {
+    try {
+      const appointments = await Appointment.findAll({
+        where: {patient_id: token.patient.id}
+      })
+      const result = await Promise.all(appointments.map(async (item) => {
+        const kq = await Treatment.findOne({
+          limit: limit,
+          offset: offset,
+          where: {appointment_id: item.id}
+        })
+        if(kq !== null){
+          return {...kq.dataValues,
+            patient_name: item.patient_name,
+            numerical_order: item.numerical_order
+          };
+        }
+      }))
+      return res.status(200).json({
+        result: 1,
+        msg: "Get all treatments successfully",
+        quantity: result.length,
+        data: result,
+      });
+    } catch (e) {
+      return res.status(500).json({
+        result: 0,
+        msg: e.message || "Some error occur when get all treatments",
+      });
+    }
   }
 };
 
