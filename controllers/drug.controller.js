@@ -12,10 +12,11 @@ const getAllDrugs = async (info, req, res, next) => {
       limit: limit,
       offset: offset,
     });
-    if (!result) {
-      res.status(500).json({
-        result: 0,
-        msg: e.message,
+    if (result) {
+      return res.status(200).json({
+        result: 1,
+        msg: "Get all drugs successfully",
+        data: result
       });
     }
   } catch (e) {
