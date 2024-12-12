@@ -165,24 +165,24 @@ const updateDoctor = (req, res) => {
   Doctor.update(req.body, { where: { id: id } })
     .then(async (element) => {
       const speciality = await Speciality.findByPk(
-        element.dataValues.speciality_id
+        element.dataValues?.speciality_id
       ).data;
-      const room = await Room.findByPk(element.dataValues.room_id).data;
+      const room = await Room.findByPk(element.dataValues?.room_id).data;
 
       const return_data = {
         id: id,
-        email: element.dataValues.email,
-        phone: element.dataValues.phone,
-        password: element.dataValues.password,
-        name: element.dataValues.name,
-        description: element.dataValues.description,
-        price: element.dataValues.price,
-        role: element.dataValues.role,
-        active: element.dataValues.active ?? 1,
-        avatar: element.dataValues.avatar,
-        create_at: element.dataValues.create_at,
-        update_at: element.dataValues.update_at,
-        recovery_token: element.dataValues.recovery_token,
+        email: element.dataValues?.email,
+        phone: element.dataValues?.phone,
+        password: element.dataValues?.password,
+        name: element.dataValues?.name,
+        description: element.dataValues?.description,
+        price: element.dataValues?.price,
+        role: element.dataValues?.role,
+        active: element.dataValues?.active ?? 1,
+        avatar: element.dataValues?.avatar,
+        create_at: element.dataValues?.create_at,
+        update_at: element.dataValues?.update_at,
+        recovery_token: element.dataValues?.recovery_token,
         speciality_id: speciality ? speciality.data : null,
         room_id: room ? room.data : null,
       };
