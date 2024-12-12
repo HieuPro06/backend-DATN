@@ -28,7 +28,7 @@ const getPhotosByBookingId = async (info, req, res, next) => {
 const createBookingPhoto = async (info, req, res, next) => {
   const request = {
     booking_id: req.body.booking_id,
-    url: req.body.url,
+    url: `${process.env.ENV_DEVELOPMENT}/Booking/${req.file.filename}`,
   };
   try {
     const data = await BookingPhoto.create(request);
