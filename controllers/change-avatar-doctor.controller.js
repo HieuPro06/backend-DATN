@@ -4,7 +4,7 @@ const changeAvatarDoctorController = async (data, req, res, next) => {
   try {
     const payload = jwt.decode(data);
     const result = await Doctor.update(
-      { avatar: `${process.env.ENV_DEVELOPMENT}/Images/${req.file.filename}` },
+      { avatar: `${process.env.ENV_DEVELOPMENT}/Doctor/${req.file.filename}` },
       {
         where: { id: payload.doctor.id },
       }
