@@ -9,7 +9,22 @@ const doctorProfileController = async (data, req, res, next) => {
     return res.status(200).json({
       result: 1,
       msg: "Successfully",
-      data: result,
+      data: {
+        id: result.id,
+        email: result.email,
+        phone: result.phone,
+        name: result.name,
+        description: result.description,
+        price: result.price,
+        role: result.role,
+        active: result.active,
+        avatar: result.avatar,
+        create_at: result.create_at,
+        update_at: result.update_at,
+        speciality_id: result.speciality_id,
+        room_id: result.room_id,
+        recovery_token: result.recovery_token
+      },
     });
   } catch (e) {
     return res.status(500).json({
