@@ -163,7 +163,7 @@ const updateDoctor = (req, res) => {
   const id = req.params.id;
 
   Doctor.update(req.body, { where: { id: id } })
-    .then(async (data) => {
+    .then(async (element) => {
       const speciality = await Speciality.findByPk(
         element.dataValues.speciality_id
       ).data;
