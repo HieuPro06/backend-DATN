@@ -118,10 +118,23 @@ const getAllAppointmentRecords = async (info, req, res, next) => {
             }
         } else {
             try {
-                const result = await AppointmentRecord.findAll({
+                const appointmentRecords = await AppointmentRecord.findAll({
                     limit: limit,
                     offset: offset,
                 });
+                const result = await Promise.all(appointmentRecords.map(async (item) => {
+                    const appointment = await Appointment.findOne({
+                        limit: limit,
+                        offset: offset,
+                        where: {id: item.appointment_id}
+                    })
+                    if(appointment !== null){
+                        return {...item.dataValues,
+                            patient_name: appointment.patient_name,
+                            numerical_order: appointment.numerical_order
+                        };
+                    }
+                }))
                 return res.status(200).json({
                     result: 1,
                     msg: "Get all appointment-record successfully",
