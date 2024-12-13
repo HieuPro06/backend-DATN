@@ -1,5 +1,8 @@
 const jwt = require("jsonwebtoken");
 const Doctor = require("../models/doctor.model");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const doctorProfileController = async (data, req, res, next) => {
   try {
     const payload = jwt.decode(data);
@@ -23,7 +26,7 @@ const doctorProfileController = async (data, req, res, next) => {
         update_at: result.update_at,
         speciality_id: result.speciality_id,
         room_id: result.room_id,
-        recovery_token: result.recovery_token
+        recovery_token: result.recovery_token,
       },
     });
   } catch (e) {

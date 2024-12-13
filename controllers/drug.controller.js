@@ -1,5 +1,7 @@
 const Drug = require("../models/drug.model");
 const Doctor = require("../models/doctor.model");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const defaultSize = 1000000;
 
@@ -16,7 +18,7 @@ const getAllDrugs = async (info, req, res, next) => {
       return res.status(200).json({
         result: 1,
         msg: "Get all drugs successfully",
-        data: result
+        data: result,
       });
     }
   } catch (e) {

@@ -2,6 +2,8 @@ const Doctor = require("../models/doctor.model.js");
 const Room = require("../models/room.model.js");
 const Speciality = require("../models/speciality.model.js");
 const DoctorService = require("../models/doctorAndService.model");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const defaultSize = 100;
 const defaultSort = "id";
@@ -26,8 +28,8 @@ const getDoctorAll = (info, req, res, next) => {
         data.map(async (element) => {
           const speciality = await Speciality.findByPk(
             element.dataValues.speciality_id
-          ).data;
-          const room = await Room.findByPk(element.dataValues.room_id).data;
+          );
+          const room = await Room.findByPk(element.dataValues.room_id);
 
           return {
             id: element.dataValues.id,
@@ -69,8 +71,8 @@ const getDoctorByID = (info, req, res, next) => {
     .then(async (element) => {
       const speciality = await Speciality.findByPk(
         element.dataValues.speciality_id
-      ).data;
-      const room = await Room.findByPk(element.dataValues.room_id).data;
+      );
+      const room = await Room.findByPk(element.dataValues.room_id);
 
       const return_data = {
         id: id,
@@ -86,8 +88,8 @@ const getDoctorByID = (info, req, res, next) => {
         create_at: element.dataValues.create_at,
         update_at: element.dataValues.update_at,
         recovery_token: element.dataValues.recovery_token,
-        speciality_id: speciality ? speciality.data : null,
-        room_id: room ? room.data : null,
+        speciality_id: speciality ? speciality.dataValues : null,
+        room_id: room ? room.dataValues : null,
       };
 
       return res.status(200).json({
@@ -280,8 +282,8 @@ const getAllDoctorsByServiceId = async (info, req, res, next) => {
               where: { id: item.doctor_id },
             });
             const speciality = await Speciality.findOne({
-              where: {id: result.speciality_id}
-            })
+              where: { id: result.speciality_id },
+            });
             return {
               id: result.id,
               email: result.email,

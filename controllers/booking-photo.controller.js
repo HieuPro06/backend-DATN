@@ -1,4 +1,6 @@
 const BookingPhoto = require("../models/bookingPhoto.model");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const getBookingPhoto = async (req, res) => {
   try {

@@ -1,6 +1,8 @@
 const Booking = require("../models/booking.model");
 const Service = require("../models/service.model");
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 const { booking_status } = require("../enum");
 const moment = require("moment");
 const { createAppointment } = require("../controllers/appointment.controller");

@@ -5,6 +5,8 @@ const Service = require("../models/service.model.js");
 const Speciality = require("../models/speciality.model.js");
 const { getServiceById } = require("./services.controller.js");
 const { Op } = require("sequelize");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const defaultSize = 10;
 const defaultSort = "id";

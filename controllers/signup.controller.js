@@ -1,6 +1,8 @@
 const Doctor = require("../models/doctor.model");
 const Patient = require("../models/patient.model");
 const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const SignupController = async (req, res) => {
   const salt = 10;

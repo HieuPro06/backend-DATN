@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Patient = require("../models/patient.model");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const PatientProfileController = async (data, req, res, next) => {
   try {

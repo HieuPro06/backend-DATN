@@ -1,6 +1,8 @@
 const Patient = require("../models/patient.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const ChangePatientProfileController = async (data, req, res, next) => {
   const payload = jwt.decode(data);
