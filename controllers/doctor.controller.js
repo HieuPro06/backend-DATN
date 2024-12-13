@@ -279,6 +279,9 @@ const getAllDoctorsByServiceId = async (info, req, res, next) => {
             const result = await Doctor.findOne({
               where: { id: item.doctor_id },
             });
+            const speciality = await Speciality.findOne({
+              where: {id: result.speciality_id}
+            })
             return {
               id: result.id,
               email: result.email,
@@ -291,7 +294,7 @@ const getAllDoctorsByServiceId = async (info, req, res, next) => {
               avatar: result.avatar,
               create_at: result.create_at,
               update_at: result.update_at,
-              speciality_id: result.speciality_id,
+              speciality: speciality,
               room_id: result.room_id,
               recovery_token: result.recovery_token,
             };
