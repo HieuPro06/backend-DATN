@@ -1,6 +1,8 @@
 const Patient = require("../models/patient.model");
 const Room = require("../models/room.model");
 const defaultSize = 10;
+const dotenv = require("dotenv");
+dotenv.config();
 
 const getPatientAll = (req, res) => {
   const { length, page } = req.body;

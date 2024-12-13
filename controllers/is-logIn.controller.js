@@ -1,3 +1,6 @@
+const dotenv = require("dotenv");
+dotenv.config();
+
 const isLogInController = (req, res, next) => {
   try {
     const access_token = req.headers["authorization"];

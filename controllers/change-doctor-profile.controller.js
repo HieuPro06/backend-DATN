@@ -1,19 +1,21 @@
 const Doctor = require("../models/doctor.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const changeDoctorProfileController = async (data, req, res, next) => {
   const payload = jwt.decode(data);
   const salt = 10;
   if (req.body.action === "personal") {
     const isValidUsername = await Doctor.findOne({
-      where: {name: req.body.name}
-    })
-    if(isValidUsername){
+      where: { name: req.body.name },
+    });
+    if (isValidUsername) {
       return res.status(400).json({
         result: 0,
-        msg: "Username has been exist"
-      })
+        msg: "Username has been exist",
+      });
     }
     const result = await Doctor.update(req.body, {
       where: { id: payload.doctor.id },

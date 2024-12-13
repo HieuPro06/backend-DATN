@@ -1,4 +1,6 @@
 const Service = require("../models/service.model");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const defaultSize = 1000000;
 

@@ -1,5 +1,7 @@
 const Speciality = require("../models/speciality.model");
 const Doctor = require("../models/doctor.model");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const defaultSize = 10;
 

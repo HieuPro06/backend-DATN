@@ -1,5 +1,7 @@
 const { where } = require("sequelize");
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 const Notification = require("../models/notification.model");
 
 const defaultSize = 1000000;

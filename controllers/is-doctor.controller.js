@@ -1,4 +1,7 @@
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const isDoctorController = (req, res, next) => {
   try {
     const access_token = req.headers["authorization"];

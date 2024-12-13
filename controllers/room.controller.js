@@ -1,5 +1,7 @@
 const Room = require("../models/room.model");
 const Doctor = require("../models/doctor.model");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const defaultSize = 1000000;
 

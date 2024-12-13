@@ -4,6 +4,8 @@ const Room = require("../models/room.model.js");
 const Service = require("../models/service.model.js");
 const Speciality = require("../models/speciality.model.js");
 const { Op } = require("sequelize");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const doctorAndServiceReady = async (req, res) => {
   const id = req.params.id;

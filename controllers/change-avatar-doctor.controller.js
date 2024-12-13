@@ -1,5 +1,8 @@
 const jwt = require("jsonwebtoken");
 const Doctor = require("../models/doctor.model");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const changeAvatarDoctorController = async (data, req, res, next) => {
   try {
     const payload = jwt.decode(data);
