@@ -59,26 +59,41 @@ const getAppointmentAll = async (data, req, res, next) => {
                 })
             }
         } else {
-            Appointment.findAll({
-                limit: limit,
-                offset: offset,
-                // where: condition,
-                // order: sorting.sortQuery(req, defaultSort, defaultDirection),
-            })
-                .then((data) => {
+            try {
+                const appointments = await Appointment.findAll({
+                    limit: limit,
+                    offset: offset,
+                    // where: condition,
+                    // order: sorting.sortQuery(req, defaultSort, defaultDirection),
+                })
+                if (appointments) {
+                    const returnData = await Promise.all(appointments.map(async (item) => {
+                        const doctor = await Doctor.findOne({
+                            where: {id: item.doctor_id}
+                        })
+                        const speciality = await Speciality.findOne({
+                            where: {id: doctor.speciality_id}
+                        })
+                        if(doctor){
+                            // console.log(doctor)
+                            return {
+                                ...item.dataValues,
+                                speciality: speciality
+                            }
+                        }
+                    }))
                     return res.status(200).json({
                         result: 1,
                         msg: "Get all appointments successfully",
-                        data: data,
-                    });
+                        data: returnData
+                    })
+                }
+            } catch (e) {
+                return res.json(500).json({
+                    result: 0,
+                    msg: e
                 })
-                .catch((err) => {
-                    return res.status(500).json({
-                        msg:
-                            err.message ||
-                            "Some error occurred while retrieving appointment list.",
-                    });
-                });
+            }
         }
     } else {
         const patientId = token.patient.id;
