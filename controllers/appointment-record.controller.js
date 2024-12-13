@@ -1,5 +1,7 @@
 const AppointmentRecord = require("../models/appointment-record.model");
 const Appointment = require("../models/appointment.model");
+const Doctor = require("../models/doctor.model");
+const Room = require("../models/room.model");
 const defaultSize = 1000000;
 const jwt = require("jsonwebtoken");
 const createNewAppointmentRecord = async (req, res) => {
@@ -43,11 +45,28 @@ const getAppointmentRecord = async (info, req, res, next) => {
             msg: "Can't get appointment record",
         });
     } else {
-        return res.status(200).json({
-            result: 1,
-            msg: "Get appointment record successfully",
-            data: data,
-        });
+        const appointment = await Appointment.findOne({
+            where: {id: data.appointment_id}
+        })
+        const doctor = await Doctor.findOne({
+            where: {id: appointment.doctor_id}
+        })
+        const room = await Room.findOne({
+            where: {id: doctor.room_id}
+        })
+        if(doctor) {
+            // console.log(doctor)
+            const returnData = {
+                ...data.dataValues,
+                doctor_name: doctor.name,
+                room: room
+            }
+            return res.status(200).json({
+                result: 1,
+                msg: "Get appointment record successfully",
+                data: returnData,
+            });
+        }
     }
 };
 const updateAppointmentRecord = async (req, res) => {
