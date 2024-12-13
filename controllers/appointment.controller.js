@@ -158,12 +158,26 @@ const getAppointmentByID = async (data, req, res, next) => {
                 where: {doctor_id: appointment.doctor_id}
             })
             if(appointment && appoitmentQueue){
-                return res.status(200).json({
-                    result: 1,
-                    msg: "Get appointment by id successfully",
-                    data: appointment,
-                    appointment_queue: appoitmentQueue
+                const doctor = await Doctor.findOne({
+                    where: {id: appointment.doctor_id}
                 })
+                const room = await Room.findOne({
+                    where: {id: doctor.room_id}
+                })
+                if(doctor){
+                    // console.log(doctor)
+                    const returnData =  {
+                        ...appointment.dataValues,
+                        doctor_name: doctor.name,
+                        room: room
+                    }
+                    return res.status(200).json({
+                        result: 1,
+                        msg: "Get appointment by id successfully",
+                        data: returnData,
+                        appointment_queue: appoitmentQueue
+                    })
+                }
             }
         } catch (e) {
             return res.status(500).json({
