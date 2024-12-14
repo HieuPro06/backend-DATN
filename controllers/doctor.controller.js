@@ -45,8 +45,10 @@ const getDoctorAll = (info, req, res, next) => {
             create_at: element.dataValues.create_at,
             update_at: element.dataValues.update_at,
             recovery_token: element.dataValues.recovery_token,
-            speciality_id: speciality ? speciality.data : null,
-            room_id: room ? room.data : null,
+            speciality_id: speciality ? speciality.dataValues.id : null,
+            speciality_name: speciality ? speciality.dataValues.name : "",
+            room_id: room ? room.dataValues.id : null,
+            room_name: room ? room.dataValues.name : "",
           };
         })
       );
@@ -88,8 +90,10 @@ const getDoctorByID = (info, req, res, next) => {
         create_at: element.dataValues.create_at,
         update_at: element.dataValues.update_at,
         recovery_token: element.dataValues.recovery_token,
-        speciality_id: speciality ? speciality.dataValues : null,
-        room_id: room ? room.dataValues : null,
+        speciality_id: speciality ? speciality.dataValues.id : null,
+        speciality_name: speciality ? speciality.dataValues.name : "",
+        room_id: room ? room.dataValues.id : null,
+        room_name: room ? room.dataValues.name : "",
       };
 
       return res.status(200).json({
