@@ -21,7 +21,8 @@ const appointment_number_threshold = 20;
 
 const getAppointmentAll = async (data, req, res, next) => {
   const token = jwt.decode(data);
-  const { size, page } = req.body;
+  const size = parseInt(req.query.size);
+  const page = parseInt(req.query.page);
   const limit = size ? size : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
   const condition = condition_active;
