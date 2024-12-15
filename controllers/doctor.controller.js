@@ -11,7 +11,8 @@ const defaultDirection = "ASC";
 const condition_active = { active: 1 };
 
 const getDoctorAll = (info, req, res, next) => {
-  const { size, page } = req.body;
+  const size = parseInt(req.query.size);
+  const page = parseInt(req.query.page);
 
   const limit = size ? size : defaultSize;
   const offset = page ? (page - 1) * limit : 0;

@@ -122,11 +122,11 @@ const markAsRead = async (data, req, res, next) => {
       });
     }
 
-    const data = await Notification.update(
+    const response = await Notification.update(
       { is_read: 1 },
       { where: { id: id } }
     );
-    if (!data) {
+    if (!response) {
       return res.status(500).json({
         result: 0,
         msg: "Mark as read failed",
@@ -135,7 +135,6 @@ const markAsRead = async (data, req, res, next) => {
     return res.status(200).json({
       result: 1,
       msg: "Mark as read successfully",
-      data: data,
     });
   } catch (err) {
     return res.status(500).json({
@@ -157,11 +156,11 @@ const markAsReadAll = async (data, req, res, next) => {
       });
     }
 
-    const data = await Notification.update(
+    const response = await Notification.update(
       { is_read: 1 },
       { where: { patient_id: patient_id, is_read: 0 } }
     );
-    if (!data) {
+    if (!response) {
       return res.status(500).json({
         result: 0,
         msg: "Mark as read failed",
@@ -170,7 +169,6 @@ const markAsReadAll = async (data, req, res, next) => {
     return res.status(200).json({
       result: 1,
       msg: "Mark as read successfully",
-      data: data,
     });
   } catch (err) {
     return res.status(500).json({

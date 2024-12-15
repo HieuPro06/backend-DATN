@@ -7,7 +7,8 @@ const defaultSize = 10;
 
 const getAllSpeciality = async (data, req, res, next) => {
   try {
-    const { size, page } = req.body;
+    const size = parseInt(req.query.size);
+    const page = parseInt(req.query.page);
     const limit = size ? size : defaultSize;
     const offset = page ? (page - 1) * limit : 0;
     const result = await Speciality.findAll({

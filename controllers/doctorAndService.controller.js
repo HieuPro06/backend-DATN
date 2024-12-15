@@ -14,7 +14,8 @@ const defaultDirection = "ASC";
 const condition_active = { active: 1 };
 
 const getDoctorsFromServiceId = async (req, res) => {
-  const { size, page } = req.body;
+  const size = parseInt(req.query.size);
+  const page = parseInt(req.query.page);
   const id = req.params.id;
 
   const limit = size ? size : defaultSize;
@@ -82,7 +83,8 @@ const getDoctorsFromServiceId = async (req, res) => {
 };
 
 const getServicesFromDoctorId = async (req, res) => {
-  const { size, page } = req.body;
+  const size = parseInt(req.query.size);
+  const page = parseInt(req.query.page);
   const id = req.params.id;
 
   const limit = size ? size : defaultSize;

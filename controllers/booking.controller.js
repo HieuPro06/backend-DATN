@@ -58,7 +58,7 @@ const createBooking = async (result, req, res, next) => {
     });
     return res.status(200).json({
       result: 1,
-      msg: `Congratulations . ${request.booking_name} ! This booking at ${request.appointment_date} ${request.appointment_hour} which has been created succesfully by you`,
+      msg: `Congratulations . ${payload.patient.name} ! This booking at ${request.appointment_date} ${request.appointment_hour} which has been created succesfully by you`,
       data: {
         id: data.id,
         booking_name: data.booking_name,

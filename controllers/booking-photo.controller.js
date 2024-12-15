@@ -2,7 +2,7 @@ const BookingPhoto = require("../models/bookingPhoto.model");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const getBookingPhoto = async (req, res) => {
+const getBookingPhoto = async (data, req, res, next) => {
   try {
     const id = req.params.id;
 
@@ -18,6 +18,7 @@ const getBookingPhoto = async (req, res) => {
     return res.status(200).json({
       result: 1,
       msg: "Get photo successfully",
+      data: data,
     });
   } catch (e) {
     return res.status(500).json({
