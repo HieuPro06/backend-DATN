@@ -3,9 +3,9 @@ const cors = require("cors");
 const express = require("express");
 const app = express();
 const port = 3001;
-const admin = require("firebase-admin");
-const serviceAccount = require("./datn-628d9-firebase-adminsdk-xvurg-39c741a657.json");
-/* Khởi tạo Firebase-admin */
+// const admin = require("firebase-admin");
+// const serviceAccount = require("./datn-628d9-firebase-adminsdk-xvurg-39c741a657.json");
+// /* Khởi tạo Firebase-admin */
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount)
 // });

@@ -87,10 +87,10 @@ const getAppointmentAll = async (data, req, res, next) => {
                 where: { id: doctor.speciality_id },
               });
               if (doctor) {
-                // console.log(doctor)
                 return {
                   ...item.dataValues,
                   speciality: speciality,
+                  doctor: doctor
                 };
               }
             })
