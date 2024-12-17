@@ -6,10 +6,10 @@ const getBookingPhoto = async (data, req, res, next) => {
   try {
     const id = req.params.id;
 
-    const data = await BookingPhoto.findOne({
+    const response = await BookingPhoto.findOne({
       where: { id: id },
     });
-    if (!data) {
+    if (!response) {
       return res.status(500).json({
         result: 0,
         msg: `Get photo ${id} failed`,
