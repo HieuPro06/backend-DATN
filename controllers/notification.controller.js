@@ -72,40 +72,26 @@ const getNotificationById = async (data, req, res, next) => {
   }
 };
 
-const createNotification = async (data, req, res, next) => {
+const createNotification = async (data, values) => {
   try {
     const auth = jwt.decode(data);
     const patient_id = auth.patient.id ? auth.patient.id : null;
 
     if (patient_id == null) {
-      return res.status(500).json({
-        result: 0,
-        msg: "Error",
-      });
+      return null;
     }
 
     const request = {
-      name: req.body.name,
-      location: req.body.location,
+      message: values.message,
+      record_type: values.record_type,
+      record_id: values.record_id,
+      is_read: 0,
+      patient_id: patient_id,
     };
 
-    const data = await Notification.create(request);
-    if (!data) {
-      return res.status(500).json({
-        result: 0,
-        msg: "Create notification failed",
-      });
-    }
-    return res.status(200).json({
-      result: 1,
-      msg: "Create notification successfully",
-      data: data,
-    });
+    const notification = await Notification.create(request);
   } catch (err) {
-    return res.status(500).json({
-      result: 0,
-      msg: err,
-    });
+    console.log(err);
   }
 };
 
@@ -215,6 +201,31 @@ const countUnread = async (data, req, res, next) => {
   }
 };
 
+const deleteNotification = async (data, req, res, next) => {
+  try {
+    const id = req.params.id;
+    const result = await Notification.destroy({
+      where: { id: id },
+    });
+    if (!result) {
+      return res.status(404).json({
+        result: 0,
+        msg: `Delete notification with id=${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Delete notification successfully",
+      data: result,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      result: 0,
+      msg: err,
+    });
+  }
+};
+
 module.exports = {
   getAllNotifications,
   getNotificationById,
@@ -222,4 +233,5 @@ module.exports = {
   markAsRead,
   markAsReadAll,
   countUnread,
+  deleteNotification,
 };

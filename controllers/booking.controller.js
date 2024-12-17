@@ -56,6 +56,12 @@ const createBooking = async (result, req, res, next) => {
     const service = await Service.findOne({
       where: { id: data?.service_id },
     });
+    await Notification.createNotification(result, {
+      message: `Congratulations . ${payload.patient.name} ! You successfully created the booking at ${request.appointment_date} ${request.appointment_hour}
+      Please await further appovements from our staff`,
+      record_type: "booking",
+      record_id: data.id,
+    });
     return res.status(200).json({
       result: 1,
       msg: `Congratulations . ${payload.patient.name} ! This booking at ${request.appointment_date} ${request.appointment_hour} which has been created succesfully by you`,
@@ -391,12 +397,19 @@ const confirmBooking = async (req, res) => {
         },
         { where: { id: id } }
       )
-        .then((data) => {
-          if (data == 1)
+        .then(async (data) => {
+          if (data == 1) {
+            await Notification.createNotification(result, {
+              message: `Congratulations . ${payload.patient.name} ! Your booking at ${booking.appointment_date} ${booking.appointment_hour} has been approved
+              Please remember to come on time for your appointment`,
+              record_type: "appointment",
+              record_id: data.id,
+            });
             return res.status(200).json({
               success: 1,
               msg: "Booking was confirmed successfully.",
             });
+          }
         })
         .catch((err) => {
           return res.status(500).json({

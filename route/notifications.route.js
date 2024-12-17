@@ -8,12 +8,13 @@ const {
   markAsRead,
   markAsReadAll,
   countUnread,
+  deleteNotification,
 } = require("../controllers/notification.controller");
 
 NotificationsRouter.get("/", isLogInController, getAllNotifications);
 NotificationsRouter.get("/unread", isLogInController, countUnread);
 NotificationsRouter.get("/:id", isLogInController, getNotificationById);
-NotificationsRouter.post("/", isLogInController, createNotification);
+NotificationsRouter.delete("/:id", isLogInController, deleteNotification);
 NotificationsRouter.put("/mark-as-read/:id", isLogInController, markAsRead);
 NotificationsRouter.put("/mark-as-read-all/", isLogInController, markAsReadAll);
 
