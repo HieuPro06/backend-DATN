@@ -6,6 +6,9 @@ dotenv.config();
 const { booking_status } = require("../enum");
 const moment = require("moment");
 const { createAppointment } = require("../controllers/appointment.controller");
+const {
+  createNotification,
+} = require("../controllers/notification.controller");
 
 const defaultSize = 1000000;
 
@@ -56,7 +59,7 @@ const createBooking = async (result, req, res, next) => {
     const service = await Service.findOne({
       where: { id: data?.service_id },
     });
-    await Notification.createNotification(result, {
+    await createNotification(result, {
       message: `Congratulations . ${payload.patient.name} ! You successfully created the booking at ${request.appointment_date} ${request.appointment_hour}
       Please await further appovements from our staff`,
       record_type: "booking",
@@ -111,7 +114,7 @@ const deleteBooking = async (data, req, res, next) => {
       }
       if (requestBooking.status === booking_status.CANCEL) {
         return res.status(400).json({
-          result: 0,
+          result: 1,
           msg: "This booking's status is cancelled . No need any more action !",
         });
       } else if (requestBooking.status === booking_status.PROCESSING) {
@@ -399,7 +402,7 @@ const confirmBooking = async (req, res) => {
       )
         .then(async (data) => {
           if (data == 1) {
-            await Notification.createNotification(result, {
+            await createNotification(result, {
               message: `Congratulations . ${payload.patient.name} ! Your booking at ${booking.appointment_date} ${booking.appointment_hour} has been approved
               Please remember to come on time for your appointment`,
               record_type: "appointment",
