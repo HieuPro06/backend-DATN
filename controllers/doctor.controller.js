@@ -240,6 +240,9 @@ const getAllDoctorsBySpecialityId = async (info, req, res, next) => {
       where: { speciality_id: specialityId },
     });
     if (data) {
+      const speciality = await Speciality.findOne({
+        where: { id: specialityId },
+      });
       return res.status(200).json({
         result: 1,
         msg: "Get all doctor by speciality successfully",
@@ -257,7 +260,7 @@ const getAllDoctorsBySpecialityId = async (info, req, res, next) => {
             avatar: item.avatar,
             create_at: item.create_at,
             update_at: item.update_at,
-            speciality_id: item.speciality_id,
+            speciality: speciality,
             room_id: item.room_id,
             recovery_token: item.recovery_token,
           };

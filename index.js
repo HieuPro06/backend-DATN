@@ -26,7 +26,7 @@ const NotificationsRouter = require("./route/notifications.route.js");
 
 app.use(bodyParser.json());
 app.use(cors());
-app.use(express.static('avatar'));
+app.use(express.static("avatar"));
 app.get("/", (req, res) => {
   res.json("Backend home");
 });
@@ -37,7 +37,7 @@ app.use("/api/signup", SignUpRouter);
 app.use("/api/login", LoginRouter);
 app.use("/api/doctor/profile", DoctorProfileRouter);
 app.use("/api/patient/profile", PatientProfileRouter);
-app.use("/api/specialites", SpecialityRouter);
+app.use("/api/specialities", SpecialityRouter);
 app.use("/api/rooms", RoomRouter);
 app.use("/api/services", ServiceRouter);
 app.use("/api/patients/", PatientRouter);
