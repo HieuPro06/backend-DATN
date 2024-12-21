@@ -159,7 +159,6 @@ const createDoctor = (req, res) => {
 
 const updateDoctor = (req, res) => {
   const id = req.params.id;
-
   Doctor.update(req.body, { where: { id: id } })
     .then(async (element) => {
       const speciality = await Speciality.findByPk(
