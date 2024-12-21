@@ -1,4 +1,6 @@
 const Service = require("../models/service.model");
+const DoctorAndService = require("../models/doctorAndService.model");
+const Booking = require("../models/booking.model");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -120,6 +122,18 @@ const updateService = async (req, res) => {
 const deleteService = async (req, res) => {
   try {
     const id = req.params.id;
+    const serviceUsed = await Booking.findOne({
+      where: {service_id: id}
+    })
+    const doctorInService = await DoctorAndService.findOne({
+      where: {service_id: id}
+    })
+    if(serviceUsed || doctorInService){
+      return res.status(400).json({
+        result: 0,
+        msg: "This service is used or have doctor in there , Don't remove"
+      })
+    }
     const data = await Service.destroy({
       where: { id: id },
     });
