@@ -72,11 +72,8 @@ const getNotificationById = async (data, req, res, next) => {
   }
 };
 
-const createNotification = async (data, values) => {
+const createNotification = async (patient_id, values) => {
   try {
-    const auth = jwt.decode(data);
-    const patient_id = auth.patient.id ? auth.patient.id : null;
-
     if (patient_id == null) {
       return null;
     }

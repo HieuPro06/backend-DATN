@@ -1,5 +1,6 @@
 const Booking = require("../models/booking.model");
 const Service = require("../models/service.model");
+const Patient = require("../models/patient.model");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -9,12 +10,13 @@ const { createAppointment } = require("../controllers/appointment.controller");
 const {
   createNotification,
 } = require("../controllers/notification.controller");
-
+const { Op } = require("sequelize");
 const defaultSize = 1000000;
 
 const createBooking = async (result, req, res, next) => {
   try {
     const payload = jwt.decode(result);
+    const user = await Patient.findByPk(payload.patient.id);
     /* Kiểm tra thơì gian booking tránh bị trùng lặp */
     const appointment_time = req.body.appointment_time;
     const appointmentDate = appointment_time?.split(" ")[0];
@@ -24,9 +26,13 @@ const createBooking = async (result, req, res, next) => {
         patient_id: payload.patient.id,
         appointment_date: appointmentDate,
         appointment_hour: appointmentHour,
+        status: {
+          [Op.ne]: booking_status.CANCEL, // Sequelize operator for 'not equal'
+        },
       },
     });
     if (isExistBookingInThisTime.length !== 0) {
+      console.log(`Please choose another time booking`);
       return res.status(400).json({
         result: 0,
         msg: `Please choose another time booking , had at least booking with this time ${appointmentDate} ${appointmentHour}`,
@@ -56,39 +62,45 @@ const createBooking = async (result, req, res, next) => {
         msg: "Error ! Can't be booking , please try again",
       });
     }
-    const service = await Service.findOne({
-      where: { id: data?.service_id },
-    });
-    await createNotification(result, {
-      message: `Congratulations . ${payload.patient.name} ! You successfully created the booking at ${request.appointment_date} ${request.appointment_hour}
+    if (data) {
+      var service = null;
+      if (data.service_id) {
+        service = await Service.findOne({
+          where: { id: data.service_id },
+        });
+      }
+      await createNotification(user.id, {
+        message: `Congratulations, ${user?.name} ! You successfully created the booking at ${request.appointment_date} ${request.appointment_hour}
       Please await further appovements from our staff`,
-      record_type: "booking",
-      record_id: data.id,
-    });
-    return res.status(200).json({
-      result: 1,
-      msg: `Congratulations . ${payload.patient.name} ! This booking at ${request.appointment_date} ${request.appointment_hour} which has been created succesfully by you`,
-      data: {
-        id: data.id,
-        booking_name: data.booking_name,
-        booking_phone: data.booking_phone,
-        doctor_id: data.doctor_id,
-        name: data.name,
-        gender: data.gender,
-        birthday: data.birthday,
-        address: data.address,
-        reason: data.reason,
-        appointment_time: `${data.appointment_date} ${data.appointment_hour}`,
-        status: data.status,
-        create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-        update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
-        service: {
-          id: data.service_id,
-          name: service.name,
+        record_type: "booking",
+        record_id: data.id,
+      });
+      return res.status(200).json({
+        result: 1,
+        msg: `Congratulations, ${user?.name} ! This booking at ${request.appointment_date} ${request.appointment_hour} which has been created succesfully by you`,
+        data: {
+          id: data.id,
+          booking_name: data.booking_name,
+          booking_phone: data.booking_phone,
+          doctor_id: data.doctor_id,
+          name: data.name,
+          gender: data.gender,
+          birthday: data.birthday,
+          address: data.address,
+          reason: data.reason,
+          appointment_time: `${data.appointment_date} ${data.appointment_hour}`,
+          status: data.status,
+          create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+          update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
+          service: {
+            id: service ? data.service_id : 0,
+            name: service ? service.name : "",
+          },
         },
-      },
-    });
+      });
+    }
   } catch (e) {
+    console.log(e);
     return res.status(500).json({
       result: 0,
       msg: e.message,
@@ -157,6 +169,7 @@ const readAllBooking = async (data, req, res, next) => {
         offset: offset,
       });
       if (!result) {
+        console.log("Error ! Can't get all booking");
         return res.status(500).json({
           result: 0,
           msg: "Error ! Can't get all bookings ",
@@ -167,9 +180,12 @@ const readAllBooking = async (data, req, res, next) => {
         quantity: result.length,
         data: await Promise.all(
           result.map(async (item) => {
-            const service = await Service.findOne({
-              where: { id: item?.service_id },
-            });
+            var service = null;
+            if (item?.service_id) {
+              service = await Service.findOne({
+                where: { id: item?.service_id },
+              });
+            }
             return {
               id: item.id,
               doctor_id: item.doctor_id,
@@ -185,8 +201,8 @@ const readAllBooking = async (data, req, res, next) => {
               create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
               update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
               service: {
-                id: item.service_id,
-                name: service.name,
+                id: service ? item.service_id : 0,
+                name: service ? service.name : "",
               },
             };
           })
@@ -199,6 +215,7 @@ const readAllBooking = async (data, req, res, next) => {
         where: { patient_id: patientId },
       });
       if (!result) {
+        console.log("Error ! Can't get all booking");
         return res.status(500).json({
           result: 0,
           msg: "Error ! Don't get all booking of you",
@@ -209,9 +226,12 @@ const readAllBooking = async (data, req, res, next) => {
         quantity: result.length,
         data: await Promise.all(
           result.map(async (item) => {
-            const service = await Service.findOne({
-              where: { id: item?.service_id },
-            });
+            var service = null;
+            if (item?.service_id) {
+              service = await Service.findOne({
+                where: { id: item?.service_id },
+              });
+            }
             return {
               id: item.id,
               booking_name: item.booking_name,
@@ -226,8 +246,8 @@ const readAllBooking = async (data, req, res, next) => {
               create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
               update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
               service: {
-                id: item.service_id,
-                name: service.name,
+                id: service ? item.service_id : 0,
+                name: service ? service.name : "",
               },
             };
           })
@@ -235,6 +255,7 @@ const readAllBooking = async (data, req, res, next) => {
       });
     }
   } catch (e) {
+    console.log(e);
     return res.status(500).json({
       result: 0,
       msg: e.message,
@@ -257,9 +278,12 @@ const readBookingById = async (data, req, res, next) => {
           msg: "This booking not exist",
         });
       }
-      const service = await Service.findOne({
-        where: { id: requestBooking?.service_id },
-      });
+      var service = null;
+      if (requestBooking?.service_id) {
+        service = await Service.findOne({
+          where: { id: requestBooking?.service_id },
+        });
+      }
       return res.status(200).json({
         result: 1,
         msg: "Action successfully !",
@@ -277,8 +301,8 @@ const readBookingById = async (data, req, res, next) => {
           create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
           update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
           service: {
-            id: requestBooking.service_id,
-            name: service.name,
+            id: service ? requestBooking.service_id : 0,
+            name: service ? service.name : "",
           },
         },
       });
@@ -290,9 +314,12 @@ const readBookingById = async (data, req, res, next) => {
             msg: "This booking not exist",
           });
         }
-        const service = await Service.findOne({
-          where: { id: requestBooking?.service_id },
-        });
+        var service = null;
+        if (requestBooking?.service_id) {
+          service = await Service.findOne({
+            where: { id: requestBooking?.service_id },
+          });
+        }
         return res.status(200).json({
           result: 1,
           msg: "Action successfully !",
@@ -310,8 +337,8 @@ const readBookingById = async (data, req, res, next) => {
             create_at: moment().format("YYYY-MM-DD HH:MM:SS"),
             update_at: moment().format("YYYY-MM-DD HH:MM:SS"),
             service: {
-              id: requestBooking.service_id,
-              name: service.name,
+              id: service ? requestBooking.service_id : 0,
+              name: service ? service.name : "",
             },
           },
         });
@@ -360,6 +387,7 @@ const confirmBooking = async (req, res) => {
     const access_token = req.headers["authorization"];
     const token = access_token.split(" ")[1];
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await Patient.findByPk(payload.doctor.id);
     if (
       !payload.hasOwnProperty("doctor") ||
       (payload.doctor.role !== "supporter" && payload.doctor.role !== "admin")
@@ -401,9 +429,10 @@ const confirmBooking = async (req, res) => {
         { where: { id: id } }
       )
         .then(async (data) => {
+          console.log(data)
           if (data == 1) {
-            await createNotification(result, {
-              message: `Congratulations . ${payload.patient.name} ! Your booking at ${booking.appointment_date} ${booking.appointment_hour} has been approved
+            await createNotification(user.id, {
+              message: `Congratulations, ${user?.name} ! Your booking at ${booking.appointment_date} ${booking.appointment_hour} has been approved
               Please remember to come on time for your appointment`,
               record_type: "appointment",
               record_id: data.id,
@@ -415,6 +444,7 @@ const confirmBooking = async (req, res) => {
           }
         })
         .catch((err) => {
+          console.log(err);
           return res.status(500).json({
             success: 0,
             msg: `Cannot confirm Booking with id=${id}`,
@@ -424,6 +454,7 @@ const confirmBooking = async (req, res) => {
       return res.status(500).json(response_appointment);
     }
   } catch (e) {
+    console.log(e);
     return res.status(500).json({
       result: 0,
       msg: e.message,

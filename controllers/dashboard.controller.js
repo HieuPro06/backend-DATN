@@ -14,19 +14,19 @@ const DashboardController = async (data, req, res, next) => {
     });
     const doctors = await Doctor.findAll({});
     const appointments = await Appointment.findAll({
-      where: { doctor_id: user.id },
+      where: { doctor_id: user?.id },
     });
     const bookings = await Booking.findAll({
-      where: { doctor_id: user.id },
+      where: { doctor_id: user?.id },
     });
     const cancelAppointments = await Appointment.findAll({
-      where: { doctor_id: user.id, status: appointment_status.CANCEL },
+      where: { doctor_id: user?.id, status: appointment_status.CANCEL },
     });
     res.status(200).json({
       result: 1,
       msg: "Welcome to Umbrella corporation",
       data: {
-        id: user.id,
+        id: user?.id,
         email: user.email,
         phone: user.phone,
         name: user.name,
