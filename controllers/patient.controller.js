@@ -47,38 +47,52 @@ const getPatientById = (req, res) => {
 };
 
 const updatePatient = async (req, res) => {
-  const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-  const data = await Patient.update(req.body, {
-    where: { id: id },
-  });
-  if (!data) {
+    const data = await Patient.update(req.body, {
+      where: { id: id },
+    });
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: `Update patient ${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Update patient successfully",
+    });
+  } catch (err) {
     return res.status(500).json({
       result: 0,
-      msg: `Update patient ${id} failed`,
+      msg: err,
     });
   }
-  return res.status(200).json({
-    result: 1,
-    msg: "Update patient successfully",
-  });
 };
 
 const deletePatient = async (req, res) => {
-  const id = req.params.id;
-  const data = await Patient.destroy({
-    where: { id: id },
-  });
-  if (!data) {
+  try {
+    const id = req.params.id;
+    const data = await Patient.destroy({
+      where: { id: id },
+    });
+    if (!data) {
+      return res.status(500).json({
+        result: 0,
+        msg: `Delete patient ${id} failed`,
+      });
+    }
+    return res.status(200).json({
+      result: 1,
+      msg: "Delete patient successfully",
+    });
+  } catch (err) {
     return res.status(500).json({
       result: 0,
-      msg: `Delete patient ${id} failed`,
+      msg: err,
     });
   }
-  return res.status(200).json({
-    result: 1,
-    msg: "Delete patient successfully",
-  });
 };
 
 module.exports = {

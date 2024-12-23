@@ -23,6 +23,7 @@ const getAppointmentAll = async (data, req, res, next) => {
   const token = jwt.decode(data);
   const size = parseInt(req.query.size);
   const page = parseInt(req.query.page);
+  const date = req.query.date;
   const limit = size ? size : defaultSize;
   const offset = page ? (page - 1) * limit : 0;
   const condition = condition_active;

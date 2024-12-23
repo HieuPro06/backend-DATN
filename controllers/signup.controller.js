@@ -8,6 +8,7 @@ const SignupController = async (req, res) => {
   const salt = 10;
   /* Đăng kí bên web - doctor */
   try {
+    console.log(req.body.type);
     if (req.body.type !== "patient") {
       const request = {
         email: req.body.email,
@@ -33,12 +34,14 @@ const SignupController = async (req, res) => {
         where: { phone: request.phone },
       });
       if (existEmail) {
+        console.log("Email had been exist");
         return res.status(400).json({
           result: 0,
           msg: "Email had been exist",
         });
       }
       if (existPhone) {
+        console.log("Phone number had been exist");
         return res.status(400).json({
           result: 0,
           msg: "Phone number had been exist",
@@ -47,6 +50,7 @@ const SignupController = async (req, res) => {
       /* Mã hoá password */
       bcrypt.hash(request.password, salt, async (err, hashedPassword) => {
         if (err) {
+          console.log("Error hashing password");
           return res.status(500).json({ msg: "Error hashing password" });
         }
         request.password = hashedPassword;
@@ -59,6 +63,7 @@ const SignupController = async (req, res) => {
             data: result,
           });
         } catch (err) {
+          console.log(err);
           return res.status(500).json({
             result: 0,
             msg: err.message || "Some error occurred when sign up",
@@ -84,6 +89,7 @@ const SignupController = async (req, res) => {
         where: { phone: request.phone },
       });
       if (existPhone) {
+        console.log("This phone number had been exist");
         return res.status(400).json({
           result: 0,
           msg: "This phone number had been exist",
@@ -92,6 +98,7 @@ const SignupController = async (req, res) => {
       /* Mã hoá password */
       bcrypt.hash(request.password, salt, async (err, hashedPassword) => {
         if (err) {
+          console.log("Error hashing password");
           return res.status(500).json({ msg: "Error hashing password" });
         }
         request.password = hashedPassword;
@@ -103,6 +110,7 @@ const SignupController = async (req, res) => {
             data: result,
           });
         } catch (err) {
+          console.log(err);
           return res.status(500).json({
             result: 0,
             msg: err.message || "Some error occurred when sign up",
@@ -111,6 +119,7 @@ const SignupController = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       result: 0,
       msg: err.message || "Some error occurred when sign up",
