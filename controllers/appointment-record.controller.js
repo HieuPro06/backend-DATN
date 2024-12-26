@@ -54,7 +54,7 @@ const getAppointmentRecord = async (info, req, res, next) => {
       where: { id: appointment.doctor_id },
     });
     const room = await Room.findOne({
-      where: { id: doctor.room_id },
+      where: { id: appointment.room_id },
     });
     if (doctor) {
       // console.log(doctor)

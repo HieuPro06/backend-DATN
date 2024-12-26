@@ -25,14 +25,22 @@ const Appointment = sequelize.define(
         key: "id",
       },
     },
-      patient_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'tn_patients', // references the tn_patients table
-          key: 'id',
-        },
+    room_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "tn_rooms", // references the tn_doctors table
+        key: "id",
       },
+    },
+    patient_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "tn_patients", // references the tn_patients table
+        key: "id",
+      },
+    },
     patient_name: {
       type: DataTypes.STRING(50),
       allowNull: true,

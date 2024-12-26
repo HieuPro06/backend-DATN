@@ -8,7 +8,7 @@ const changeAvatarPatientController = async (data, req, res, next) => {
     const payload = jwt.decode(data);
     const result = await Patient.update(
       {
-        avatar: `${process.env.ENV_DEVELOPMENT}/Patient/${req.file?.filename}`,
+        avatar: `Patient/${req.file?.filename}`,
       },
       {
         where: { id: payload?.patient.id },
