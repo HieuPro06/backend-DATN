@@ -95,6 +95,7 @@ const createBooking = async (result, req, res, next) => {
           service: {
             id: service ? data.service_id : 0,
             name: service ? service.name : "",
+            image: service ? service.image : "",
           },
         },
       });
@@ -203,6 +204,7 @@ const readAllBooking = async (data, req, res, next) => {
               service: {
                 id: service ? item.service_id : 0,
                 name: service ? service.name : "",
+                image: service ? service.image : "",
               },
             };
           })
@@ -248,6 +250,7 @@ const readAllBooking = async (data, req, res, next) => {
               service: {
                 id: service ? item.service_id : 0,
                 name: service ? service.name : "",
+                image: service ? service.image : "",
               },
             };
           })
@@ -303,6 +306,7 @@ const readBookingById = async (data, req, res, next) => {
           service: {
             id: service ? requestBooking.service_id : 0,
             name: service ? service.name : "",
+            image: service ? service.image : "",
           },
         },
       });
@@ -339,6 +343,7 @@ const readBookingById = async (data, req, res, next) => {
             service: {
               id: service ? requestBooking.service_id : 0,
               name: service ? service.name : "",
+              image: service ? service.image : "",
             },
           },
         });
@@ -387,7 +392,6 @@ const confirmBooking = async (req, res) => {
     const access_token = req.headers["authorization"];
     const token = access_token.split(" ")[1];
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await Patient.findByPk(payload.doctor.id);
     if (
       !payload.hasOwnProperty("doctor") ||
       (payload.doctor.role !== "supporter" && payload.doctor.role !== "admin")
@@ -429,13 +433,13 @@ const confirmBooking = async (req, res) => {
         { where: { id: id } }
       )
         .then(async (data) => {
-          console.log(data)
+          const user = await Patient.findByPk(booking.patient_id);
           if (data == 1) {
-            await createNotification(user.id, {
+            await createNotification(user?.id, {
               message: `Congratulations, ${user?.name} ! Your booking at ${booking.appointment_date} ${booking.appointment_hour} has been approved
               Please remember to come on time for your appointment`,
               record_type: "appointment",
-              record_id: data.id,
+              record_id: appointment.id,
             });
             return res.status(200).json({
               success: 1,

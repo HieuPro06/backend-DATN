@@ -16,6 +16,7 @@ const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { status: appointment_status.PROCESSING };
 const { Op } = require("sequelize");
+const Service = require("../models/service.model.js");
 
 const appointment_number_threshold = 20;
 
@@ -32,6 +33,8 @@ const getAppointmentAll = async (data, req, res, next) => {
       const doctorId = token.doctor.id;
       try {
         const appointments = await Appointment.findAll({
+          limit: limit,
+          offset: offset,
           where: { doctor_id: doctorId },
         });
         if (appointments) {
@@ -59,6 +62,7 @@ const getAppointmentAll = async (data, req, res, next) => {
           });
         }
       } catch (e) {
+        console.log(e);
         return res.json(500).json({
           result: 0,
           msg: e,
@@ -73,6 +77,7 @@ const getAppointmentAll = async (data, req, res, next) => {
           // order: sorting.sortQuery(req, defaultSort, defaultDirection),
         });
         if (appointments) {
+          console.log(appointments);
           const returnData = await Promise.all(
             appointments.map(async (item) => {
               const doctor = await Doctor.findOne({
@@ -97,6 +102,7 @@ const getAppointmentAll = async (data, req, res, next) => {
           });
         }
       } catch (e) {
+        console.log(e);
         return res.json(500).json({
           result: 0,
           msg: e,
@@ -107,6 +113,8 @@ const getAppointmentAll = async (data, req, res, next) => {
     const patientId = token.patient.id;
     try {
       const appointments = await Appointment.findAll({
+        limit: limit,
+        offset: offset,
         where: { patient_id: patientId },
       });
       if (appointments) {
@@ -116,7 +124,7 @@ const getAppointmentAll = async (data, req, res, next) => {
               where: { id: item.doctor_id },
             });
             const room = await Room.findOne({
-              where: { id: doctor.room_id },
+              where: { id: item.room_id },
             });
             if (doctor) {
               // console.log(doctor)
@@ -136,6 +144,7 @@ const getAppointmentAll = async (data, req, res, next) => {
         });
       }
     } catch (e) {
+      console.log(e);
       return res.status(500).json({
         result: 0,
         msg: e,
@@ -173,7 +182,7 @@ const getAppointmentByID = async (data, req, res, next) => {
           where: { id: appointment.doctor_id },
         });
         const room = await Room.findOne({
-          where: { id: doctor.room_id },
+          where: { id: appointment.room_id },
         });
         if (doctor) {
           // console.log(doctor)
@@ -200,10 +209,19 @@ const getAppointmentByID = async (data, req, res, next) => {
 };
 
 const createAppointment = async (req, res) => {
+  const force_create = req.body.force_create ? req.body.force_create : false;
+
+  const bookingRec = await Booking.findByPk(req.body.booking_id);
+
+  const service = await Service.findByPk(bookingRec.service_id);
+  const room = await Room.findOne({
+    where: { id: service?.room_id },
+  });
   var appointment_values = {
     booking_id: req.body.booking_id,
     doctor_id: req.body.doctor_id || null,
     patient_id: req.body.patient_id,
+    room_id: room ? room.id : null,
     patient_name: req.body.patient_name,
     patient_birthday: req.body.patient_birthday,
     patient_reason: req.body.patient_reason,
@@ -218,17 +236,14 @@ const createAppointment = async (req, res) => {
   };
 
   // Biến chỉ định bắt buộc tạo (áp dụng sau khi xác nhận vẫn tạo khi có pop up lỗi)
-  const force_create = req.body.force_create ? req.body.force_create : false;
 
-  const bookingRec = await Booking.findByPk(req.body.booking_id);
-  const service_id = bookingRec.service_id ? bookingRec.service_id : null;
   var appointDoctor = null;
   var appoint_id = 0;
   if (appointment_values.doctor_id == null) {
     appointDoctor = await doctorAutoAppoint(
       appointment_values.date,
       appointment_values.appointment_time,
-      service_id
+      service?.id
     );
     if (appointDoctor != null) {
       appoint_id = appointDoctor.id;
@@ -267,7 +282,7 @@ const createAppointment = async (req, res) => {
       }
 
       if (
-        !checkDoctorServiceCompatible(service_id, appointment_values.doctor_id)
+        !checkDoctorServiceCompatible(service.id, appointment_values.doctor_id)
       ) {
         return {
           appointment: null,

@@ -30,7 +30,6 @@ const getDoctorAll = (info, req, res, next) => {
           const speciality = await Speciality.findByPk(
             element.dataValues.speciality_id
           );
-          const room = await Room.findByPk(element.dataValues.room_id);
 
           return {
             id: element.dataValues.id,
@@ -48,8 +47,6 @@ const getDoctorAll = (info, req, res, next) => {
             recovery_token: element.dataValues.recovery_token,
             speciality_id: speciality ? speciality.dataValues.id : null,
             speciality_name: speciality ? speciality.dataValues.name : "",
-            room_id: room ? room.dataValues.id : null,
-            room_name: room ? room.dataValues.name : "",
           };
         })
       );
@@ -75,7 +72,6 @@ const getDoctorByID = (info, req, res, next) => {
       const speciality = await Speciality.findByPk(
         element.dataValues.speciality_id
       );
-      const room = await Room.findByPk(element.dataValues.room_id);
 
       const return_data = {
         id: id,
@@ -93,8 +89,6 @@ const getDoctorByID = (info, req, res, next) => {
         recovery_token: element.dataValues.recovery_token,
         speciality_id: speciality ? speciality.dataValues.id : null,
         speciality_name: speciality ? speciality.dataValues.name : "",
-        room_id: room ? room.dataValues.id : null,
-        room_name: room ? room.dataValues.name : "",
       };
 
       return res.status(200).json({
@@ -125,7 +119,6 @@ const createDoctor = (req, res) => {
     update_at: req.body.update_at ?? new Date(), // Default to current date if not provided
     recovery_token: req.body.recovery_token,
     speciality_id: req.body.speciality_id,
-    room_id: req.body.room_id,
   };
 
   Doctor.create(doctor_values)
@@ -133,7 +126,6 @@ const createDoctor = (req, res) => {
       const speciality = await Speciality.findByPk(
         element.dataValues.speciality_id
       ).data;
-      const room = await Room.findByPk(element.dataValues.room_id).data;
 
       const return_data = {
         id: id,
@@ -150,7 +142,6 @@ const createDoctor = (req, res) => {
         update_at: element.dataValues.update_at,
         recovery_token: element.dataValues.recovery_token,
         speciality_id: speciality ? speciality.data : null,
-        room_id: room ? room.data : null,
       };
       if (data == 1)
         return res.status(200).json({
@@ -174,7 +165,6 @@ const updateDoctor = (req, res) => {
       const speciality = await Speciality.findByPk(
         element.dataValues?.speciality_id
       ).data;
-      const room = await Room.findByPk(element.dataValues?.room_id).data;
 
       const return_data = {
         id: id,
@@ -191,7 +181,6 @@ const updateDoctor = (req, res) => {
         update_at: element.dataValues?.update_at,
         recovery_token: element.dataValues?.recovery_token,
         speciality_id: speciality ? speciality.data : null,
-        room_id: room ? room.data : null,
       };
 
       return res.status(200).json({
@@ -261,7 +250,6 @@ const getAllDoctorsBySpecialityId = async (info, req, res, next) => {
             create_at: item.create_at,
             update_at: item.update_at,
             speciality: speciality,
-            room_id: item.room_id,
             recovery_token: item.recovery_token,
           };
         }),
@@ -305,7 +293,6 @@ const getAllDoctorsByServiceId = async (info, req, res, next) => {
               create_at: result.create_at,
               update_at: result.update_at,
               speciality: speciality,
-              room_id: result.room_id,
               recovery_token: result.recovery_token,
             };
           } catch (e) {

@@ -59,6 +59,7 @@ const doctorAndServiceReady = async (req, res) => {
           id: service.id,
           name: service.name,
           description: service.description,
+          image: service ? service.image : "",
         },
       });
     })
