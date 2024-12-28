@@ -8,7 +8,7 @@ const Booking = sequelize.define(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-      allowNull: false,
+      allowNull: true,
     },
     service_id: {
       type: DataTypes.INTEGER,

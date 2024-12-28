@@ -13,7 +13,7 @@ const DoctorAndService = sequelize.define(
     },
     service_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: Service, // Reference to the Service model
         key: "id",
@@ -21,7 +21,7 @@ const DoctorAndService = sequelize.define(
     },
     doctor_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: Doctor, // Reference to the Doctor model
         key: "id",

@@ -217,6 +217,7 @@ const createAppointment = async (req, res) => {
   const room = await Room.findOne({
     where: { id: service?.room_id },
   });
+  console.log(service?.room_id, room);
   var appointment_values = {
     booking_id: req.body.booking_id,
     doctor_id: req.body.doctor_id || null,

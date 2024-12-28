@@ -11,15 +11,15 @@ const Service = sequelize.define(
     },
     name: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     description: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     image: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     room_id: {
       type: DataTypes.INTEGER,

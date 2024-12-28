@@ -11,11 +11,18 @@ const Room = sequelize.define(
     },
     name: {
       type: DataTypes.STRING(15),
-      allowNull: false,
+      allowNull: true,
     },
     location: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
+    },
+    speciality_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "tn_specialities", // The table name you are referencing
+        key: "id",
+      },
     },
   },
   {

@@ -11,7 +11,7 @@ const Appointment = sequelize.define(
     },
     booking_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: "tn_bookings", // references the tn_doctors table
         key: "id",
@@ -19,7 +19,7 @@ const Appointment = sequelize.define(
     },
     doctor_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: "tn_doctors", // references the tn_doctors table
         key: "id",
@@ -27,7 +27,7 @@ const Appointment = sequelize.define(
     },
     room_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: "tn_rooms", // references the tn_doctors table
         key: "id",
@@ -35,7 +35,7 @@ const Appointment = sequelize.define(
     },
     patient_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: "tn_patients", // references the tn_patients table
         key: "id",

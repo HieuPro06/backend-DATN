@@ -11,7 +11,7 @@ const Treatment = sequelize.define(
     },
     appointment_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: "tn_appointment", // references the tn_doctors table
         key: "id",
@@ -19,31 +19,38 @@ const Treatment = sequelize.define(
     },
     name: {
       type: DataTypes.STRING(500),
-      allowNull: false,
+      allowNull: true,
     },
     type: {
       type: DataTypes.STRING(20),
-      allowNull: false,
+      allowNull: true,
     },
     times: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     purpose: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
     },
     instruction: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     repeat_days: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     repeat_time: {
       type: DataTypes.STRING(5),
-      allowNull: false,
+      allowNull: true,
+    },
+    drug_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "tn_drugs", // The table name you are referencing
+        key: "id",
+      },
     },
   },
   {
