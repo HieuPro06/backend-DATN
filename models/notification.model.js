@@ -11,7 +11,7 @@ const Notification = sequelize.define(
     },
     message: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     record_id: {
       type: DataTypes.INTEGER,
@@ -23,7 +23,7 @@ const Notification = sequelize.define(
     },
     patient_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: "tn_patient", // references the Patient model
         key: "id",
@@ -31,17 +31,17 @@ const Notification = sequelize.define(
     },
     is_read: {
       type: DataTypes.INTEGER, // You may want to use BOOLEAN depending on your logic
-      allowNull: false,
+      allowNull: true,
       defaultValue: 0, // Default to unread
     },
     create_at: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: DataTypes.NOW,
     },
     update_at: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: DataTypes.NOW,
     },
   },

@@ -11,7 +11,7 @@ const Doctor = sequelize.define(
     },
     email: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
     phone: {
@@ -20,11 +20,11 @@ const Doctor = sequelize.define(
     },
     password: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     name: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
     },
     description: {
       type: DataTypes.STRING(255),
@@ -36,7 +36,7 @@ const Doctor = sequelize.define(
     },
     role: {
       type: DataTypes.STRING(10),
-      allowNull: false,
+      allowNull: true,
     },
     active: {
       type: DataTypes.INTEGER,

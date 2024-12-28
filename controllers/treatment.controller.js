@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Appointment = require("../models/appointment.model");
 const defaultSize = 1000000;
 const dotenv = require("dotenv");
+const Drug = require("../models/drug.model");
 dotenv.config();
 
 const createNewTreatment = async (req, res) => {
@@ -40,10 +41,11 @@ const createNewTreatment = async (req, res) => {
 const getTreatment = async (info, req, res, next) => {
   try {
     const appointmentId = req.params.id;
-    const data = await Treatment.findOne({
+    const data = await Treatment.findAll({
       where: { appointment_id: appointmentId },
     });
     if (!data) {
+      console.log(e);
       return res.status(500).json({
         result: 0,
         msg: "Can't get treatment record",
@@ -52,9 +54,27 @@ const getTreatment = async (info, req, res, next) => {
     return res.status(200).json({
       result: 1,
       msg: "Get treatment record successfully",
-      data: data,
+      data: await Promise.all(
+        data.map(async (item) => {
+          const drug = await Drug.findByPk(item.drug_id);
+          return {
+            id: item.id,
+            appointment_id: item.appointment_id,
+            name: item.name,
+            type: item.type,
+            times: item.times,
+            purpose: item.purpose,
+            instruction: item.instruction,
+            repeat_days: item.repeat_days,
+            repeat_time: item.repeat_time,
+            drug_id: item.drug_id,
+            drug_name: drug ? drug.name : "",
+          };
+        })
+      ),
     });
   } catch (e) {
+    console.log(e);
     return res.status(500).json({
       result: 0,
       msg: e.message,

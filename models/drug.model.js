@@ -11,7 +11,7 @@ const Drug = sequelize.define(
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

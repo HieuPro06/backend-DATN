@@ -11,11 +11,11 @@ const BookingPhoto = sequelize.define(
     },
     url: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     booking_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
