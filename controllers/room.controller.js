@@ -122,7 +122,7 @@ const deleteRoom = async (req, res) => {
       where: { room_id: id },
     });
     if (isExistDoctor) {
-      res.json({
+      return res.status(400).json({
         result: 0,
         msg: "This room can't be deleted because it's have doctor",
       });

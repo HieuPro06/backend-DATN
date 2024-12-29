@@ -115,7 +115,7 @@ const deleteSpeciality = async (req, res) => {
       where: { speciality_id: id },
     });
     if (isExistDoctor) {
-      res.json({
+      return res.status(400).json({
         result: 0,
         msg: "This speciality can't be deleted because it's have doctor",
       });

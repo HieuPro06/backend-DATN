@@ -2,6 +2,7 @@ const Doctor = require("../models/doctor.model.js");
 const Room = require("../models/room.model.js");
 const Speciality = require("../models/speciality.model.js");
 const DoctorService = require("../models/doctorAndService.model");
+const Appointment = require("../models/appointment.model");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -159,7 +160,6 @@ const createDoctor = (req, res) => {
 
 const updateDoctor = (req, res) => {
   const id = req.params.id;
-
   Doctor.update(req.body, { where: { id: id } })
     .then(async (element) => {
       const speciality = await Speciality.findByPk(
@@ -196,9 +196,17 @@ const updateDoctor = (req, res) => {
     });
 };
 
-const deleteDoctor = (req, res) => {
+const deleteDoctor = async (req, res) => {
   const id = req.params.id;
-
+  const appointmentWithDoctor = await Appointment.findOne({
+    where: {doctor_id: id}
+  })
+  if(appointmentWithDoctor){
+    return res.status(400).json({
+      result: 0,
+      msg: "Cannot delete doctor because doctor is assigned in appointment"
+    })
+  }
   Doctor.update(
     { active: 0 },
     {
