@@ -11,7 +11,7 @@ const changeDoctorProfileController = async (data, req, res, next) => {
     const isValidUsername = await Doctor.findOne({
       where: { name: req.body.name },
     });
-    if (isValidUsername) {
+    if (isValidUsername && isValidUsername.id !== payload.doctor.id) {
       return res.status(400).json({
         result: 0,
         msg: "Username has been exist",

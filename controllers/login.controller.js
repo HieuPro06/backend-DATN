@@ -66,7 +66,6 @@ const loginController = async (req, res) => {
               price: result.price,
               role: result.role,
               speciality_id: result.speciality_id,
-              room_id: result.room_id,
               avatar: result.avatar,
               create_at: result.create_at,
               update_at: result.update_at,

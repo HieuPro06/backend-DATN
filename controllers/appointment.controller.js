@@ -77,7 +77,6 @@ const getAppointmentAll = async (data, req, res, next) => {
           // order: sorting.sortQuery(req, defaultSort, defaultDirection),
         });
         if (appointments) {
-          console.log(appointments);
           const returnData = await Promise.all(
             appointments.map(async (item) => {
               const doctor = await Doctor.findOne({
