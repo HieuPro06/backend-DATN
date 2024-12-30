@@ -66,6 +66,15 @@ const createSpeciality = async (req, res) => {
       description: req.body.description,
       image: req.body.image ?? "",
     };
+    const existNameSpeciality = await Speciality.findOne({
+      where: {name: request.name}
+    })
+    if(existNameSpeciality){
+      return res.status(400).json({
+        result: 0,
+        msg: "This speciality is exist"
+      })
+    }
     const data = await Speciality.create(request);
     if (!data) {
       return res.status(500).json({
@@ -88,6 +97,15 @@ const createSpeciality = async (req, res) => {
 const updateSpeciality = async (req, res) => {
   try {
     const id = req.params.id;
+    const existNameSpeciality = await Speciality.findOne({
+      where: {name: req.body.name}
+    })
+    if(existNameSpeciality && existNameSpeciality.id !== id){
+      return res.status(400).json({
+        result: 0,
+        msg: "This speciality is exist"
+      })
+    }
     const data = await Speciality.update(req.body, {
       where: { id: id },
     });
