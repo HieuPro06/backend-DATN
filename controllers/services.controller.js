@@ -98,6 +98,15 @@ const createService = async (req, res) => {
 const updateService = async (req, res) => {
   try {
     const id = req.params.id;
+    const existNameService = await Service.findOne({
+      where: {name: req.body.name}
+    })
+    if(existNameService && existNameService.id !== id){
+      return res.status(400).json({
+        result: 0,
+        msg: "This service is exist"
+      })
+    }
     const data = await Service.update(req.body, {
       where: { id: id },
     });
