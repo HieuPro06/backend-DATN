@@ -95,6 +95,15 @@ const createRoom = async (req, res) => {
 const updateRoom = async (req, res) => {
   try {
     const id = req.params.id;
+    const existNameRoom = await Room.findOne({
+      where: {name: req.body.name}
+    })
+    if(existNameRoom && existNameRoom.id !== id){
+      return res.status(400).json({
+        result: 0,
+        msg: "This room is exist"
+      })
+    }
     const data = await Room.update(req.body, {
       where: { id: id },
     });
