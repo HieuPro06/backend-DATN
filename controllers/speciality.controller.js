@@ -62,13 +62,14 @@ const getSpecialityById = async (data, req, res, next) => {
 const createSpeciality = async (req, res) => {
   try {
     const request = {
-      name: req.body.name,
+      name: req.body.name.trim(),
       description: req.body.description,
       image: req.body.image ?? "",
     };
     const existNameSpeciality = await Speciality.findOne({
       where: {name: request.name}
     })
+    // console.log(existNameSpeciality);
     if(existNameSpeciality){
       return res.status(400).json({
         result: 0,
