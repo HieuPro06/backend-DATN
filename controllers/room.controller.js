@@ -61,7 +61,7 @@ const getRoomById = async (data, req, res, next) => {
 const createRoom = async (req, res) => {
   try {
     const request = {
-      name: req.body.name,
+      name: req.body.name.trim(),
       location: req.body.location,
     };
     const isExistRoomName = await Room.findOne({
@@ -98,7 +98,7 @@ const updateRoom = async (req, res) => {
     const existNameRoom = await Room.findOne({
       where: {name: req.body.name}
     })
-    if(existNameRoom && existNameRoom.id !== id){
+    if(existNameRoom && existNameRoom.id !== parseInt(id)){
       return res.status(400).json({
         result: 0,
         msg: "This room is exist"
