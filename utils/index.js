@@ -3,4 +3,19 @@ const base64Url = str => {
         .replace(/\//,'-')
         .replace(/\=/,'');
 }
-module.exports = base64Url;
+const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const date = today.getDate();
+    const res = `${year}-${month}-${date}`;
+    return res;
+}
+const reverseString = (str) => {
+    return str.split('').reverse().join('');
+}
+module.exports = {
+    base64Url,
+    getCurrentDate,
+    reverseString
+};

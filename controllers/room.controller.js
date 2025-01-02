@@ -1,4 +1,6 @@
 const Room = require("../models/room.model");
+const Appointment  =  require("../models/appointment.model");
+const Service = require("../models/service.model");
 const Doctor = require("../models/doctor.model");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -127,13 +129,22 @@ const updateRoom = async (req, res) => {
 const deleteRoom = async (req, res) => {
   try {
     const id = req.params.id;
-    const isExistDoctor = await Doctor.findOne({
+    const isExistAppointment = await Appointment.findOne({
       where: { room_id: id },
     });
-    if (isExistDoctor) {
+    const isExistService = await Service.findOne({
+      where: { room_id: id },
+    });
+    if (isExistAppointment) {
       return res.status(400).json({
         result: 0,
-        msg: "This room can't be deleted because it's have doctor",
+        msg: "This room can't be deleted because it's have appointment",
+      });
+    }
+    if (isExistService) {
+      return res.status(400).json({
+        result: 0,
+        msg: "This room can't be deleted because it's have service",
       });
     }
     const data = await Room.destroy({
