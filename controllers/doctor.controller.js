@@ -2,6 +2,7 @@ const Doctor = require("../models/doctor.model.js");
 const Room = require("../models/room.model.js");
 const Speciality = require("../models/speciality.model.js");
 const DoctorService = require("../models/doctorAndService.model");
+const Booking = require("../models/booking.model");
 const Appointment = require("../models/appointment.model");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -201,10 +202,19 @@ const deleteDoctor = async (req, res) => {
   const appointmentWithDoctor = await Appointment.findOne({
     where: {doctor_id: id}
   })
+  const bookingWithDoctor = await Booking.findOne({
+    where: {doctor_id: id}
+  })
   if(appointmentWithDoctor){
     return res.status(400).json({
       result: 0,
       msg: "Cannot delete doctor because doctor is assigned in appointment"
+    })
+  }
+  if(bookingWithDoctor){
+    return res.status(400).json({
+      result: 0,
+      msg: "Cannot delete doctor because doctor is having booking"
     })
   }
   Doctor.update(
@@ -213,15 +223,20 @@ const deleteDoctor = async (req, res) => {
       where: { id: id, active: 1 },
     }
   )
-    .then((data) => {
-      if (data == 1)
+    .then( async (data) => {
+      if (data == 1){
+        await DoctorService.destroy({
+          where: {doctor_id: id}
+        })
         return res.status(200).json({
           msg: "Doctor was removed successfully.",
         });
-      else
+      }
+      else{
         return res.status(500).json({
           msg: `Cannot remove Doctor with id=${id}`,
         });
+      }
     })
     .catch((err) => {
       return res.status(500).json({

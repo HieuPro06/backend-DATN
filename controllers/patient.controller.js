@@ -1,5 +1,9 @@
 const Patient = require("../models/patient.model");
 const Room = require("../models/room.model");
+const AppointmentRecord = require("../models/appointment-record.model");
+const Treatment = require("../models/treatment.model");
+const Appointment = require("../models/appointment.model");
+const Booking = require("../models/booking.model");
 const defaultSize = 10;
 const dotenv = require("dotenv");
 dotenv.config();
@@ -74,8 +78,23 @@ const updatePatient = async (req, res) => {
 const deletePatient = async (req, res) => {
   try {
     const id = req.params.id;
+    await Booking.destroy({
+      where: {patient_id: id}
+    })
+    const appointment = await Appointment.findOne({
+      where: {patient_id: id}
+    })
+    await AppointmentRecord.destroy({
+      where: {appointment_id: appointment.id}
+    })
+    await Treatment.destroy({
+      where: {appointment_id: appointment.id}
+    })
+    await Appointment.destroy({
+      where: {patient_id: id}
+    })
     const data = await Patient.destroy({
-      where: { id: id },
+      where: { id: parseInt(id) },
     });
     if (!data) {
       return res.status(500).json({
