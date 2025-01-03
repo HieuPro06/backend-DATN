@@ -51,15 +51,22 @@ const getAppointmentAll = async (data, req, res, next) => {
               const speciality = await Speciality.findOne({
                 where: { id: doctor.speciality_id },
               });
+              const room = await Room.findOne({
+                where: {id: item.room_id}
+              })
+              const service = await Service.findOne({
+                where: {room_id: room.id}
+              })
               const appointment_record = await AppointmentRecord.findOne({
                 where: { appointment_id: item.id },
               });
               if (doctor) {
-                // console.log(doctor)
                 return {
                   ...item.dataValues,
                   speciality: speciality,
                   appointment_record: appointment_record,
+                  room: room,
+                  service: service
                 };
               }
             })
@@ -97,12 +104,20 @@ const getAppointmentAll = async (data, req, res, next) => {
               const appointment_record = await AppointmentRecord.findOne({
                 where: { appointment_id: item.id },
               });
+              const room = await Room.findOne({
+                where: {id: item.room_id}
+              })
+              const service = await Service.findOne({
+                where: {room_id: item.room_id}
+              })
               if (doctor) {
                 return {
                   ...item.dataValues,
                   speciality: speciality,
                   doctor: doctor,
                   appointment_record: appointment_record,
+                  room: room,
+                  service: service
                 };
               }
             })
@@ -227,7 +242,7 @@ const createAppointment = async (req, res) => {
   const room = await Room.findOne({
     where: { id: service?.room_id },
   });
-  console.log(service?.room_id, room);
+  // console.log(service?.room_id, room);
   var appointment_values = {
     booking_id: req.body.booking_id,
     doctor_id: req.body.doctor_id || null,
@@ -245,6 +260,7 @@ const createAppointment = async (req, res) => {
     create_at: new Date(), // automatically set the current date and time
     update_at: new Date(), // automatically set the current date and time
   };
+  // console.log(appointment_values)
 
   // Biến chỉ định bắt buộc tạo (áp dụng sau khi xác nhận vẫn tạo khi có pop up lỗi)
 
