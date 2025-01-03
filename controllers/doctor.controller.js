@@ -183,7 +183,16 @@ const updateDoctor = (req, res) => {
         recovery_token: element.dataValues?.recovery_token,
         speciality_id: speciality ? speciality.data : null,
       };
-
+      req.body.selectionServices.forEach((item) => {
+        DoctorService.create({
+          doctor_id: id,
+          service_id: item
+        }).then((data) => {
+          // console.log(data);
+        }).catch((e) => {
+          console.log(e);
+        })
+      })
       return res.status(200).json({
         result: 1,
         data: return_data ? return_data : [],
