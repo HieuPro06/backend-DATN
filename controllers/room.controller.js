@@ -65,6 +65,7 @@ const createRoom = async (req, res) => {
     const request = {
       name: req.body.name.trim(),
       location: req.body.location,
+      speciality_id: req.body.spe
     };
     const isExistRoomName = await Room.findOne({
       where: { name: request.name },
