@@ -1,4 +1,5 @@
 const Appointment = require("../models/appointment.model.js");
+const AppointmentRecord = require("../models/appointment-record.model");
 const Doctor = require("../models/doctor.model.js");
 const Room = require("../models/room.model");
 const Speciality = require("../models/speciality.model");
@@ -46,11 +47,15 @@ const getAppointmentAll = async (data, req, res, next) => {
               const speciality = await Speciality.findOne({
                 where: { id: doctor.speciality_id },
               });
+              const appointment_record = await AppointmentRecord.findOne({
+                where: {appointment_id: item.id}
+              })
               if (doctor) {
                 // console.log(doctor)
                 return {
                   ...item.dataValues,
                   speciality: speciality,
+                  appointment_record: appointment_record
                 };
               }
             })
@@ -77,7 +82,6 @@ const getAppointmentAll = async (data, req, res, next) => {
           // order: sorting.sortQuery(req, defaultSort, defaultDirection),
         });
         if (appointments) {
-          console.log(appointments);
           const returnData = await Promise.all(
             appointments.map(async (item) => {
               const doctor = await Doctor.findOne({
@@ -86,11 +90,15 @@ const getAppointmentAll = async (data, req, res, next) => {
               const speciality = await Speciality.findOne({
                 where: { id: doctor.speciality_id },
               });
+              const appointment_record = await AppointmentRecord.findOne({
+                where: {appointment_id: item.id}
+              })
               if (doctor) {
-                // console.log(doctor)
                 return {
                   ...item.dataValues,
                   speciality: speciality,
+                  doctor: doctor,
+                  appointment_record: appointment_record
                 };
               }
             })

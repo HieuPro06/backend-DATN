@@ -4,6 +4,7 @@ const Appointment = require("../models/appointment.model");
 const Booking = require("../models/booking.model");
 const { appointment_status } = require("../enum/index");
 const dotenv = require("dotenv");
+const {getCurrentDate, reverseString} = require("../utils");
 dotenv.config();
 
 const DashboardController = async (data, req, res, next) => {
@@ -12,12 +13,14 @@ const DashboardController = async (data, req, res, next) => {
     const user = await Doctor.findOne({
       where: { id: token.doctor.id },
     });
-    const doctors = await Doctor.findAll({});
+    const doctors = await Doctor.findAll({
+      where: {active: 1}
+    });
     const appointments = await Appointment.findAll({
-      where: { doctor_id: user?.id },
+      where: { doctor_id: user?.id, date: getCurrentDate()},
     });
     const bookings = await Booking.findAll({
-      where: { doctor_id: user?.id },
+      where: { doctor_id: user?.id, appointment_date: reverseString(getCurrentDate()) },
     });
     const cancelAppointments = await Appointment.findAll({
       where: { doctor_id: user?.id, status: appointment_status.CANCEL },

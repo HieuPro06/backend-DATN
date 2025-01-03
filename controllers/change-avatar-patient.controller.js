@@ -5,6 +5,7 @@ dotenv.config();
 
 const changeAvatarPatientController = async (data, req, res, next) => {
   try {
+    console.log(data);
     const payload = jwt.decode(data);
     const result = await Patient.update(
       {

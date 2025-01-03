@@ -124,6 +124,7 @@ const getAllAppointmentRecords = async (info, req, res, next) => {
                 ...kq.dataValues,
                 patient_name: item.patient_name,
                 numerical_order: item.numerical_order,
+                date: item.date
               };
             }
           })
@@ -158,6 +159,7 @@ const getAllAppointmentRecords = async (info, req, res, next) => {
                 ...item.dataValues,
                 patient_name: appointment.patient_name,
                 numerical_order: appointment.numerical_order,
+                date: item.date
               };
             }
           })

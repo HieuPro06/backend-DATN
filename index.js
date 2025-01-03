@@ -3,6 +3,47 @@ const cors = require("cors");
 const express = require("express");
 const app = express();
 const port = 3001;
+// const admin = require("firebase-admin");
+// const serviceAccount = require("./datn-628d9-firebase-adminsdk-xvurg-39c741a657.json");
+// /* Khởi tạo Firebase-admin */
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
+// const sendNotification = async (registrationToken) => {
+//   const messageSend = {
+//     token: registrationToken,
+//     notification: {
+//       title: "Hello",
+//       body: "World"
+//     },
+//     data: {
+//       key1: "value1",
+//       key2: "value2"
+//     },
+//     android: {
+//       priority: "high"
+//     },
+//     apns: {
+//       payload: {
+//         aps: {
+//           badge: 42
+//         }
+//       }
+//     }
+//   }
+// }
+// admin
+//     .messaging()
+//     .send(messageSend)
+//     .then(response => {
+//       console.log("Successfully sent message: ", response);
+//     })
+//     .catch(error => {
+//       console.error("Error sending message : ", error);
+//     })
+// const registrationToken = "";
+// sendNotification(registrationToken);
+
 const DoctorRouter = require("./route/doctor.routes.js");
 const SignUpRouter = require("./route/signup.route");
 const LoginRouter = require("./route/login.route");
@@ -23,6 +64,7 @@ const BookingPhotosRouter = require("./route/booking-photos.routes.js");
 const BookingPhotoRouter = require("./route/booking-photo.routes.js");
 const DashboardRouter = require("./route/dashboard.route");
 const NotificationsRouter = require("./route/notifications.route.js");
+const {response} = require("express");
 
 app.use(bodyParser.json());
 app.use(cors());

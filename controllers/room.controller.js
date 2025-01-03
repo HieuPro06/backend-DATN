@@ -1,4 +1,6 @@
 const Room = require("../models/room.model");
+const Appointment  =  require("../models/appointment.model");
+const Service = require("../models/service.model");
 const Doctor = require("../models/doctor.model");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -61,7 +63,7 @@ const getRoomById = async (data, req, res, next) => {
 const createRoom = async (req, res) => {
   try {
     const request = {
-      name: req.body.name,
+      name: req.body.name.trim(),
       location: req.body.location,
     };
     const isExistRoomName = await Room.findOne({
@@ -95,6 +97,15 @@ const createRoom = async (req, res) => {
 const updateRoom = async (req, res) => {
   try {
     const id = req.params.id;
+    const existNameRoom = await Room.findOne({
+      where: {name: req.body.name}
+    })
+    if(existNameRoom && existNameRoom.id !== parseInt(id)){
+      return res.status(400).json({
+        result: 0,
+        msg: "This room is exist"
+      })
+    }
     const data = await Room.update(req.body, {
       where: { id: id },
     });
@@ -118,13 +129,22 @@ const updateRoom = async (req, res) => {
 const deleteRoom = async (req, res) => {
   try {
     const id = req.params.id;
-    const isExistDoctor = await Doctor.findOne({
+    const isExistAppointment = await Appointment.findOne({
       where: { room_id: id },
     });
-    if (isExistDoctor) {
-      res.json({
+    const isExistService = await Service.findOne({
+      where: { room_id: id },
+    });
+    if (isExistAppointment) {
+      return res.status(400).json({
         result: 0,
-        msg: "This room can't be deleted because it's have doctor",
+        msg: "This room can't be deleted because it's have appointment",
+      });
+    }
+    if (isExistService) {
+      return res.status(400).json({
+        result: 0,
+        msg: "This room can't be deleted because it's have service",
       });
     }
     const data = await Room.destroy({

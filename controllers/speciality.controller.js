@@ -1,4 +1,6 @@
 const Speciality = require("../models/speciality.model");
+const Room = require("../models/room.model");
+const Service = require("../models/service.model");
 const Doctor = require("../models/doctor.model");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -62,10 +64,19 @@ const getSpecialityById = async (data, req, res, next) => {
 const createSpeciality = async (req, res) => {
   try {
     const request = {
-      name: req.body.name,
+      name: req.body.name.trim(),
       description: req.body.description,
       image: req.body.image ?? "",
     };
+    const existNameSpeciality = await Speciality.findOne({
+      where: {name: request.name}
+    })
+    if(existNameSpeciality){
+      return res.status(400).json({
+        result: 0,
+        msg: "This speciality is exist"
+      })
+    }
     const data = await Speciality.create(request);
     if (!data) {
       return res.status(500).json({
@@ -88,6 +99,15 @@ const createSpeciality = async (req, res) => {
 const updateSpeciality = async (req, res) => {
   try {
     const id = req.params.id;
+    const existNameSpeciality = await Speciality.findOne({
+      where: {name: req.body.name}
+    })
+    if(existNameSpeciality && existNameSpeciality.id !== parseInt(id)){
+      return res.status(400).json({
+        result: 0,
+        msg: "This speciality is exist"
+      })
+    }
     const data = await Speciality.update(req.body, {
       where: { id: id },
     });
@@ -114,10 +134,28 @@ const deleteSpeciality = async (req, res) => {
     const isExistDoctor = await Doctor.findOne({
       where: { speciality_id: id },
     });
+    const isExistRoom = await Room.findOne({
+      where: {speciality_id: id}
+    })
+    const isExistService = await Service.findOne({
+      where: {speciality_id: id}
+    })
     if (isExistDoctor) {
-      res.json({
+      return res.status(400).json({
         result: 0,
         msg: "This speciality can't be deleted because it's have doctor",
+      });
+    }
+    if (isExistRoom) {
+      return res.status(400).json({
+        result: 0,
+        msg: "This speciality can't be deleted because it's have room",
+      });
+    }
+    if (isExistService) {
+      return res.status(400).json({
+        result: 0,
+        msg: "This speciality can't be deleted because it's have service",
       });
     }
     const data = await Speciality.destroy({

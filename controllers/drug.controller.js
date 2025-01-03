@@ -114,15 +114,6 @@ const updateDrug = async (req, res) => {
 const deleteDrug = async (req, res) => {
   try {
     const id = req.params.id;
-    const isExistDoctor = await Doctor.findOne({
-      where: { drug_id: id },
-    });
-    if (isExistDoctor) {
-      res.json({
-        result: 0,
-        msg: "This drug can't be deleted because it's have doctor",
-      });
-    }
     const data = await Drug.destroy({
       where: { id: id },
     });

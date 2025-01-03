@@ -22,11 +22,9 @@ const loginController = async (req, res) => {
       if (result) {
         bcrypt.compare(request.password, result.password, (err, isMatch) => {
           if (err) {
-            console.log("Error comparing passwords");
             return res.status(500).json({ msg: "Error comparing passwords" });
           }
           if (!isMatch) {
-            console.log("Wrong password");
             return res.status(401).json({
               result: 0,
               msg: "Wrong password",
@@ -66,7 +64,6 @@ const loginController = async (req, res) => {
               price: result.price,
               role: result.role,
               speciality_id: result.speciality_id,
-              room_id: result.room_id,
               avatar: result.avatar,
               create_at: result.create_at,
               update_at: result.update_at,
@@ -74,7 +71,6 @@ const loginController = async (req, res) => {
           });
         });
       } else {
-        console.log("Account invalid");
         return res.status(404).json({
           msg: "Account invalid",
         });
@@ -94,11 +90,9 @@ const loginController = async (req, res) => {
       if (result) {
         bcrypt.compare(request.password, result.password, (err, isMatch) => {
           if (err) {
-            console.log("Error comparing passwords");
             return res.status(500).json({ msg: "Error comparing passwords" });
           }
           if (!isMatch) {
-            console.log("Wrong password");
             return res.status(401).json({
               result: 0,
               msg: "Wrong password",
@@ -138,7 +132,6 @@ const loginController = async (req, res) => {
           });
         });
       } else {
-        console.log("Account invalid");
         return res.status(404).json({
           result: 0,
           msg: "Account invalid",
