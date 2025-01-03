@@ -58,18 +58,18 @@ const createBooking = async (result, req, res, next) => {
       status: booking_status.PROCESSING,
     };
 
-    if (
-      doctorAppointmentTimeAvailable(
-        request.doctor_id,
-        request.appointment_date,
-        request.appointment_hour
-      ) == false
-    ) {
-      return {
-        success: 0,
-        msg: "Doctor isn't available during this time",
-      };
-    }
+    // if (
+    //   doctorAppointmentTimeAvailable(
+    //     request.doctor_id,
+    //     request.appointment_date,
+    //     request.appointment_hour
+    //   ) == false
+    // ) {
+    //   return {
+    //     success: 0,
+    //     msg: "Doctor isn't available during this time",
+    //   };
+    // }
 
     // if (
     //   getDoctorAppointmentNumber(request.doctor_id, request.appointment_date) >
@@ -81,14 +81,14 @@ const createBooking = async (result, req, res, next) => {
     //   };
     // }
 
-    if (
-      !checkDoctorServiceCompatible(service.id, appointment_values.doctor_id)
-    ) {
-      return {
-        success: 0,
-        msg: "Doctor is not available for this service",
-      };
-    }
+    // if (
+    //   !checkDoctorServiceCompatible(service.id, appointment_values.doctor_id)
+    // ) {
+    //   return {
+    //     success: 0,
+    //     msg: "Doctor is not available for this service",
+    //   };
+    // }
 
     const data = await Booking.create(request);
     if (!data) {
