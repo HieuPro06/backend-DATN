@@ -225,12 +225,12 @@ const deleteDoctor = async (req, res) => {
   )
     .then( async (data) => {
       if (data == 1){
-        return res.status(200).json({
-          msg: "Doctor was removed successfully.",
-        });
         await DoctorService.destroy({
           where: {doctor_id: id}
         })
+        return res.status(200).json({
+          msg: "Doctor was removed successfully.",
+        });
       }
       else{
         return res.status(500).json({
