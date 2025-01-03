@@ -209,8 +209,6 @@ const getAppointmentByID = async (data, req, res, next) => {
 };
 
 const createAppointment = async (req, res) => {
-  const force_create = req.body.force_create ? req.body.force_create : false;
-
   const bookingRec = await Booking.findByPk(req.body.booking_id);
 
   const service = await Service.findByPk(bookingRec.service_id);
@@ -250,49 +248,28 @@ const createAppointment = async (req, res) => {
       appoint_id = appointDoctor.id;
     }
   } else {
-    if (!force_create) {
-      if (
-        doctorAppointmentTimeAvailable(
-          appointment_values.doctor_id,
-          appointment_values.date,
-          appointment_values.appointment_time
-        ) == false
-      ) {
-        return {
-          appointment: null,
-          success: 0,
-          msg: "Doctor isn't available during this time",
-          error_type: 1, // Xác định kiểu lỗi: tạo pop-up lỗi, k có xác nhận nào khác
-          previous_request: req,
-        };
-      }
+    if (
+      doctorAppointmentTimeAvailable(
+        appointment_values.doctor_id,
+        appointment_values.date,
+        appointment_values.appointment_time
+      ) == false
+    ) {
+      return {
+        appointment: null,
+        success: 0,
+        msg: "Doctor isn't available during this time",
+      };
+    }
 
-      if (
-        getDoctorAppointmentNumber(
-          appointment_values.doctor_id,
-          appointment_values.date
-        ) > appointment_number_threshold
-      ) {
-        return {
-          appointment: null,
-          success: 0,
-          msg: "Doctor has too many appointments in this day",
-          error_type: 2, // Xác định kiểu lỗi, tạo pop-up lỗi yêu cầu xác nhận tạo appointment hay k
-          previous_request: null,
-        };
-      }
-
-      if (
-        !checkDoctorServiceCompatible(service.id, appointment_values.doctor_id)
-      ) {
-        return {
-          appointment: null,
-          success: 0,
-          msg: "Doctor is not available for this service",
-          error_type: 1,
-          previous_request: null,
-        };
-      }
+    if (
+      !checkDoctorServiceCompatible(service.id, appointment_values.doctor_id)
+    ) {
+      return {
+        appointment: null,
+        success: 0,
+        msg: "Doctor is not available for this service",
+      };
     }
     appoint_id = appointment_values.doctor_id;
   }
@@ -311,8 +288,6 @@ const createAppointment = async (req, res) => {
       appointment: null,
       success: 0,
       msg: "No available doctors",
-      error_type: 1,
-      previous_request: null,
     };
   else {
     appointment_values.doctor_id = appoint_id;
@@ -325,16 +300,12 @@ const createAppointment = async (req, res) => {
       appointment: null,
       success: 0,
       msg: "Create appointment failed",
-      error_type: 1,
-      previous_request: null,
     };
 
   return {
     appointment: appointment,
     success: 1,
     msg: "Appointment has been created!",
-    error_type: null,
-    previous_request: null,
   };
 };
 

@@ -1,4 +1,5 @@
 const Booking = require("../models/booking.model");
+const Appointment = require("../models/appointment.model");
 const Service = require("../models/service.model");
 const Patient = require("../models/patient.model");
 const jwt = require("jsonwebtoken");
@@ -12,6 +13,7 @@ const {
 } = require("../controllers/notification.controller");
 const { Op } = require("sequelize");
 const defaultSize = 1000000;
+
 
 const createBooking = async (result, req, res, next) => {
   try {
@@ -55,6 +57,39 @@ const createBooking = async (result, req, res, next) => {
       update_at: Date.now(),
       status: booking_status.PROCESSING,
     };
+
+    if (
+      doctorAppointmentTimeAvailable(
+        request.doctor_id,
+        request.appointment_date,
+        request.appointment_hour
+      ) == false
+    ) {
+      return {
+        success: 0,
+        msg: "Doctor isn't available during this time",
+      };
+    }
+
+    // if (
+    //   getDoctorAppointmentNumber(request.doctor_id, request.appointment_date) >
+    //   appointment_number_threshold
+    // ) {
+    //   return {
+    //     success: 0,
+    //     msg: "Doctor has too many appointments in this day",
+    //   };
+    // }
+
+    if (
+      !checkDoctorServiceCompatible(service.id, appointment_values.doctor_id)
+    ) {
+      return {
+        success: 0,
+        msg: "Doctor is not available for this service",
+      };
+    }
+
     const data = await Booking.create(request);
     if (!data) {
       return res.status(500).json({
