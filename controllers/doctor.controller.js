@@ -12,6 +12,8 @@ const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { active: 1 };
 
+const appointment_number_threshold = 20;
+
 const getDoctorAll = (info, req, res, next) => {
   const size = parseInt(req.query.size);
   const page = parseInt(req.query.page);
@@ -186,13 +188,15 @@ const updateDoctor = (req, res) => {
       req.body.selectionServices.forEach((item) => {
         DoctorService.create({
           doctor_id: id,
-          service_id: item
-        }).then((data) => {
-          // console.log(data);
-        }).catch((e) => {
-          console.log(e);
+          service_id: item,
         })
-      })
+          .then((data) => {
+            // console.log(data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      });
       return res.status(200).json({
         result: 1,
         data: return_data ? return_data : [],
@@ -209,22 +213,22 @@ const updateDoctor = (req, res) => {
 const deleteDoctor = async (req, res) => {
   const id = req.params.id;
   const appointmentWithDoctor = await Appointment.findOne({
-    where: {doctor_id: id}
-  })
+    where: { doctor_id: id },
+  });
   const bookingWithDoctor = await Booking.findOne({
-    where: {doctor_id: id}
-  })
-  if(appointmentWithDoctor){
+    where: { doctor_id: id },
+  });
+  if (appointmentWithDoctor) {
     return res.status(400).json({
       result: 0,
-      msg: "Cannot delete doctor because doctor is assigned in appointment"
-    })
+      msg: "Cannot delete doctor because doctor is assigned in appointment",
+    });
   }
-  if(bookingWithDoctor){
+  if (bookingWithDoctor) {
     return res.status(400).json({
       result: 0,
-      msg: "Cannot delete doctor because doctor is having booking"
-    })
+      msg: "Cannot delete doctor because doctor is having booking",
+    });
   }
   Doctor.update(
     { active: 0 },
@@ -232,16 +236,15 @@ const deleteDoctor = async (req, res) => {
       where: { id: id, active: 1 },
     }
   )
-    .then( async (data) => {
-      if (data == 1){
+    .then(async (data) => {
+      if (data == 1) {
         await DoctorService.destroy({
-          where: {doctor_id: id}
-        })
+          where: { doctor_id: id },
+        });
         return res.status(200).json({
           msg: "Doctor was removed successfully.",
         });
-      }
-      else{
+      } else {
         return res.status(500).json({
           msg: `Cannot remove Doctor with id=${id}`,
         });
@@ -297,47 +300,61 @@ const getAllDoctorsBySpecialityId = async (info, req, res, next) => {
 
 const getAllDoctorsByServiceId = async (info, req, res, next) => {
   const serviceId = req.params.id;
+  const date = req.query.date;
   try {
     const data = await DoctorService.findAll({
       where: { service_id: serviceId },
     });
     // return res.json(data);
     if (data) {
-      const returnData = await Promise.all(
+      var returnData = await Promise.all(
         data.map(async (item) => {
           try {
             const result = await Doctor.findOne({
-              where: { id: item.doctor_id },
+              where: { id: item.doctor_id, active: 1 },
             });
-            const speciality = await Speciality.findOne({
-              where: { id: result.speciality_id },
-            });
-            return {
-              id: result.id,
-              email: result.email,
-              phone: result.phone,
-              name: result.name,
-              description: result.description,
-              price: result.price,
-              role: result.role,
-              active: result.active,
-              avatar: result.avatar,
-              create_at: result.create_at,
-              update_at: result.update_at,
-              speciality: speciality,
-              recovery_token: result.recovery_token,
-            };
+            if (result) {
+              const speciality = await Speciality.findOne({
+                where: { id: result.speciality_id },
+              });
+              const appointment_number = await getDoctorAppointmentNumber(
+                result.id,
+                date
+              );
+
+              return {
+                id: result.id,
+                email: result.email,
+                phone: result.phone,
+                name: result.name,
+                description: result.description,
+                price: result.price,
+                role: result.role,
+                active: result.active,
+                avatar: result.avatar,
+                create_at: result.create_at,
+                update_at: result.update_at,
+                speciality: speciality,
+                recovery_token: result.recovery_token,
+                appointment_number: appointment_number,
+                available_status:
+                  appointment_number > appointment_number_threshold
+                    ? "Nhiều lịch đặt"
+                    : "",
+              };
+            }
           } catch (e) {
             console.log(e);
             return null; // Trả về null nếu có lỗi
           }
         })
       );
+      returnData = returnData.filter((item) => item !== undefined);
       return res.status(200).json({
         result: 1,
         msg: "Get all doctors by service successfully",
         quantity: returnData.length,
-        data: returnData,
+        data: returnData ? returnData : [],
       });
     } else {
       return res.status(500).json({
@@ -351,6 +368,17 @@ const getAllDoctorsByServiceId = async (info, req, res, next) => {
       msg: `Error with ${e}`,
     });
   }
+};
+
+const getDoctorAppointmentNumber = async (doctor_id, date) => {
+  if (date == null) return 0;
+  const appointmentNumber = await Appointment.count({
+    where: {
+      doctor_id: doctor_id,
+      date: date,
+    },
+  });
+  return appointmentNumber;
 };
 
 module.exports = {

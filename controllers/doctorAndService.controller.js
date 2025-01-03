@@ -13,9 +13,12 @@ const defaultSort = "id";
 const defaultDirection = "ASC";
 const condition_active = { active: 1 };
 
+const appointment_number_threshold = 20;
+
 const getDoctorsFromServiceId = async (req, res) => {
   const size = parseInt(req.query.size);
   const page = parseInt(req.query.page);
+  const date = parseInt(req.query.date);
   const id = req.params.id;
 
   const limit = size ? size : defaultSize;
@@ -43,6 +46,11 @@ const getDoctorsFromServiceId = async (req, res) => {
           ).data;
           const room = await Room.findByPk(element.dataValues.room_id).data;
 
+          var appointment_number = await getDoctorAppointmentNumber(
+            element.dataValues.id,
+            date
+          );
+
           return {
             id: element.dataValues.id,
             email: element.dataValues.email,
@@ -59,6 +67,8 @@ const getDoctorsFromServiceId = async (req, res) => {
             recovery_token: element.dataValues.recovery_token,
             speciality_id: speciality ? speciality.data : null,
             room_id: room ? room.data : null,
+            appointment_number: appointment_number,
+            available_status: appointment_number > appointment_number_threshold ? "Nhiều lịch đặt" : ""
           };
         })
       );
@@ -212,6 +222,16 @@ const checkDoctorServiceCompatible = async (service_id, doctor_id) => {
       msg: e.message,
     });
   }
+};
+
+const getDoctorAppointmentNumber = async (doctor_id, date) => {
+  const appointmentNumber = await Appointment.count({
+    where: {
+      doctor_id: doctor_id,
+      date: date,
+    },
+  });
+  return appointmentNumber;
 };
 
 module.exports = {
