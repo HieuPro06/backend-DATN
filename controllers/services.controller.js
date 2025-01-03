@@ -62,9 +62,11 @@ const getServiceById = async (data, req, res, next) => {
 const createService = async (req, res) => {
   try {
     const request = {
-      name: req.body.name,
+      name: req.body.name.trim(),
       description: req.body.description ?? "",
       image: req.body.image ?? "",
+      speciality_id: req.body.speciality_id,
+      room_id: req.body.room_id
     };
     const isExistServiceName = await Service.findOne({
       where: { name: request.name },
@@ -99,9 +101,9 @@ const updateService = async (req, res) => {
   try {
     const id = req.params.id;
     const existNameService = await Service.findOne({
-      where: {name: req.body.name}
+      where: {name: req.body.name.trim()}
     })
-    if(existNameService && existNameService.id !== id){
+    if(existNameService && existNameService.id !== parseInt(id)){
       return res.status(400).json({
         result: 0,
         msg: "This service is exist"
