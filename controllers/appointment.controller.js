@@ -6,6 +6,9 @@ const Speciality = require("../models/speciality.model");
 const { appointment_status } = require("../enum");
 const DoctorAndService = require("../models/doctorAndService.model.js");
 const Booking = require("../models/booking.model.js");
+const {
+  createNotification,
+} = require("../controllers/notification.controller");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -18,8 +21,9 @@ const defaultDirection = "ASC";
 const condition_active = { status: appointment_status.PROCESSING };
 const { Op } = require("sequelize");
 const Service = require("../models/service.model.js");
-
-const appointment_number_threshold = 20;
+const cron = require("node-cron");
+const Patient = require("../models/patient.model.js");
+const moment = require("moment");
 
 const getAppointmentAll = async (data, req, res, next) => {
   const token = jwt.decode(data);
@@ -48,14 +52,14 @@ const getAppointmentAll = async (data, req, res, next) => {
                 where: { id: doctor.speciality_id },
               });
               const appointment_record = await AppointmentRecord.findOne({
-                where: {appointment_id: item.id}
-              })
+                where: { appointment_id: item.id },
+              });
               if (doctor) {
                 // console.log(doctor)
                 return {
                   ...item.dataValues,
                   speciality: speciality,
-                  appointment_record: appointment_record
+                  appointment_record: appointment_record,
                 };
               }
             })
@@ -91,14 +95,14 @@ const getAppointmentAll = async (data, req, res, next) => {
                 where: { id: doctor.speciality_id },
               });
               const appointment_record = await AppointmentRecord.findOne({
-                where: {appointment_id: item.id}
-              })
+                where: { appointment_id: item.id },
+              });
               if (doctor) {
                 return {
                   ...item.dataValues,
                   speciality: speciality,
                   doctor: doctor,
-                  appointment_record: appointment_record
+                  appointment_record: appointment_record,
                 };
               }
             })
@@ -317,17 +321,35 @@ const createAppointment = async (req, res) => {
   };
 };
 
-const updateAppointment = (info, req, res, next) => {
+const updateAppointment = async (info, req, res, next) => {
   const id = req.params.id;
+  const appointment = await Appointment.findByPk(id);
+  old_status = appointment ? appointment.status : null;
+  new_status = req.body.status ? req.body.status : null;
   Appointment.update(req.body, {
     where: { id: id },
   })
-    .then((data) => {
-      if (data == 1)
+    .then(async (data) => {
+      if (data == 1) {
+        // if (
+        //   old_status == appointment_status.PROCESSING ||
+        //   old_status == appointment_status.EXAMINATING
+        // ) {
+        //   if (new_status == appointment_status.DONE) {
+
+        //     await createNotification(user.id, {
+        //       message: `Your appointment at with ${}`,
+        //       record_type: "booking",
+        //       record_id: data.id,
+        //     });
+        //   }
+        // }
+
         return res.status(200).json({
           result: 1,
           msg: "Appointment was updated successfully.",
         });
+      }
     })
     .catch((err) => {
       return res.status(500).json({
@@ -444,6 +466,73 @@ const orderAppointments = async (req, res) => {
     }
   }
 };
+
+// Your existing function, modified or new, to be executed by the cron job
+const checkComingAppointments = async () => {
+  console.log("Running cron job to check for upcoming appointments...");
+
+  try {
+    const currentDate = moment(); // Get current date and time
+
+    // Dates and times for checking (2 days, 1 day, and 2 hours before)
+    const twoDaysAfter = moment().add(2, "days").format("YYYY/MM/DD");
+    const oneDayAfter = moment().add(1, "days").format("YYYY/MM/DD");
+
+    // Query appointments that are due in the next 2 days, 1 day, or 2 hours
+    const appointments = await Appointment.findAll({
+      where: {
+        status: appointment_status.PROCESSING, // Only consider appointments that are in processing
+      },
+    });
+
+    // Loop through each appointment and create notifications
+    for (const appointment of appointments) {
+      // Combine the appointment's date and time strings into a full date-time string
+      const appointmentDateString = `${appointment.date}`;
+
+      const doctor = await Doctor.findByPk(appointment.doctor_id);
+      const user = await Patient.findByPk(appointment.patient_id);
+
+      // Parse the date-time string into a moment object
+      const appointmentDateTime = moment(appointmentDateString, "YYYY/MM/DD");
+
+      // Check if the appointment is due within 2 days, 1 day, or 2 hours
+      if (
+        appointmentDateTime.isSame(twoDaysAfter) ||
+        appointmentDateTime.isSame(oneDayAfter) ||
+        appointmentDateTime.isSame(currentDate)
+      ) {
+        var timeDue = null;
+        if (appointmentDateTime.isSame(twoDaysAfter)) {
+          timeDue = "2 days";
+        }
+        if (appointmentDateTime.isSame(oneDayAfter)) {
+          timeDue = "1 day";
+        }
+        if (appointmentDateTime.isSame(twoHoursAfter)) {
+          timeDue = "today";
+        }
+        const message = `Your appointment with Doctor ${doctor.name} is due ${timeDue} on ${appointment.appointment_time} ${appointment.date}.`;
+        await createNotification(user?.id, {
+          message: message,
+          record_type: "appointment",
+          record_id: appointment.id,
+        });
+      }
+    }
+
+    console.log("Cron job completed successfully!");
+  } catch (e) {
+    console.error("Error during cron job:", e);
+  }
+};
+
+// Add the cron job (running every day at midnight)
+cron.schedule("0 0 * * *", async () => {
+  await checkComingAppointments();
+  // You can schedule this cron to run at any specific time, here it runs daily at midnight
+  console.log("Cron job triggered at midnight!");
+});
 
 module.exports = {
   getAppointmentAll,

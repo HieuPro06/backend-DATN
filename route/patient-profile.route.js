@@ -33,7 +33,7 @@ PatientProfileRouter.put(
   "/avatar/:id",
   upload.single("file"),
   isLogInController,
-  changeAvatarAndroidPatientController
+  changeAvatarPatientController
 );
 
 module.exports = PatientProfileRouter;
