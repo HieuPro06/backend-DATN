@@ -52,11 +52,11 @@ const getAppointmentAll = async (data, req, res, next) => {
                 where: { id: doctor.speciality_id },
               });
               const room = await Room.findOne({
-                where: {id: item.room_id}
-              })
+                where: { id: item.room_id },
+              });
               const service = await Service.findOne({
-                where: {room_id: room.id}
-              })
+                where: { room_id: room.id },
+              });
               const appointment_record = await AppointmentRecord.findOne({
                 where: { appointment_id: item.id },
               });
@@ -66,7 +66,7 @@ const getAppointmentAll = async (data, req, res, next) => {
                   speciality: speciality,
                   appointment_record: appointment_record,
                   room: room,
-                  service: service
+                  service: service,
                 };
               }
             })
@@ -105,11 +105,11 @@ const getAppointmentAll = async (data, req, res, next) => {
                 where: { appointment_id: item.id },
               });
               const room = await Room.findOne({
-                where: {id: item.room_id}
-              })
+                where: { id: item.room_id },
+              });
               const service = await Service.findOne({
-                where: {room_id: item.room_id}
-              })
+                where: { room_id: item.room_id },
+              });
               if (doctor) {
                 return {
                   ...item.dataValues,
@@ -117,7 +117,7 @@ const getAppointmentAll = async (data, req, res, next) => {
                   doctor: doctor,
                   appointment_record: appointment_record,
                   room: room,
-                  service: service
+                  service: service,
                 };
               }
             })
@@ -202,7 +202,7 @@ const getAppointmentByID = async (data, req, res, next) => {
     try {
       const appointment = await Appointment.findByPk(id);
       const appoitmentQueue = await Appointment.findAll({
-        where: { doctor_id: appointment.doctor_id },
+        where: { doctor_id: appointment.doctor_id, date: appointment.date },
       });
       if (appointment && appoitmentQueue) {
         const doctor = await Doctor.findOne({
@@ -347,19 +347,34 @@ const updateAppointment = async (info, req, res, next) => {
   })
     .then(async (data) => {
       if (data == 1) {
-        // if (
-        //   old_status == appointment_status.PROCESSING ||
-        //   old_status == appointment_status.EXAMINATING
-        // ) {
-        //   if (new_status == appointment_status.DONE) {
+        if (old_status == appointment_status.PROCESSING) {
+          if (new_status == appointment_status.EXAMINATING) {
+            const next_appointment = await Appointment.findAll({
+              where: {
+                position: {
+                  [Op.gt]: appointment.position,
+                },
+                date: appointment.date,
+              },
+              order: [["position", "ASC"]],
+              limit: 1,
+            });
 
-        //     await createNotification(user.id, {
-        //       message: `Your appointment at with ${}`,
-        //       record_type: "booking",
-        //       record_id: data.id,
-        //     });
-        //   }
-        // }
+            if (next_appointment[0]) {
+              const doctor = await Doctor.findByPk(
+                next_appointment[0].doctor_id
+              );
+              const user = await Patient.findByPk(
+                next_appointment[0].patient_id
+              );
+              await createNotification(user?.id, {
+                message: `Chú ý, lịch khám lúc ${next_appointment[0].appointment_time} ngày ${next_appointment[0].date} với bác sĩ ${doctor?.name} sắp tới giờ`,
+                record_type: "appointment",
+                record_id: next_appointment[0].id,
+              });
+            }
+          }
+        }
 
         return res.status(200).json({
           result: 1,
@@ -520,15 +535,15 @@ const checkComingAppointments = async () => {
       ) {
         var timeDue = null;
         if (appointmentDateTime.isSame(twoDaysAfter)) {
-          timeDue = "2 days";
+          timeDue = "2 ngày";
         }
         if (appointmentDateTime.isSame(oneDayAfter)) {
-          timeDue = "1 day";
+          timeDue = "1 ngày";
         }
         if (appointmentDateTime.isSame(twoHoursAfter)) {
-          timeDue = "today";
+          timeDue = "hôm nay";
         }
-        const message = `Your appointment with Doctor ${doctor.name} is due ${timeDue} on ${appointment.appointment_time} ${appointment.date}.`;
+        const message = `Lịch khám của bạn với bác sĩ ${doctor.name} sắp tới trong ${timeDue} vào lúc ${appointment.appointment_time} ngày ${appointment.date}.`;
         await createNotification(user?.id, {
           message: message,
           record_type: "appointment",
