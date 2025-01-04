@@ -5,6 +5,7 @@ const DoctorService = require("../models/doctorAndService.model");
 const Booking = require("../models/booking.model");
 const Appointment = require("../models/appointment.model");
 const dotenv = require("dotenv");
+const Service = require("../models/service.model.js");
 dotenv.config();
 
 const defaultSize = 100;
@@ -35,6 +36,10 @@ const getDoctorAll = (info, req, res, next) => {
             element.dataValues.speciality_id
           );
 
+          const service_doctor = await DoctorService.findAll({
+            where: { doctor_id: element.dataValues.id },
+          });
+
           return {
             id: element.dataValues.id,
             email: element.dataValues.email,
@@ -51,6 +56,22 @@ const getDoctorAll = (info, req, res, next) => {
             recovery_token: element.dataValues.recovery_token,
             speciality_id: speciality ? speciality.dataValues.id : null,
             speciality_name: speciality ? speciality.dataValues.name : "",
+            services: await Promise.all(
+              service_doctor.map(async (pair) => {
+                const service = await Service.findByPk(
+                  pair.dataValues.service_id
+                );
+                if (service)
+                  return {
+                    id: service.dataValues.id,
+                    name: service.dataValues.name,
+                    image: service.dataValues.image,
+                    room_id: service.dataValues.room_id,
+                    speciality_id: service.dataValues.speciality_id,
+                  };
+                return null;
+              })
+            ),
           };
         })
       );
@@ -261,39 +282,62 @@ const getAllDoctorsBySpecialityId = async (info, req, res, next) => {
   const specialityId = req.params.id;
   try {
     const data = await Doctor.findAll({
-      where: { speciality_id: specialityId },
+      where: { speciality_id: specialityId, role: "doctor", active: 1 },
     });
+    // return res.json(data);
     if (data) {
-      const speciality = await Speciality.findOne({
-        where: { id: specialityId },
-      });
+      var returnData = await Promise.all(
+        data.map(async (item) => {
+          try {
+            const speciality = await Speciality.findByPk(specialityId);
+            // const appointment_number = await getDoctorAppointmentNumber(
+            //   item.id,
+            //   date
+            // );
+
+            return {
+              id: item.id,
+              email: item.email,
+              phone: item.phone,
+              name: item.name,
+              description: item.description,
+              price: item.price,
+              role: item.role,
+              active: item.active,
+              avatar: item.avatar,
+              create_at: item.create_at,
+              update_at: item.update_at,
+              speciality: speciality,
+              recovery_token: item.recovery_token,
+              // appointment_number: appointment_number,
+              // available_status:
+              //   appointment_number > appointment_number_threshold
+              //     ? "Nhiều lịch đặt"
+              //     : "",
+            };
+          } catch (e) {
+            console.log(e);
+            return null; // Trả về null nếu có lỗi
+          }
+        })
+      );
+      returnData = returnData.filter((item) => item !== undefined);
       return res.status(200).json({
         result: 1,
-        msg: "Get all doctor by speciality successfully",
-        quantity: data.length,
-        data: data.map((item) => {
-          return {
-            id: item.id,
-            email: item.email,
-            phone: item.phone,
-            name: item.name,
-            description: item.description,
-            price: item.price,
-            role: item.role,
-            active: item.active,
-            avatar: item.avatar,
-            create_at: item.create_at,
-            update_at: item.update_at,
-            speciality: speciality,
-            recovery_token: item.recovery_token,
-          };
-        }),
+        msg: "Get all doctors by speciality successfully",
+        quantity: returnData.length,
+        data: returnData ? returnData : [],
+      });
+    } else {
+      return res.status(500).json({
+        result: 0,
+        msg: "This speciality does not have any doctor",
       });
     }
   } catch (e) {
     return res.status(500).json({
       result: 0,
-      msg: "Get all doctor failed",
+      msg: `Error with ${e}`,
     });
   }
 };
@@ -311,8 +355,9 @@ const getAllDoctorsByServiceId = async (info, req, res, next) => {
         data.map(async (item) => {
           try {
             const result = await Doctor.findOne({
-              where: { id: item.doctor_id, active: 1 },
+              where: { id: item.doctor_id, active: 1, role: "doctor" },
             });
+
             if (result) {
               const speciality = await Speciality.findOne({
                 where: { id: result.speciality_id },

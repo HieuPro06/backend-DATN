@@ -14,7 +14,6 @@ const {
 const { Op } = require("sequelize");
 const defaultSize = 1000000;
 
-
 const createBooking = async (result, req, res, next) => {
   try {
     const payload = jwt.decode(result);
@@ -105,8 +104,7 @@ const createBooking = async (result, req, res, next) => {
         });
       }
       await createNotification(user.id, {
-        message: `Congratulations, ${user?.name} ! You successfully created the booking at ${request.appointment_date} ${request.appointment_hour}
-      Please await further appovements from our staff`,
+        message: `Xin chúc mừng, ${user?.name} ! Bạn đã thành công đặt lịch hẹn ngày ${request.appointment_date} vào lúc ${request.appointment_hour}\nLịch hẹn của bạn sẽ được chúng tôi xem xét phê duyệt, vui lòng chờ`,
         record_type: "booking",
         record_id: data.id,
       });
@@ -471,8 +469,7 @@ const confirmBooking = async (req, res) => {
           const user = await Patient.findByPk(booking.patient_id);
           if (data == 1) {
             await createNotification(user?.id, {
-              message: `Congratulations, ${user?.name} ! Your booking at ${booking.appointment_date} ${booking.appointment_hour} has been approved
-              Please remember to come on time for your appointment`,
+              message: `Xin chúc mừng, ${user?.name} ! Lịch hẹn vào lúc ${booking.appointment_date} ${booking.appointment_hour} đã được chúng tôi xác nhận\nXin hãy vui lòng sắp xếp thời gian để tới khám đúng lịch`,
               record_type: "appointment",
               record_id: appointment.id,
             });

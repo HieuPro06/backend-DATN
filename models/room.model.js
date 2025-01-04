@@ -10,7 +10,7 @@ const Room = sequelize.define(
       primaryKey: true,
     },
     name: {
-      type: DataTypes.STRING(15),
+      type: DataTypes.STRING(255),
       allowNull: true,
     },
     location: {

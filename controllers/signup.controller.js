@@ -8,7 +8,6 @@ const SignupController = async (req, res) => {
   const salt = 10;
   /* Đăng kí bên web - doctor */
   try {
-    console.log(req.body.type);
     if (req.body.type !== "patient") {
       const request = {
         email: req.body.email,
@@ -23,8 +22,8 @@ const SignupController = async (req, res) => {
         avatar: "", // Default avatar is empty string
         create_at: req.body.create_at ?? new Date(), // Default to current date if not provided
         update_at: req.body.update_at ?? new Date(), // Default to current date if not provided
-        speciality_id: 1, // Default speciality 1
-        room_id: 1, // Default room 1
+        speciality_id: null, // Default speciality 1
+        room_id: null, // Default room 1
       };
       /* Kiểm tra xem email và số điện thoại đã được dùng chưa */
       const existEmail = await Doctor.findOne({
