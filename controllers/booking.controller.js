@@ -12,6 +12,7 @@ const {
   createNotification,
 } = require("../controllers/notification.controller");
 const { Op } = require("sequelize");
+const Doctor = require("../models/doctor.model");
 const defaultSize = 1000000;
 
 const createBooking = async (result, req, res, next) => {
@@ -320,6 +321,7 @@ const readBookingById = async (data, req, res, next) => {
           where: { id: requestBooking?.service_id },
         });
       }
+      const doctor = await Doctor.findByPk(requestBooking.doctor_id);
       return res.status(200).json({
         result: 1,
         msg: "Action successfully !",
@@ -327,6 +329,13 @@ const readBookingById = async (data, req, res, next) => {
           id: requestBooking.id,
           booking_name: requestBooking.booking_name,
           booking_phone: requestBooking.booking_phone,
+          doctor: doctor
+            ? {
+                id: doctor.id,
+                name: doctor.name,
+                avatar: doctor.avatar,
+              }
+            : null,
           name: requestBooking.name,
           gender: requestBooking.gender,
           birthday: requestBooking.birthday,
@@ -357,6 +366,7 @@ const readBookingById = async (data, req, res, next) => {
             where: { id: requestBooking?.service_id },
           });
         }
+        const doctor = await Doctor.findByPk(requestBooking.doctor_id);
         return res.status(200).json({
           result: 1,
           msg: "Action successfully !",
@@ -364,6 +374,13 @@ const readBookingById = async (data, req, res, next) => {
             id: requestBooking.id,
             booking_name: requestBooking.booking_name,
             booking_phone: requestBooking.booking_phone,
+            doctor: doctor
+              ? {
+                  id: doctor.id,
+                  name: doctor.name,
+                  avatar: doctor.avatar,
+                }
+              : null,
             name: requestBooking.name,
             gender: requestBooking.gender,
             birthday: requestBooking.birthday,
