@@ -4,6 +4,7 @@ const Service = require("../models/service.model");
 const Patient = require("../models/patient.model");
 const Speciality = require("../models/speciality.model");
 const Room = require("../models/room.model");
+const BookingPhoto = require("../models/bookingPhoto.model");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -238,6 +239,9 @@ const readAllBooking = async (data, req, res, next) => {
             const speciality = await Speciality.findOne({
               where: {id: findService.speciality_id}
             })
+            const booking_photos = await BookingPhoto.findAll({
+              where: {booking_id: item.id}
+            })
             return {
               id: item.id,
               doctor_id: item.doctor_id,
@@ -260,7 +264,8 @@ const readAllBooking = async (data, req, res, next) => {
               patient: patient,
               doctor: doctor,
               room: room,
-              speciality: speciality
+              speciality: speciality,
+              booking_photo: booking_photos
             };
           })
         ),
