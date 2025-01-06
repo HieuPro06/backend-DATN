@@ -39,6 +39,38 @@ const getDoctorAll = (info, req, res, next) => {
           const service_doctor = await DoctorService.findAll({
             where: { doctor_id: element.dataValues.id },
           });
+          var services = await Promise.all(
+            service_doctor.map(async (pair) => {
+              const service = await Service.findByPk(
+                pair.dataValues.service_id
+              );
+              if (service)
+                return {
+                  id: service.dataValues.id,
+                  name: service.dataValues.name,
+                  image: service.dataValues.image,
+                  room_id: service.dataValues.room_id,
+                  speciality_id: service.dataValues.speciality_id,
+                };
+              return null;
+            })
+          );
+
+          var rooms = await Promise.all(
+            services.map(async (item) => {
+              if (item) {
+                const room = await Room.findByPk(item.room_id);
+                if (room)
+                  return {
+                    id: room.dataValues.id,
+                    name: room.dataValues.name,
+                    location: room.dataValues.location,
+                    speciality_id: room.dataValues.speciality_id,
+                  };
+              }
+              return null;
+            })
+          );
 
           return {
             id: element.dataValues.id,
@@ -56,22 +88,8 @@ const getDoctorAll = (info, req, res, next) => {
             recovery_token: element.dataValues.recovery_token,
             speciality_id: speciality ? speciality.dataValues.id : null,
             speciality_name: speciality ? speciality.dataValues.name : "",
-            services: await Promise.all(
-              service_doctor.map(async (pair) => {
-                const service = await Service.findByPk(
-                  pair.dataValues.service_id
-                );
-                if (service)
-                  return {
-                    id: service.dataValues.id,
-                    name: service.dataValues.name,
-                    image: service.dataValues.image,
-                    room_id: service.dataValues.room_id,
-                    speciality_id: service.dataValues.speciality_id,
-                  };
-                return null;
-              })
-            ),
+            services: services.filter((item) => item !== null),
+            rooms: rooms.filter((item) => item !== null),
           };
         })
       );
