@@ -114,6 +114,7 @@ const getAllAppointmentRecords = async (info, req, res, next) => {
         });
         const result = await Promise.all(
           appointments.map(async (item) => {
+            console.log(item.date);
             const kq = await AppointmentRecord.findOne({
               limit: limit,
               offset: offset,
@@ -159,7 +160,7 @@ const getAllAppointmentRecords = async (info, req, res, next) => {
                 ...item.dataValues,
                 patient_name: appointment.patient_name,
                 numerical_order: appointment.numerical_order,
-                date: item.date
+                date: appointment.date
               };
             }
           })

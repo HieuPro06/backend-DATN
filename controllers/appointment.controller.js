@@ -6,6 +6,7 @@ const Speciality = require("../models/speciality.model");
 const { appointment_status } = require("../enum");
 const DoctorAndService = require("../models/doctorAndService.model.js");
 const Booking = require("../models/booking.model.js");
+const BookingPhoto = require("../models/bookingPhoto.model");
 const {
   createNotification,
 } = require("../controllers/notification.controller");
@@ -60,6 +61,9 @@ const getAppointmentAll = async (data, req, res, next) => {
               const appointment_record = await AppointmentRecord.findOne({
                 where: { appointment_id: item.id },
               });
+              const booking_photos = await BookingPhoto.findAll({
+                where: {booking_id: item.booking_id}
+              })
               if (doctor) {
                 return {
                   ...item.dataValues,
@@ -67,6 +71,7 @@ const getAppointmentAll = async (data, req, res, next) => {
                   appointment_record: appointment_record,
                   room: room,
                   service: service,
+                  booking_photo: booking_photos
                 };
               }
             })
@@ -110,6 +115,9 @@ const getAppointmentAll = async (data, req, res, next) => {
               const service = await Service.findOne({
                 where: { room_id: item.room_id },
               });
+              const booking_photos = await BookingPhoto.findAll({
+                where: {booking_id: item.booking_id}
+              })
               if (doctor) {
                 return {
                   ...item.dataValues,
@@ -118,6 +126,7 @@ const getAppointmentAll = async (data, req, res, next) => {
                   appointment_record: appointment_record,
                   room: room,
                   service: service,
+                  booking_photo: booking_photos
                 };
               }
             })

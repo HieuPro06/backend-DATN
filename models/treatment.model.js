@@ -22,7 +22,7 @@ const Treatment = sequelize.define(
       allowNull: true,
     },
     type: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(200),
       allowNull: true,
     },
     times: {
@@ -30,7 +30,7 @@ const Treatment = sequelize.define(
       allowNull: true,
     },
     purpose: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(250),
       allowNull: true,
     },
     instruction: {
@@ -42,7 +42,7 @@ const Treatment = sequelize.define(
       allowNull: true,
     },
     repeat_time: {
-      type: DataTypes.STRING(5),
+      type: DataTypes.STRING(255),
       allowNull: true,
     },
     drug_id: {

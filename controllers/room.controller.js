@@ -1,5 +1,6 @@
 const Room = require("../models/room.model");
 const Appointment  =  require("../models/appointment.model");
+const Speciality = require("../models/speciality.model");
 const Service = require("../models/service.model");
 const Doctor = require("../models/doctor.model");
 const dotenv = require("dotenv");
@@ -22,10 +23,21 @@ const getAllRooms = async (data, req, res, next) => {
         msg: "Error , Don't get rooms",
       });
     }
+    const returnData = await Promise.all(
+        result.map(async (item) => {
+          const speciality = await Speciality.findOne({
+            where: {id: item.speciality_id}
+          })
+          return {
+            ...item.dataValues,
+            speciality: speciality
+          }
+        })
+    )
     return res.status(200).json({
       result: 1,
       msg: "Get all rooms successfully",
-      data: result,
+      data: returnData,
     });
   } catch (e) {
     return res.status(500).json({

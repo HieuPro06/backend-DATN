@@ -1,5 +1,8 @@
 const Doctor = require("../models/doctor.model");
 const Patient = require("../models/patient.model");
+const DoctorAndService = require("../models/doctorAndService.model");
+const Room = require("../models/room.model");
+const Service = require("../models/service.model");
 const dotenv = require("dotenv");
 const bcrypt = require("bcrypt");
 // const base64Url = require("../utils/index");
@@ -20,7 +23,7 @@ const loginController = async (req, res) => {
         where: { email: request.email },
       });
       if (result) {
-        bcrypt.compare(request.password, result.password, (err, isMatch) => {
+        bcrypt.compare(request.password, result.password, async (err, isMatch) => {
           if (err) {
             return res.status(500).json({ msg: "Error comparing passwords" });
           }
@@ -51,6 +54,25 @@ const loginController = async (req, res) => {
           const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: "100h",
           });
+          // const data = Promise.all(result.map( async (item) => {
+          //   const services = await DoctorAndService.findAll({
+          //     where: {doctor_id: item.id}
+          //   })
+          //   const rooms = services.
+          // }))
+          const services = await DoctorAndService.findAll({
+            where: {doctor_id: result.id}
+          })
+          const rooms = await Promise.all(services.map(async (item) => {
+            const service = await Service.findOne({
+              where: {id: item.service_id}
+            })
+            const room = await Room.findOne({
+              where: {id: service.room_id}
+            })
+            return room;
+          }))
+          console.log(rooms);
           return res.status(200).json({
             result: 1,
             msg: "Login successfully",
@@ -67,6 +89,8 @@ const loginController = async (req, res) => {
               avatar: result.avatar,
               create_at: result.create_at,
               update_at: result.update_at,
+              service: services,
+              room: rooms
             },
           });
         });

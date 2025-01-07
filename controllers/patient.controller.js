@@ -33,7 +33,7 @@ const getPatientAll = (req, res) => {
     });
 };
 
-const getPatientById = (req, res) => {
+const getPatientById = (info,req, res,next) => {
   const id = req.params.id;
 
   Patient.findByPk(id)

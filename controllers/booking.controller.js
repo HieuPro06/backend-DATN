@@ -2,6 +2,9 @@ const Booking = require("../models/booking.model");
 const Appointment = require("../models/appointment.model");
 const Service = require("../models/service.model");
 const Patient = require("../models/patient.model");
+const Speciality = require("../models/speciality.model");
+const Room = require("../models/room.model");
+const BookingPhoto = require("../models/bookingPhoto.model");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -221,6 +224,24 @@ const readAllBooking = async (data, req, res, next) => {
                 where: { id: item?.service_id },
               });
             }
+            const patient = await Patient.findOne({
+              where: {id: item.patient_id}
+            })
+            const doctor = await Doctor.findOne({
+              where: {id: item.doctor_id}
+            })
+            const findService = await Service.findOne({
+              where: {id: item.service_id}
+            })
+            const room = await Room.findOne({
+              where: {id: findService.room_id}
+            })
+            const speciality = await Speciality.findOne({
+              where: {id: findService.speciality_id}
+            })
+            const booking_photos = await BookingPhoto.findAll({
+              where: {booking_id: item.id}
+            })
             return {
               id: item.id,
               doctor_id: item.doctor_id,
@@ -240,6 +261,11 @@ const readAllBooking = async (data, req, res, next) => {
                 name: service ? service.name : "",
                 image: service ? service.image : "",
               },
+              patient: patient,
+              doctor: doctor,
+              room: room,
+              speciality: speciality,
+              booking_photo: booking_photos
             };
           })
         ),
