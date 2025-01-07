@@ -139,7 +139,7 @@ const getAllTreatments = async (info, req, res, next) => {
                 ...item.dataValues,
                 patient_name: appointment.patient_name,
                 numerical_order: appointment.numerical_order,
-                date: item.date
+                date: appointment.date
               };
             }
           })
